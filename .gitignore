@@ -1,0 +1,13 @@
+build/
+logs/
+demos/
+python_env/
+tests/
+
+snake_game/
+mario_game/
+pacman_game/
+space_invaders/
+ai_videos.csv
+
+config.toml

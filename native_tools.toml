@@ -1,0 +1,113 @@
+#####################################
+### Send message
+#####################################
+[[instruction]]
+name = "send_message"
+description = "Send message to stdout"
+[[instruction.parameters]]
+name = "message"
+description = "Message to send as a plain text"
+
+#####################################
+### User input
+#####################################
+[[instruction]]
+name = "user_input"
+description = """Read a message from user. If you need to ask a user."""
+[[instruction.parameters]]
+name = "prompt"
+description = "prompt as a plain text"
+
+#####################################
+### Python script execution
+#####################################
+[[instruction]]
+name = "execute_python_script"
+description = """This is the python code interpreter.
+Use python script from response or generate a new one to execute.
+1. Always add to the code 'print' instruction to output result of code execution
+to the console, e.g. outputting variables important for understanding the result;
+2. Handle potential None or unexpected types in the Python code within the JSON;
+3. In JSON, all strings must be enclosed in double quotes, and any double quotes 
+within those strings must be escaped using a backslash (\");
+4. Ensure any backslashes in JSON string values are correctly escaped.
+This includes doubling them up (\\\\) or properly forming escape sequences for special characters."""
+[[instruction.parameters]]
+name = "script"
+description = "insert here python script as a plain text"
+[[instruction.parameters]]
+name = "dependencies"
+description = "dependencies separated by spaces need to be installed to execute the code"
+
+#####################################
+### Bash command execution
+#####################################
+[[instruction]]
+name = "execute_bash_command"
+description = """Bash command to execute.
+Call this instruction if you need to execute a bash command.
+Use the bash command from reponse in markdown syntax or generate a new one.
+1. Do strings with escape charactres and use double quotes;
+2. For http requests, if the url string has spaces, insert a '+' between words."""
+[[instruction.parameters]]
+name = "command"
+description = "insert bash command here as a plain text"
+
+#####################################
+### Read file
+#####################################
+[[instruction]]
+name = "read_file"
+description = """Read file and return content from it."""
+[[instruction.parameters]]
+name = "file_path"
+description = """Insert here path with filename. 
+Use a relative or absolute path if required.
+Consider the working directory."""
+
+#####################################
+### Write file
+#####################################
+[[instruction]]
+name = "write_file"
+description = """Create file and write content into it."""
+[[instruction.parameters]]
+name = "file_path"
+description = """Insert here path with filename. 
+Use a relative or absolute path if required.
+Consider the working directory."""
+[[instruction.parameters]]
+name = "content"
+description = "insert here content to write into file"
+
+#####################################
+### Append file
+#####################################
+[[instruction]]
+name = "append_file"
+description = """Append content to a file."""
+[[instruction.parameters]]
+name = "file_path"
+description = """Insert here path with filename. 
+Use a relative or absolute path if required.
+Consider the working directory."""
+[[instruction.parameters]]
+name = "content"
+description = "insert here content to append to a file"
+
+#####################################
+### Store in memory
+### Memory shared for all instructions/contexts
+#####################################
+[[instruction]]
+name = "memory"
+description = """Memorizing content as requested."""
+[[instruction.parameters]]
+name = "keyword"
+description = "insert relevant keyword here"
+[[instruction.parameters]]
+name = "description"
+description = "insert a brief description of the content here"
+[[instruction.parameters]]
+name = "content"
+description = "insert here content to memorize as a plain text"

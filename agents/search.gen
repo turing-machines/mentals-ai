@@ -1,0 +1,35 @@
+# root
+## use: duckduckgo
+
+Search in DuckDuckGo for hacker spaces in SF.
+Output the first 5 search results.
+
+# duckduckgo
+## use: execute_python_script
+## input: search query
+
+```python
+import requests
+from bs4 import BeautifulSoup
+
+def search_duckduckgo(query):
+    url = f'https://duckduckgo.com/html/?q={query}'
+    response = requests.get(url)
+    soup = BeautifulSoup(response.text, 'html.parser')
+    results = []
+    for result in soup.find_all('a', class_='result__a', limit=5):
+        title = result.get_text()
+        description = result.find_next('a', class_='result__snippet').get_text()
+        results.append({'title': title, 'description': description})
+    return results
+    
+query = 'insert here search query'
+results = search_duckduckgo(query)
+
+for result in results:
+    print(f\"Name: {result['title']}\")
+    print(f\"Description: {result['description']}\")
+    print()
+```
+
+Return results.

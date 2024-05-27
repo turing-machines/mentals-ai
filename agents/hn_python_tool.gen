@@ -1,0 +1,59 @@
+# root
+## use: fetch_hacker_news
+
+Output hacker news about self driving cars.
+
+# fetch_hacker_news
+## use: execute_python_script
+
+```python
+import requests
+
+def get_hacker_news_topics_by_theme(theme):
+    # Base URL for the Hacker News API
+    base_url = "https://hacker-news.firebaseio.com/v0"
+
+    # Get the top stories IDs
+    top_stories_url = f"{base_url}/topstories.json"
+    response = requests.get(top_stories_url)
+    top_story_ids = response.json()
+
+    # Function to get story details
+    def get_story_details(story_id):
+        story_url = f"{base_url}/item/{story_id}.json"
+        response = requests.get(story_url)
+        return response.json()
+
+    # Get details of the top stories
+    stories = [get_story_details(story_id) for story_id in top_story_ids[:100]]  # Limit to top 100 stories
+
+    # Filter stories by theme
+    filtered_stories = [story for story in stories if story and theme.lower() in story.get('title', '').lower()]
+
+    # Format and return the results
+    result = []
+    for story in filtered_stories:
+        result.append({
+            'title': story.get('title', 'No Title'),
+            'url': story.get('url', 'No URL'),
+            'score': story.get('score', 0),
+            'by': story.get('by', 'Unknown'),
+            'time': story.get('time', 0),
+            'text': story.get('text', 'No Content')
+        })
+    return result
+
+# Example usage
+theme = "Python"
+topics = get_hacker_news_topics_by_theme(theme)
+for topic in topics:
+    print(f"Title: {topic['title']}")
+    print(f"URL: {topic['url']}")
+    print(f"Score: {topic['score']}")
+    print(f"By: {topic['by']}")
+    print(f"Time: {topic['time']}")
+    print(f"Text: {topic['text']}")
+    print()
+```
+
+Execute script and `return` result.

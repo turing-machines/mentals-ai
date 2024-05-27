@@ -1,0 +1,31 @@
+# root
+## use: execute_python_script, send_message, researcher
+
+## keep_context: true
+
+1. Fetch top 3 stories and their content from Hacker News. 
+2. Message the top 3 stories and memorize to 'top_stories'.
+3. Call researcher.
+
+# researcher
+## use: writer
+
+1. From top_stories pick one and propose an unique angle to create content based on the selected story.
+2. Formulate the angle and call writer.
+
+# writer
+## use: critic
+
+You're a writer. Your job is to create compelling, insightful, and engaging 
+blog posts that will engage our audience. Limit post to 150 words.
+Add title. Add word count [word_count] and [revision #]. 
+Then call critic with article for review.
+Refine post based on feedback.
+
+# critic
+## use: write_file
+## keep_context: true
+
+Your job is to evaluate blog post. Your analysis should be thorough, constructive, and insightful, offering both praise for strengths and suggestions for improvement. Limit feedback to 150 words. Try to be brief and concise. 
+
+If you happy with the results and no more revisions needed: save final blog post to .md. 

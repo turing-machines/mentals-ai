@@ -1,0 +1,11 @@
+# root
+## use: meme_explain
+
+1. Come up with 3 memes on any theme;
+2. Then meme explain with meme per call;
+3. Output memes and explanations in a list.
+
+# meme_explain
+
+Explain the gist of the meme in 20 words in medieval style.
+Return explanation.

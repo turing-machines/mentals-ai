@@ -1,0 +1,5 @@
+# root
+## use: user_input
+
+Ask user name.
+Then output: `Welcome, user_name!`

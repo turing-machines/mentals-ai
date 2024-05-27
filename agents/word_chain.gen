@@ -1,0 +1,13 @@
+# root
+## use: send_message
+
+Play word chain game in a loop.
+
+RULES
+Come up with word that begin with the letter 
+that the previous word ended with.
+Words may not be repeated in the game.
+
+Each call send message: "Turn #counter: current_word"
+
+Complete game after turn 5.

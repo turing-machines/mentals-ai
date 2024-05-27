@@ -1,0 +1,26 @@
+{
+    "configurations": [
+        {
+            "name": "Linux",
+            "includePath": [
+                "${workspaceFolder}/**",
+                "${workspaceFolder}/liboai/include"
+            ],
+            "defines": [],
+            "compilerPath": "/usr/bin/gcc",
+            "cStandard": "c17",
+            "cppStandard": "gnu++17",
+            "intelliSenseMode": "linux-gcc-x64",
+            "forcedInclude": [],
+            "compilerArgs": [
+                "-std=c++20",
+                "-Wall",
+                "-Wextra",
+                "-Werror",
+                "-O3",
+                "-march=native"
+            ]
+        }
+    ],
+    "version": 4
+}

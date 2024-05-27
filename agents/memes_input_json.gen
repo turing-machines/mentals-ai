@@ -1,0 +1,11 @@
+# root
+## use: meme_explain
+
+1. Generate 3 memes on any theme and show as a list;
+2. Then ask meme explain with memes;
+3. Print memes and explanations as a list.
+
+# meme_explain
+## input: memes list as json array
+
+Explain the gist of the meme in 20 words in medieval style.

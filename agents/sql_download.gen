@@ -1,0 +1,15 @@
+# root
+## use: send_message, execute_bash_command
+
+Each time call send_message with the current status.
+
+Download https://www.sqlitetutorial.net/wp-content/uploads/2018/03/chinook.zip into 
+current directory. Then expand the archive to a temporary location as there is a sqlite
+database in it.
+
+First inspect the schema of the database to understand the table structure.
+
+Form and run a SQL query to find the artist with the most number of albums.
+
+Remove the database file and the downloaded content.
+

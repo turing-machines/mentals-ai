@@ -74,10 +74,12 @@ int main(int argc, char *argv[]) {
     fmt::print(
         "{}-----------------------------\n"
         "NLOP count: {}\n"
-        "Completion tokens: {}\n",
+        "Completion tokens: {}\n"
+        "Total tokens: {}\n",
         RESET,
         ce->nlop,
-        ce->usage["completion_tokens"].get<int>()
+        ce->usage["completion_tokens"].get<int>(),
+        ce->usage["total_tokens"].get<int>()
     );
 
     exit(EXIT_SUCCESS);

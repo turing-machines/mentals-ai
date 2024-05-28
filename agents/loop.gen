@@ -3,4 +3,4 @@
 
 Each call send message: "Iteration #current_number".
 
-After 3rd iteration output Hello world!
+After 3rd iteration message: Hello world!

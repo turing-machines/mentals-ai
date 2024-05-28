@@ -15,6 +15,7 @@ Requirements:
 - Don't use python virtual environment;
 - Project dir: {{project_dir}};
 - Use all textures from `assets/{{project_dir}}/textures` folder;
+- Don't copy textures;
 - Don't use sound effects.
 """
 
@@ -91,7 +92,7 @@ Return with the final answer: image1.png, image2.png are present in the images d
 
 
 # software_development
-## input: detailed software task to implement
+## input: one software task from GDD to implement
 ## use: send_message, write_file
 ## max_context: 5
 
@@ -102,18 +103,14 @@ Don't write into texture files.
 You don't do QA testing.
 Save files into {{project_dir}}.
 
-Build and output a detailed development plan based on the game design document.
 Apply all available assets in the game.
 
 Utilize Python’s built-in logging module instead of using print statements.
 Use try-except blocks to handle exceptions and ensure the program flow is not disrupted by errors.
 
-Strictly follow development tasks requirements.
-Do all development tasks in a loop: task by task.
-
 Always save python code you implement into main.py file.
 
-Return report with the completed tasks, don't output code.
+Return report with the completed task, don't output code.
 
 
 # quality_assurance

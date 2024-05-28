@@ -3,7 +3,7 @@ mario
 {{/project_dir}}
 
 # root
-## use: memory, project_manager
+## use: memory, execute_bash_command, project_manager
 
 **Create a Mario like game**
 

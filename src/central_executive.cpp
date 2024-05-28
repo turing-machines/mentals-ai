@@ -298,7 +298,7 @@ void CentralExecutive::apply_instruction_response(std::shared_ptr<liboai::Conver
     const std::string& result) {
 
     ///
-    std::string message = fmt::format("Return from instruction: '{}' with response: '{}'", name, result);
+    std::string message = fmt::format("Return from instruction: '{}' with response: {}", name, result);
     std::string response = content + "\n\n" + message;
     working_memory->AddAssistantData(response);
 }

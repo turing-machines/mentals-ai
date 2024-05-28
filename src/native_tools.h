@@ -20,7 +20,7 @@ std::string tool_memory(std::shared_ptr<CentralExecutive> ce_ref, json args) {
         print_in_line(CYAN, "[memory_data]\t", content);
         print_in_line(CYAN, "[memory_result]\t", "Content has been memorised");
     }
-    answer = fmt::format("The content: '{}' has been memorised", content);
+    answer = fmt::format("The content: '{}' has been memorised.", content);
     return answer;
 }
 

@@ -1,0 +1,70 @@
+# root
+## use: memory, select, send_message
+
+Task: "This SVG path element <path d="M 55.57,80.69 L 57.38,65.80 M 57.38,65.80 L 48.90,57.46 M 48.90,57.46 L
+45.58,47.78 M 45.58,47.78 L 53.25,36.07 L 66.29,48.90 L 78.69,61.09 L 55.57,80.69"/> draws a:
+(A) circle (B) heptagon (C) hexagon (D) kite (E) line (F) octagon (G) pentagon(H) rectangle (I) sector 
+(J) triangle (K) quadrilateral"
+
+1. Each time call send_message with the current status;
+2. Store task into memory;
+3. Go to select.
+
+Terminate if you have an answer.
+
+# select
+## use: memory, read_file, adapt, send_message
+## input: nothing
+
+1. Each time call send_message with the current status;
+2. Read assets/modules.txt file;
+3. Select 3-4 reasoning modules from list that are crucial to utilize in order to solve the given task;
+4. Memorize selected modules with description.
+
+Then call adapt for modules adaptation.
+
+# adapt
+## use: memory, implement, send_message
+## input: nothing
+
+Each time call send_message with the current status.
+
+Without working out the full solution, adapt each selected reasoning 
+module to our task.
+
+Memorize adapted modules.
+
+Then call implement for implementation.
+
+# implement
+## use: memory, final, send_message
+## input: nothing
+
+Each time call send_message with the current status.
+
+Create an actionable reasoning structure for each adapted reasoning 
+module to solve the task.
+
+Format implemented modules as a list:
+1. Reasoning module name 1
+Actionable reasoning structure as a list
+2. Reasoning module name 2
+Actionable reasoning structure as a list
+etc.
+
+Go deeper in each point if needed.
+
+Memorize implemented modules.
+
+Then call final for finalization.
+
+# final
+## use: send_message
+## input: nothing
+
+Each time call send_message with the current status.
+
+For each implemented module go through described actions and provide answer.
+Then combine all answers and reason to make final answer for task.
+
+Return final answer.

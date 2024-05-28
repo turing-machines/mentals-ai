@@ -66,7 +66,7 @@ Explain the gist of the meme in 20 words in medieval style.
 Return explanation.
 ```
 
-By default, the size of the instruction context is not limited. To limit the context, there is a directive `#### max_context: number` which specifies that only the `number` of the most recent messages should be stored. Older messages will be pushed out of the context. This feature is useful when you want to keep the most recent data in context so that older data does not affect the chain of reasoning.
+By default, the size of the instruction context is not limited. To limit the context, there is a directive `## max_context: number` which specifies that only the `number` of the most recent messages should be stored. Older messages will be pushed out of the context. This feature is useful when you want to keep the most recent data in context so that older data does not affect the chain of reasoning.
 
 ```
 # python_code_generation

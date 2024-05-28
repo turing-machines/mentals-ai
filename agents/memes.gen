@@ -1,9 +1,9 @@
 # root
-## use: meme_explain
+## use: meme_explain, send_message
 
 1. Come up with 3 memes on any theme;
 2. Then meme explain with meme per call;
-3. Output memes and explanations in a list.
+3. Message memes and their explanations in a list.
 
 # meme_explain
 

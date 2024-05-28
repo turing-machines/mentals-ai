@@ -69,12 +69,25 @@ int get_terminal_width() {
 
 std::string trim_by_terminal_width(const std::string& text) {
     int terminal_width = get_terminal_width();
-    auto max_width = static_cast<std::string::size_type>(terminal_width * 0.9);
+    auto max_width = static_cast<std::string::size_type>(terminal_width * 0.75);
     std::string trimmed_text = text;
     if (trimmed_text.length() > max_width) {
         trimmed_text = trimmed_text.substr(0, max_width - 3) + "...";
     }
     return trimmed_text;
+}
+
+std::string string_in_line(const std::string& text) {
+    std::string single_line;
+    for (char c : text) {
+        if (c != '\n') {
+            single_line += c;
+        } else {
+            single_line += ' ';
+        }
+    }
+    std::string formatted_line = trim_by_terminal_width(single_line);
+    return formatted_line;
 }
 
 void print_in_line(const std::string& color, const std::string& opcode, const std::string& text) {
@@ -411,4 +424,28 @@ json accumulate_values(const json& j1, const json& j2) {
         }
     }
     return result;
+}
+
+void run_spinner(const std::string& text) {
+    const char spin_chars[] = {'|', '/', '-', '\\'};
+    int spin_index = 0;
+    while (spinner_active) {
+        std::cout << RESET << "\r" << text << ".. " << spin_chars[spin_index] << std::flush;
+        spin_index = (spin_index + 1) % sizeof(spin_chars);
+        std::this_thread::sleep_for(std::chrono::milliseconds(100));
+    }
+    std::cout << "\r" << text << ": " << completion_text << std::flush;
+}
+
+void start_spinner(const std::string& text) {
+    spinner_active = true;
+    spinner_thread = std::thread(run_spinner, text);
+}
+
+void stop_spinner(const std::string& text) {
+    completion_text = text;
+    spinner_active = false;
+    if (spinner_thread.joinable()) {
+        spinner_thread.join();
+    }
 }

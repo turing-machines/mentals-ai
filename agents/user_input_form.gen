@@ -1,0 +1,7 @@
+# root
+## use: user_input, send_message
+
+1. Ask user name;
+2. Ask user github or twitter acc;
+3. kino or slop?
+4. Send message as a json object: name, acc and preferences.

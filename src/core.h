@@ -1,5 +1,7 @@
 #pragma once
 
+#include <thread>
+#include <atomic>
 #include <string>
 #include <iostream>
 #include <cstdio>
@@ -31,6 +33,9 @@
 #include "toml++/toml.hpp"
 
 extern bool debug;
+extern std::atomic<bool> spinner_active;
+extern std::thread spinner_thread;
+extern std::string completion_text;
 
 using json = nlohmann::json;
 using std::to_string;
@@ -62,6 +67,7 @@ std::string to_lower(const std::string &str);
 std::string trim(const std::string &str);
 int get_terminal_width();
 std::string trim_by_terminal_width(const std::string& text);
+std::string string_in_line(const std::string& text);
 void print_in_line(const std::string& color, const std::string& opcode, const std::string& text);
 std::string vector_to_comma_separated_string(const std::vector<std::string>& vec);
 std::string escape_json(const std::string& json_str);
@@ -90,6 +96,9 @@ std::string json_value_to_string(const json& json_obj, const std::string& key);
 void log_exception(const std::string& method, const std::string& message);
 bool has_extension(const std::string& filename, const std::string& extension);
 json accumulate_values(const json& j1, const json& j2);
+void run_spinner(const std::string& text);
+void start_spinner(const std::string& text);
+void stop_spinner(const std::string& text);
 
 #define guard(method_name) \
     std::string __method = method_name; \

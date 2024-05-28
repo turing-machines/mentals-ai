@@ -1,12 +1,10 @@
 # root
-## use: execute_python_script, send_message
+## use: execute_python_script
 
 Which river is longer: the Nile or the Amazon?
 
-Use only actual data from the internet.
+Use Python to find actual data from the Internet.
 
 If there were errors after code execution, refine the code to 
 fix them and run the code again. If the result of the code execution 
 is empty, add information to understand the result.
-
-Each time send message with the current status.

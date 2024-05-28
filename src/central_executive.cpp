@@ -243,16 +243,13 @@ void CentralExecutive::execute() {
             "[use]\t\t{}\n"
             "[keep_context]\t{}\n",
             ///"[instruction]\t{}\n",
-            GREEN,
-            RESET,
-            instructions_call_stack.size(),
-            curr_instr.temp,
-            curr_instr.label,
-            trim_by_terminal_width(desc),
-            vector_to_comma_separated_string(curr_instr.use),
+            GREEN, RESET, instructions_call_stack.size(), curr_instr.temp, curr_instr.label,
+            trim_by_terminal_width(desc), vector_to_comma_separated_string(curr_instr.use),
             curr_instr.keep_context
             ///trim_by_terminal_width(curr_instr.prompt)
         );
+    } else {
+        start_spinner(curr_instr.label);
     }
 
     logger->log("-----------------------------");
@@ -285,6 +282,13 @@ void CentralExecutive::execute() {
 
     if (content.contains("usage")) {
         usage = accumulate_values(usage, content["usage"]);
+    }
+
+    if(!debug) {
+        std::string completion = central_executive_state["output"].get<std::string>();
+        completion = string_in_line(completion);
+        completion += "\n";
+        stop_spinner(completion);
     }
 
     execute(); /// Recursive call
@@ -434,8 +438,10 @@ void CentralExecutive::parse_content(std::string& content) {
 
                 /// Add input as a message to the context
                 if (call_object.contains("input")) {
-                    std::string input = json_value_to_string(call_object, "input");
-                    working_memory->AddUserData(input, "user");
+                    std::string input = call_object["input"].get<std::string>();
+                    if(input != "null") {
+                        working_memory->AddUserData(input, "user");
+                    }
                     ///central_executive_state["input"] = input;
                 }
             } else {

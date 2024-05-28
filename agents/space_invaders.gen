@@ -3,9 +3,7 @@ space_invaders
 {{/project_dir}}
 
 # root
-## use: memory, send_message, execute_bash_command, project_manager
-
-Each time call send_message with the current status.
+## use: memory, execute_bash_command, project_manager
 
 Task: """
 Create a Space Invaders python game.
@@ -33,9 +31,7 @@ Return report.
 
 # project_manager
 ## input: game design document content
-## use: send_message, execute_bash_command, software_development, quality_assurance
-
-Each time call send_message with the current status.
+## use: execute_bash_command, software_development, quality_assurance
 
 Act as a project manager.
 Don't generate or write a code.
@@ -93,10 +89,8 @@ Return with the final answer: image1.png, image2.png are present in the images d
 
 # software_development
 ## input: one software task from GDD to implement
-## use: send_message, write_file
+## use: write_file
 ## max_context: 5
-
-Each time call send_message with the current status.
 
 Act as a top-notch python software architect and developer.
 Don't write into texture files.
@@ -114,10 +108,8 @@ Return report with the completed task, don't output code.
 
 
 # quality_assurance
-## use: execute_bash_command, send_message, user_input
+## use: execute_bash_command, user_input
 ## keep_context: false
-
-Each time call send_message with the current status.
 
 You act as a QA engineer.
 Your job is to run applicaton for testing, then prepare a complete QA report and return it.

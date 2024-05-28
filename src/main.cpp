@@ -8,6 +8,9 @@
 #include "central_executive.h"
 
 bool debug { false };
+std::atomic<bool> spinner_active{false};
+std::thread spinner_thread;
+std::string completion_text;
 
 int main(int argc, char *argv[]) {
 
@@ -76,8 +79,7 @@ int main(int argc, char *argv[]) {
         "NLOP count: {}\n"
         "Completion tokens: {}\n"
         "Total tokens: {}\n",
-        RESET,
-        ce->nlop,
+        RESET, ce->nlop,
         ce->usage["completion_tokens"].get<int>(),
         ce->usage["total_tokens"].get<int>()
     );

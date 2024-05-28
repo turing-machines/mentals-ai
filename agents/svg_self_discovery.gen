@@ -14,7 +14,7 @@ Terminate if you have an answer.
 
 # select
 ## use: memory, read_file, adapt, send_message
-## input: nothing
+## input: null
 
 1. Each time call send_message with the current status;
 2. Read assets/modules.txt file;
@@ -25,7 +25,7 @@ Then call adapt for modules adaptation.
 
 # adapt
 ## use: memory, implement, send_message
-## input: nothing
+## input: null
 
 Each time call send_message with the current status.
 
@@ -38,7 +38,7 @@ Then call implement for implementation.
 
 # implement
 ## use: memory, final, send_message
-## input: nothing
+## input: null
 
 Each time call send_message with the current status.
 
@@ -60,7 +60,7 @@ Then call final for finalization.
 
 # final
 ## use: send_message
-## input: nothing
+## input: null
 
 Each time call send_message with the current status.
 

@@ -90,7 +90,7 @@ int word_count(const std::string& text);
 std::string remove_file_extension(const std::string& filename);
 bool find_string_in_vector(const std::vector<std::string>& vec, const std::string& target);
 std::string mask_api_key(const std::string &api_key);
-std::string user_input(const std::string& prompt);
+std::string user_input();
 bool stop_token(std::string& text);
 std::string json_value_to_string(const json& json_obj, const std::string& key);
 void log_exception(const std::string& method, const std::string& message);

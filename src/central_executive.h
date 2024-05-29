@@ -21,6 +21,8 @@ class CentralExecutive : public std::enable_shared_from_this<CentralExecutive> {
         /// All the instructions in this thread have
         /// access to the short term memory data
         json short_term_memory;
+        ///
+        json central_executive_state;
         /// Stat
         int nlop;
         json usage;
@@ -29,8 +31,6 @@ class CentralExecutive : public std::enable_shared_from_this<CentralExecutive> {
         ///
         ///friend class ToolRegistry;
         std::unique_ptr<ToolRegistry> tools;
-        ///
-        json central_executive_state;
         ///
         std::string central_executive_instruction;
         /// Loaded native instructions

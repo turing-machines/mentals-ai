@@ -78,14 +78,8 @@ std::string trim_by_terminal_width(const std::string& text) {
 }
 
 std::string string_in_line(const std::string& text) {
-    std::string single_line;
-    for (char c : text) {
-        if (c != '\n') {
-            single_line += c;
-        } else {
-            single_line += ' ';
-        }
-    }
+    std::string single_line = std::regex_replace(text, std::regex("[\\n\\t]+"), " ");
+    single_line = std::regex_replace(single_line, std::regex("[ ]+"), " ");
     std::string formatted_line = trim_by_terminal_width(single_line);
     return formatted_line;
 }
@@ -188,23 +182,25 @@ bool append_file(const std::string& filename, const std::string& content) {
 std::string execute_command(const std::string& cmd) {
     std::array<char, 128> buffer;
     std::ostringstream result_stream;
-    FILE* pipe = popen((cmd + " 2>&1").c_str(), "r");
-    if (!pipe) {
-        throw std::runtime_error("popen() failed!");
+    try {
+        FILE* pipe = popen((cmd + " 2>&1").c_str(), "r");
+        if (!pipe) {
+            throw std::runtime_error("popen() failed!");
+        }
+        while (fgets(buffer.data(), buffer.size(), pipe) != nullptr) {
+            result_stream << buffer.data();
+        }
+        int return_code = pclose(pipe);
+        if (return_code != 0) {
+            std::ostringstream error_msg;
+            error_msg << "Command failed with return code " << return_code
+                    << ": " << result_stream.str();
+            throw std::runtime_error(error_msg.str());
+        }
+    } catch(const std::runtime_error& e) {
+        std::cout << e.what() << std::endl;
+        return result_stream.str();
     }
-    /// Read the output a chunk at a time and append to our result stream
-    while (fgets(buffer.data(), buffer.size(), pipe) != nullptr) {
-        result_stream << buffer.data();
-    }
-    /// Close the pipe and set the return code
-    int return_code = pclose(pipe);
-    if (return_code != 0) {
-        std::ostringstream error_msg;
-        error_msg << "Command failed with return code " << return_code
-                  << ": " << result_stream.str();
-        throw std::runtime_error(error_msg.str());
-    }
-    /// The result contains both the output and any error messages because of the redirection
     return result_stream.str();
 }
 
@@ -367,8 +363,7 @@ std::string mask_api_key(const std::string &api_key) {
     return masked_key;
 }
 
-std::string user_input(const std::string& prompt) {
-    std::cout << CYAN << prompt << RESET << "\n> ";
+std::string user_input() {
     std::string message;
     std::getline(std::cin, message);
     return message;
@@ -432,7 +427,7 @@ void run_spinner(const std::string& text) {
     while (spinner_active) {
         std::cout << RESET << "\r" << text << ".. " << spin_chars[spin_index] << std::flush;
         spin_index = (spin_index + 1) % sizeof(spin_chars);
-        std::this_thread::sleep_for(std::chrono::milliseconds(100));
+        std::this_thread::sleep_for(std::chrono::milliseconds(250));
     }
     std::cout << "\r" << text << ": " << completion_text << std::flush;
 }
@@ -443,6 +438,7 @@ void start_spinner(const std::string& text) {
 }
 
 void stop_spinner(const std::string& text) {
+    if (!spinner_active) return;
     completion_text = text;
     spinner_active = false;
     if (spinner_thread.joinable()) {

@@ -25,11 +25,16 @@ std::string tool_memory(std::shared_ptr<CentralExecutive> ce_ref, json args) {
 }
 
 std::string tool_send_message(std::shared_ptr<CentralExecutive> ce_ref, json args) {
-    (void)ce_ref;
     std::string answer;
     if (args.contains("message")) {
-        std::string message = std::string(args["message"]);
-        std::cout << GREEN << "[message] " << RESET << message << "\n";
+        if (!debug) {
+            std::string completion = ce_ref->central_executive_state["output"];
+            completion = string_in_line(completion);
+            completion += "\n";
+            stop_spinner(completion);
+        }
+        std::string message = args["message"];
+        std::cout << GREEN << message << "\n";
         std::string answer = fmt::format(
             "The message: '{}' was successfully displayed",
             message
@@ -39,10 +44,17 @@ std::string tool_send_message(std::shared_ptr<CentralExecutive> ce_ref, json arg
 }
 
 std::string tool_user_input(std::shared_ptr<CentralExecutive> ce_ref, json args) {
-    (void)ce_ref;
     std::string answer;
     if (args.contains("prompt")) {
-        std::string message = user_input(args["prompt"]);
+        if (!debug) {
+            std::string completion = ce_ref->central_executive_state["output"].get<std::string>();
+            completion = string_in_line(completion);
+            completion += "\n";
+            stop_spinner(completion);
+        }
+        std::string prompt = args["prompt"];
+        std::cout << CYAN << prompt << RESET << "\n> ";
+        std::string message = user_input();
         answer = fmt::format(
             "User message is: '{}'",
             message

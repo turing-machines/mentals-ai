@@ -249,7 +249,7 @@ void CentralExecutive::execute() {
             ///trim_by_terminal_width(curr_instr.prompt)
         );
     } else {
-        start_spinner(curr_instr.label);
+        start_spinner(fmt::format("{} [{}]", curr_instr.label, nlop+1).c_str());
     }
 
     logger->log("-----------------------------");
@@ -284,7 +284,7 @@ void CentralExecutive::execute() {
         usage = accumulate_values(usage, content["usage"]);
     }
 
-    if(!debug) {
+    if (!debug) {
         std::string completion = central_executive_state["output"].get<std::string>();
         completion = string_in_line(completion);
         completion += "\n";

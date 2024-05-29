@@ -5,6 +5,8 @@ A tool to build and run agents using only natural language, with loops and tools
 Word chain game agent in a loop:
 ![Word Chain game agent in a loop](assets/word_chain.gen.gif)
 
+> NLOP — Natural Language OPeration
+
 Or more complex use cases:
 | Any multi-agent interactions | Space Invaders generator | 2D platformer generator |
 |--------------------|-----------|--------------|

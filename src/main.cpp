@@ -75,13 +75,16 @@ int main(int argc, char *argv[]) {
 
     /// Final stat
     fmt::print(
-        "{}-----------------------------\n"
-        "NLOP count: {}\n"
+        "{}--------------------------------------------\n"
+        "Tok/s (completion tokens / total time): {}\n"
         "Completion tokens: {}\n"
-        "Total tokens: {}\n",
-        RESET, ce->nlop,
+        "Total tokens: {}\n"
+        "Total NLOP: {}\n"
+        "NLOPS: {:.2f}\n",
+        RESET, ce->toks,
         ce->usage["completion_tokens"].get<int>(),
-        ce->usage["total_tokens"].get<int>()
+        ce->usage["total_tokens"].get<int>(),
+        ce->nlop, ce->nlops
     );
 
     exit(EXIT_SUCCESS);

@@ -25,7 +25,10 @@ class CentralExecutive : public std::enable_shared_from_this<CentralExecutive> {
         json central_executive_state;
         /// Stat
         int nlop;
+        double nlops;
+        long long total_time;
         json usage;
+        int toks;
 
     private:
         ///

@@ -79,6 +79,7 @@ std::string CentralExecutive::run_agent_thread(const std::string& entry_instruct
 
     /// Reset
     nlop = 0;
+    total_time = 0;
     ///
     instructions_call_stack.clear();
     working_contexts.clear();
@@ -112,6 +113,12 @@ std::string CentralExecutive::run_agent_thread(const std::string& entry_instruct
     std::cout << YELLOW << "Start\n";
     /// Start executing
     execute();
+
+    /// Tok/s
+    toks = usage["completion_tokens"].get<int>() * 1e6 / static_cast<double>(total_time);
+    /// Nlop per second
+    nlops = nlop * 1e6 / static_cast<double>(total_time);
+
     return central_executive_state["output"];
 }
 
@@ -261,9 +268,12 @@ void CentralExecutive::execute() {
         working_memory->UpdateQueue(curr_instr.max_context);
     }
 
+    auto start = std::chrono::high_resolution_clock::now();
     liboai::Response response = llm.chat_completion(*working_memory, curr_instr.temp);
+    auto end = std::chrono::high_resolution_clock::now();
+    auto duration = std::chrono::duration_cast<std::chrono::microseconds>(end - start);
+    total_time += duration.count();
     json content = json::parse(std::string(response.content));
-
     if (content.contains("choices")) {
         for (auto& choice : content["choices"].items()) {
             if (choice.value().contains("message")) {

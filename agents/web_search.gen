@@ -9,7 +9,7 @@ Message the first 5 search results.
 ## input: { search_query: search query, search_limit: search limit }
 
 Write a Python script to search in DuckDuckGo.
-Simulate request headers correctly, such as user-agent as Mozilla and Linux.
+Simulate request headers correctly e.g. user-agent as Mozilla and Linux.
 
 If the script returned an empty result, refine the script to correct the empty result issue.
 

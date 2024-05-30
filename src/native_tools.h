@@ -34,7 +34,7 @@ std::string tool_send_message(std::shared_ptr<CentralExecutive> ce_ref, json arg
             stop_spinner(completion);
         }
         std::string message = args["message"];
-        std::cout << GREEN << message << "\n";
+        std::cout << GREEN << "[message] " << RESET << message << "\n";
         std::string answer = fmt::format(
             "The message: '{}' was successfully displayed",
             message
@@ -53,7 +53,7 @@ std::string tool_user_input(std::shared_ptr<CentralExecutive> ce_ref, json args)
             stop_spinner(completion);
         }
         std::string prompt = args["prompt"];
-        std::cout << CYAN << prompt << RESET << "\n> ";
+        std::cout << CYAN << "[question] " << RESET << prompt << "\n> ";
         std::string message = user_input();
         answer = fmt::format(
             "User message is: '{}'",

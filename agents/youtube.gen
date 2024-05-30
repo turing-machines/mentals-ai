@@ -1,28 +1,24 @@
 # root
-## use: youtube_search, execute_python_script, execute_bash_command
+## use: youtube_search, write_file, execute_bash_command, execute_python_script
 
-Find youtube videos related to ai. Sort by viewcount.
+Find ten youtube videos related to AI. Sort by the number of views.
+
 Save videos to ai_videos.csv with video title, url, views, channel name, 
 channel url, subscribers count.
 
-Using the bash, at the end check the file that its content satisfies the 
+At the end check the file that its content satisfies the 
 expected task result. If the file does not correspond to the expected 
 result, try to solve the task with a new approach to calling youtube search.
-
-Call youtube search with the task.
 
 When finished, display the name of the file in which the data is saved.
 
 # youtube_search
-## input: search query
+## input: search query, search limit
 ## use: execute_python_script, execute_bash_command
 ## keep_context: false
 
-Use pytube or 'youtube-search-python'.
+Use `pytube` or `youtube-search-python`.
 Do not use solutions where an API key or credentials are required.
 
 If there were errors after code execution, refine the code to 
 fix them and run the code again.
-
-Message the current status each time to see how the work is progressing.
-Show what error you are fixing in the code.

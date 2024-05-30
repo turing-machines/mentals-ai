@@ -1,14 +1,16 @@
 # root
-## use: duckduckgo
+## use: duckduckgo, send_message
 
 Search in DuckDuckGo for hacker spaces in SF.
-Output the first 5 search results.
+Message the first 5 search results.
 
 # duckduckgo
 ## use: execute_python_script
-## input: search query
+## input: { search_query: search query, search_limit: search limit }
 
 Write a Python script to search in DuckDuckGo.
+Simulate request headers correctly, such as user-agent as Mozilla and Linux.
+
 If the script returned an empty result, refine the script to correct the empty result issue.
 
 Return results.

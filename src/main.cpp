@@ -7,7 +7,7 @@
 #include "platform.h"
 #include "central_executive.h"
 
-bool debug { false };
+bool debug{false};
 std::atomic<bool> spinner_active{false};
 std::thread spinner_thread;
 std::string completion_text;

@@ -107,14 +107,19 @@ void stop_spinner(const std::string& text);
 #define unguard() \
     } catch (const std::out_of_range& e) { \
         log_exception(__method, fmt::format("Out of range: {}", e.what())); \
+        throw; \
     } catch (const std::regex_error& e) { \
         log_exception(__method, fmt::format("RegEx error: {}", e.what())); \
+        throw; \
     } catch (const json::parse_error& e) { \
         log_exception(__method, fmt::format("JSON parse error: {}", e.what())); \
     } catch (const std::runtime_error& e) { \
         log_exception(__method, fmt::format("Runtime error: {}", e.what())); \
+        throw; \
     } catch (const std::exception& e) { \
         log_exception(__method, fmt::format("General exception: {}", e.what())); \
+        throw; \
     } catch (...) { \
         log_exception(__method, "Unknown exception"); \
+        throw; \
     }

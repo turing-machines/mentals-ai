@@ -90,7 +90,6 @@ Return with the final answer: image1.png, image2.png are present in the images d
 # software_development
 ## input: one software task from GDD to implement
 ## use: write_file
-## max_context: 2
 
 Act as a top-notch python software architect and developer.
 Don't write into texture files.

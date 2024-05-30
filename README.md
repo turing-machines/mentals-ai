@@ -5,7 +5,7 @@ A tool to build and run agents using only natural language, with loops and tools
 Word chain game agent in a loop:
 ![Word Chain game agent in a loop](assets/word_chain.gen.gif)
 
-> NLOP — Natural Language OPeration
+> NLOP — Natural Language Operation
 
 Or more complex use cases:
 | Any multi-agent interactions | Space Invaders generator | 2D platformer generator |
@@ -46,11 +46,22 @@ Return explanation.
 In this example, the `root` instruction refers to the `meme_explain` instruction. The response from 
 meme_explain is returned to the instruction from which it was called, i.e. to root.
 
-An instruction can take an `input` parameter, which is automatically generated based on the context when the instruction is called. You can specify a free-form prompt in the `## input:` directive to specify the input data more precisely, such as a JSON object, or pass nothing at all.
+An instruction can take an `input` parameter, which is automatically generated based on the context when the instruction is called. You can specify a *free-form prompt* in the `## input:` directive to specify the input data more precisely, such as a JSON object, or pass nothing at all.
 
 ```
 # some_instruction
 ## input: design document only
+```
+
+JSON object as input
+
+```
+# duckduckgo
+## use: execute_python_script
+## input: { search_query: search query, search_limit: search limit }
+
+Write a Python script to search in DuckDuckGo.
+Simulate request headers correctly, such as user-agent as Mozilla and Linux.
 ```
 
 > [!NOTE]

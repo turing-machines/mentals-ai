@@ -192,14 +192,14 @@ std::string execute_command(const std::string& cmd) {
         }
         int return_code = pclose(pipe);
         if (return_code != 0) {
-            std::ostringstream error_msg;
-            error_msg << "Command failed with return code " << return_code
-                    << ": " << result_stream.str();
-            throw std::runtime_error(error_msg.str());
+            //std::ostringstream error_msg;
+            //error_msg << "Command failed with return code " << return_code
+            //        << ": " << result_stream.str();
+            throw std::runtime_error(result_stream.str());
         }
     } catch(const std::runtime_error& e) {
         std::cout << e.what() << std::endl;
-        return result_stream.str();
+        return e.what();
     }
     return result_stream.str();
 }

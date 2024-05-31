@@ -1,8 +1,8 @@
 # Mentals AI
 
-A tool to build and run agents using only natural language, with loops and tools.
+A tool to build and run autonomous agents using only natural language, with loops, memory and tools.
 
-Word chain game agent in a loop:
+Word chain game simple agent in a loop:
 ![Word Chain game agent in a loop](assets/word_chain.gen.gif)
 
 > NLOP — Natural Language Operation
@@ -21,7 +21,9 @@ Two key differences from existing multi-agent frameworks:
 
 ## Key Concepts
 
-The agent file is a text file with a .gen extension.
+The agent file is a textual description of the agent instructions with a .gen extension.
+
+![instructions](assets/instructions.png)
 
 ### Instruction
 

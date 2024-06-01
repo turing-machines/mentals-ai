@@ -29,6 +29,7 @@
 #include <cassert>
 #include <fmt/core.h>
 
+#include "treehh/tree.hh"
 #include "nlohmann/json.hpp"
 #include "toml++/toml.hpp"
 
@@ -99,6 +100,7 @@ json accumulate_values(const json& j1, const json& j2);
 void run_spinner(const std::string& text);
 void start_spinner(const std::string& text);
 void stop_spinner(const std::string& text);
+void print_tree(const tree<std::string>& tr);
 
 #define guard(method_name) \
     std::string __method = method_name; \

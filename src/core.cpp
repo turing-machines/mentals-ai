@@ -445,3 +445,19 @@ void stop_spinner(const std::string& text) {
         spinner_thread.join();
     }
 }
+
+void print_tree(const tree<std::string>& tr) {
+    tree<std::string>::pre_order_iterator it = tr.begin();
+    tree<std::string>::pre_order_iterator end = tr.end();
+    if (!tr.is_valid(it)) return;
+    int rootdepth = tr.depth(it);
+    std::cout << "-----" << std::endl;
+    while (it != end) {
+        for (int i = 0; i < tr.depth(it) - rootdepth; ++i) {
+            std::cout << "  ";
+        }
+        std::cout << (*it) << std::endl << std::flush;
+        ++it;
+    }
+    std::cout << "-----" << std::endl;
+}

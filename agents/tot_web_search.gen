@@ -1,5 +1,5 @@
 # root
-## use: web_surfing
+## use: memory, web_search, get_site_content
 
 1. Imagine you're trying to find a good place to go on vacation. 
    Your needs are:
@@ -9,6 +9,7 @@
    *Has fun outdoor activities. 
    *Has interesting historical places. 
    *Summer weather should be bearable.
+Store your needs to memory.
 
 2. Suggest 3 ideas.
 
@@ -16,22 +17,30 @@
 
 4. Compare all the places you found based on your needs.
 
-Here, you can use a 'web_surfing' to help you look for
-info along the path you chose. The AI can follow a path, do
-the searching, and check how good the options are based on
-what you need. This way of solving problems can give you more
-complete and fitting answers. 
+Here, you can use a 'web_search' to help you look for info along the path you chose. 
+The AI can follow a path and check how good the options are based on what you need. 
+This way of solving problems can give you more complete and fitting answers. 
 
-
-# web_surfing
-## use: execute_python_script
-## input: site url or search query
+# web_search
+## use: execute_python_script, get_site_content
+## input: search query
 ## keep_context: false
 
-You can write a Python scripts to fetch html content from websites or perform searches in DuckDuckGo.
-Simulate request headers correctly e.g. user-agent as Mozilla and Linux.
+You can write a Python scripts to perform searches in DuckDuckGo.
 
+Simulate request headers correctly e.g. user-agent as Mozilla and Linux.
 If the script returned an empty result, refine the script to correct the empty result issue.
 
-Return search results or fetched content.
+Choose better results for your needs and then  do get_site_content.
 
+# get_site_content
+## use: execute_python_script
+## input: site url
+## keep_context: false
+
+You can write a Python scripts to get site content.
+
+Simulate request headers correctly e.g. user-agent as Mozilla and Linux.
+If the script returned an empty result, refine the script to correct the empty result issue.
+
+Return text content.

@@ -12,6 +12,7 @@ std::atomic<bool> spinner_active{false};
 std::thread spinner_thread;
 std::string completion_text;
 
+
 int main(int argc, char *argv[]) {
 
     guard("Mentals")

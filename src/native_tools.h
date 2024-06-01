@@ -171,3 +171,21 @@ std::string tool_execute_python_script(std::shared_ptr<CentralExecutive> ce_ref,
     }
     return answer;
 }
+
+/// TODO: Tree tool
+/*
+tree<std::string> t;
+t.set_head("one");
+auto i2 = t.insert(t.end(), "two");
+auto i3 = t.insert(t.end(), "three");
+t.append_child(i2, "apple");
+t.append_child(i2, "pear");   
+t.append_child(i3, "banana");
+t.append_child(i3, "kiwi");  
+
+print_tree(t);
+
+tree<std::string>::sibling_iterator it=t.begin();
+while(static_cast<tree<std::string>::pre_order_iterator>(it) != t.end()) {
+    std::cerr << (*it++) << std::endl;
+}*/

@@ -1,7 +1,9 @@
 # root
 ## use: evaluate
 
-Example: "
+Use 4 numbers and basic arithmetic operations (+-*/) to obtain 24 in 1 equation.
+
+Example:
 Input: 2 8 8 14
 Possible next steps:
 1. 2 + 8 = 10 (left: 8 10 14)
@@ -13,7 +15,6 @@ Possible next steps:
 7. 14 /  2 = 7 (left: 7 8 8)
 8. 14 - 2 = 12 (left: 8 8 12)
 
-"
 
 Input: 4 5 8 2
 Generate 8 possible next steps.

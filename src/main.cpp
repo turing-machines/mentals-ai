@@ -76,7 +76,7 @@ int main(int argc, char *argv[]) {
     /// Final stat
     fmt::print(
         "{}--------------------------------------------\n"
-        "Tok/s (completion tokens / total time): {}\n"
+        "Tok/s: {} (completion tokens / total time)\n"
         "Completion tokens: {}\n"
         "Total tokens: {}\n"
         "Total NLOP: {}\n"

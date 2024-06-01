@@ -10,7 +10,7 @@ Word chain game simple agent in a loop:
 Or more complex use cases:
 | Any multi-agent interactions | Space Invaders generator | 2D platformer generator |
 |--------------------|-----------|--------------|
-|![react](assets/react.png) | ![space_invaders.gen](assets/space_invaders.gif) | ![platformer.gen](assets/mario.gif) |
+|![react](assets/react.png) | ![space_invaders.gen](assets/space_invaders.gif) | ![mario.gen](assets/mario.gif) |
 
 Two key differences from existing multi-agent frameworks: 
 * (a) the agent of any complexity is created in plain text, without using a programming language; 
@@ -35,9 +35,9 @@ Two instructions with a reference:
 # root
 ## use: meme_explain
 
-1. Come up with 3 memes on any theme;
+1. Create 3 memes about AGI;
 2. Then meme explain with meme per call;
-3. Output memes and explanations in a list.
+3. Output memes and their explanations in a list.
 
 # meme_explain
 
@@ -48,15 +48,15 @@ Return explanation.
 In this example, the `root` instruction refers to the `meme_explain` instruction. The response from 
 meme_explain is returned to the instruction from which it was called, i.e. to root.
 
-An instruction can take an `input` parameter, which is automatically generated based on the context when the instruction is called. You can specify a *free-form prompt* in the `## input:` directive to specify the input data more precisely, such as a JSON object, or pass nothing at all.
+An instruction can take an `input` parameter, which is automatically generated based on the context when the instruction is called. You can specify a *free-form prompt* in the `## input:` directive to specify the input data more precisely, such as a JSON object, or `null`.
 
+Using a document as an input:
 ```
 # some_instruction
 ## input: design document only
 ```
 
-JSON object as input
-
+JSON object as input:
 ```
 # duckduckgo
 ## use: execute_python_script
@@ -171,6 +171,7 @@ Your available actions:
 - [ ] Web UI
 - [ ] Vector database tools
 - [ ] Agent's experience (experimental)
+- [ ] Tools: Image generation, Browser
 
 ## Getting Started
 

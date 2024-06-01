@@ -7,17 +7,14 @@ mario
 
 **Create a Mario like game**
 
-Strictly follow below game requirements:
+- Library: Pygame;
+- Don't use python virtual environment;
+- Project dir: {{project_dir}};
+- Use all textures from `assets/{{project_dir}}/textures` folder;
+- Don't copy textures;
+- Don't use sound effects.
 
-Use Python.
-Library: Pygame.
-Don't use python virtual environment.
-Сreate project directory: {{project_dir}}.
-Save all files into the project directory.
-
-Game screen: 800 x 600.
-Background: light blue.
-Textures are in the `assets/{{project_dir}}/textures`.
+---
 
 Map generation rules:
 
@@ -35,7 +32,7 @@ P - player (red) start position: on the grass.
 
 1 screen consists 16 (horizontally) x 12 (vertically) blocks
 
-Map 'Level 1':
+Map layout:
 ```plaintext
 '.........................................................................................'
 '.........................................................................................'
@@ -50,8 +47,9 @@ Map 'Level 1':
 '##########################...##########...###################........##########..########'
 '==========================...==========^^^===================^^^^^^^^==========..========'
 ```
+Implement all map layout.
 
-Draw the map to the right.
+---
 
 Player mechanics:
 
@@ -77,16 +75,17 @@ Implement camera to keep the player centered horizontally. Implement map scrolli
 
 Proceed in the sequence listed:
 
-1. List textures to understand assets you have;
-2. Memorize textures list with paths;
-3. Create a game design document (GDD) with a focus on development tasks which cover all game requirements;
-4. Call `project_manager` for development and QA testing purposes.
+1. Create project directory;
+2. List textures to understand assets you have;
+3. Memorize textures list with paths;
+4. Create and memorize game design document (GDD) with a focus on development tasks which cover all game requirements;
+5. Call `project_manager` for development and QA testing purposes.
 
 Return report.
 
 
 # project_manager
-## input: game design document content
+## input: call to action
 ## use: execute_bash_command, software_development, quality_assurance
 
 Act as a project manager.
@@ -144,31 +143,27 @@ Return with the final answer: image1.png, image2.png are present in the images d
 
 
 # software_development
-# input: software development task or a task list
+## input: development task to implement
 ## use: write_file
 
 Act as a top-notch python software architect and developer.
 Don't write into texture files.
 You don't do QA testing.
+Save files into {{project_dir}}.
 
-Build and output a detailed development plan based on the game design document.
+Apply all available assets in the game.
 
 Utilize Python’s built-in logging module instead of using print statements.
 Use try-except blocks to handle exceptions and ensure the program flow is not disrupted by errors.
 
-Strictly follow development tasks requirements.
-Do all development tasks in a loop. Task by task.
+Always save python code you implement into main.py file.
 
-Always write python code you implement into main.py file.
-
-Return report with the completed tasks.
+Return report with the completed task, don't output code.
 
 
 # quality_assurance
-## use: execute_bash_command, send_message, user_input
+## use: execute_bash_command, user_input
 ## keep_context: false
-
-Each time call send_message with the current status.
 
 You act as a QA engineer.
 Your job is to run applicaton for testing, then prepare a complete QA report and return it.

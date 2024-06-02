@@ -14,7 +14,7 @@ Or more complex use cases:
 
 Two key differences from existing multi-agent frameworks: 
 * (a) the agent of any complexity is created in plain text, without using a programming language; 
-* (b) this solution does not have built-in reasoning frameworks such as ReAct; this is the basis for building any reasoning framework, including existing ones: `ReAct`, `Self-Discovery`, `Auto-CoT`, etc.
+* (b) this solution does not have built-in reasoning frameworks such as ReAct; this is the basis for building any reasoning framework, including existing ones: `Tree of Thoughts`, `ReAct`, `Self-Discovery`, `Auto-CoT`, etc.
 
 > [!NOTE]
 > Llama3 support for providers with compatible OpenAI chat completion API.
@@ -145,7 +145,7 @@ condition: `leave the loop if you are satisfied with the result`, where the LLM 
 context decides whether to leave or not. And all this without describing flow logic in 
 Python or other programming languages.
 
-ReAct example:
+#### ReAct example
 
 ```
 ## use: execute_bash_command, software_development, quality_assurance
@@ -164,6 +164,47 @@ Your available actions:
 - `quality_assurance` for QA testing purposes.
 ...
 ```
+
+#### Tree of Thoughts example
+
+The idea behind ToT is to present a few ideas and then evaluate the value of the ideas. 
+Valuable ideas are kept and developed, other ideas are discarded.
+
+Let's take the example of the 24 game. The 24 puzzle is an arithmetical puzzle in which 
+the objective is to find a way to manipulate four integers so that the end result is 24.
+We first define the instruction that creates and manipulates the tree data structure. 
+The model knows what a tree is and can represent it in any format, from plain text to XML or JSON.
+
+In this example, we will use the plain text format:
+
+```
+# tree
+## input: e.g. "add to node `A` child nodes `B` and `C`", "remove node `D` with all branches", etc. 
+## use: memory
+## keep_context: false
+
+Build/update tree structure in formatted text.
+
+Update the tree structure within the specified action;
+Memorize final tree structure.
+```
+
+Next we need to initialize the tree with initial data, let's start with the root instruction:
+
+```
+# root
+## use: tree
+
+Input: 4 5 8 2
+Generate 8 possible next steps.
+Store all steps in the tree as nodes e.g. 
+Node value 1: "2 + 8 = 10 (left: 8 10 14)"
+Node value 2: "8 / 2 = 4 (left: 4 8 14)"
+etc.
+```
+
+Calling the root instruction will suggest 8 possible next steps to calculate with the first 2 numbers and store these steps as tree nodes. A complete example is contained in the `agents/tree_structure.gen`
+
 
 ## Roadmap
 

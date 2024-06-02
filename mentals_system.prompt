@@ -71,7 +71,7 @@ Short-Term Memory:
 
 Current instruction name: {{instruction_name}}.
 Call the instructions in the order specified in the current instruction.
-If all tasks are completed or you need to return always attach `<<RETURN>>` 
+If all tasks are completed or the instruction specify return, always attach `<<RETURN>>` 
 token to your response in the format: 
 ```plaintext
 insert final answer here

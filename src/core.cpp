@@ -204,6 +204,10 @@ std::string execute_command(const std::string& cmd) {
     return result_stream.str();
 }
 
+bool contains_substring(const std::string& text, const std::string& substring) {
+    return text.find(substring) != std::string::npos;
+}
+
 std::string erase_text_after_specified_substring(const std::string& text, const std::string& substring) {
     size_t pos = text.find(substring);
     if (pos != std::string::npos) {
@@ -446,18 +450,60 @@ void stop_spinner(const std::string& text) {
     }
 }
 
+void print_node_lines(const std::string& prefix, const std::string& node_text) {
+    std::istringstream ss(node_text);
+    std::string line;
+    bool first_line = true;
+    while (std::getline(ss, line)) {
+        if (first_line) {
+            std::cout << prefix << "- " << line << std::endl;
+            first_line = false;
+        } else {
+            std::cout << prefix << "  " << line << std::endl;
+        }
+    }
+}
+
 void print_tree(const tree<std::string>& tr) {
     tree<std::string>::pre_order_iterator it = tr.begin();
     tree<std::string>::pre_order_iterator end = tr.end();
     if (!tr.is_valid(it)) return;
-    int rootdepth = tr.depth(it);
+    int root_depth = tr.depth(it);
     std::cout << "-----" << std::endl;
     while (it != end) {
-        for (int i = 0; i < tr.depth(it) - rootdepth; ++i) {
-            std::cout << "  ";
+        int current_depth = tr.depth(it) - root_depth;
+        std::string prefix;
+        for (int i = 0; i < current_depth; ++i) {
+            if (i == current_depth - 1) {
+                prefix += "|";
+            } else {
+                prefix += "|   ";
+            }
         }
-        std::cout << (*it) << std::endl << std::flush;
+        print_node_lines(prefix, *it);
         ++it;
     }
     std::cout << "-----" << std::endl;
+}
+
+tree<std::string>::pre_order_iterator find_node(const tree<std::string>& tr, const std::string& node_value) {
+    auto it = tr.begin();
+    auto end = tr.end();
+    if (!tr.is_valid(it)) return end;
+    while (it != end) {
+        if (contains_substring(*it, node_value)) {
+            return it;
+        }
+        ++it;
+    }
+    return end;
+}
+
+bool append_child(tree<std::string>& tr, const std::string& node_value, const std::string& child_value) {
+    tree<std::string>::pre_order_iterator it = find_node(tr, node_value);
+    if (it != tr.end()) {
+        tr.append_child(it, child_value);
+        return true;
+    }
+    return false;
 }

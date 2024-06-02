@@ -12,13 +12,11 @@ std::atomic<bool> spinner_active{false};
 std::thread spinner_thread;
 std::string completion_text;
 
-
 int main(int argc, char *argv[]) {
 
     guard("Mentals")
 
-    std::string input;
-    std::string filename = parse_input(argc, argv, input);
+    std::string input, filename = parse_input(argc, argv, input);
 
     Logger* logger = Logger::get_instance();
     logger->log("Mentals started");

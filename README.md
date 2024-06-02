@@ -23,13 +23,13 @@ Two key differences from existing multi-agent frameworks:
 
 The agent file is a textual description of the agent instructions with a .gen extension.
 
-![instructions](assets/instructions.png)
+<img src="assets/instructions.png" width="500">
 
 ### Instruction
 
 Instruction is the basic component of an agent in Mentals. An agent can consist of one or more instructions, which can refer to each other. Instructions can be written in free form, but they always have a name that starts with the `#` symbol. The `## use:` directive is used to specify a reference to other instructions. Multiple references are listed separated by commas.
 
-Two instructions with a reference:
+Two instructions: `root` and `meme_explain` with a reference:
 
 ```
 # root
@@ -59,7 +59,6 @@ Using a document as an input:
 JSON object as input:
 ```
 # duckduckgo
-## use: execute_python_script
 ## input: { search_query: search query, search_limit: search limit }
 
 Write a Python script to search in DuckDuckGo.

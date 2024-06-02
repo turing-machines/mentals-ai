@@ -77,6 +77,7 @@ std::string read_file(const std::string& file_path);
 bool write_file(const std::string& file_path, const std::string& content);
 bool append_file(const std::string& file_path, const std::string& content);
 std::string execute_command(const std::string& cmd);
+bool contains_substring(const std::string& text, const std::string& substring);
 std::string erase_text_after_specified_substring(const std::string& text, const std::string& substring);
 std::string replace_new_lines(const std::string& input);
 std::string convert_to_single_line(const std::string& multiline_text);
@@ -101,6 +102,9 @@ void run_spinner(const std::string& text);
 void start_spinner(const std::string& text);
 void stop_spinner(const std::string& text);
 void print_tree(const tree<std::string>& tr);
+tree<std::string>::pre_order_iterator find_node(const tree<std::string>& tr, const std::string& node_value);
+bool append_child(tree<std::string>& tr, const std::string& node_value, const std::string& child_value);
+
 
 #define guard(method_name) \
     std::string __method = method_name; \

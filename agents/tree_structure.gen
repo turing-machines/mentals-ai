@@ -93,4 +93,6 @@ Strictly follow below actions in this sequence:
 
 1. Evaluate if given numbers can reach 24 (sure/likely/impossible).
    All given numbers must be used in each expression;
-2. Call tree only ONE TIME to add child node with an answer to the `current_node`;
+
+2. Call tree only ONE TIME to add child node: 
+with the `sure` equation OR `discard` as a value to the `current_node`;

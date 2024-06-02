@@ -203,7 +203,38 @@ Node value 2: "8 / 2 = 4 (left: 4 8 14)"
 etc.
 ```
 
-Calling the root instruction will suggest 8 possible next steps to calculate with the first 2 numbers and store these steps as tree nodes. A complete example is contained in the `agents/tree_structure.gen`
+Calling the root instruction will suggest 8 possible next steps to calculate with the first 2 numbers and store these steps as tree nodes. Further processing of the agent results in building a tree that is convenient for the model to understand and infer the final answer.
+
+```
+4 5 8 2
+├── 4 + 5 = 9 (left: 9, 8, 2)
+│   └── discard
+├── 4 + 8 = 12 (left: 12, 5, 2)
+│   └── discard
+├── 4 + 2 = 6 (left: 6, 5, 8)
+│   └── discard
+├── 5 + 8 = 13 (left: 13, 4, 2)
+│   └── discard
+├── 5 + 2 = 7 (left: 7, 4, 8)
+│   └── (7 - 4) * 8 = 24
+├── 8 + 2 = 10 (left: 10, 4, 5)
+│   └── discard
+├── 4 * 5 = 20 (left: 20, 8, 2)
+│   └── (20 - 8) * 2 = 24
+└── 4 * 8 = 32 (left: 32, 5, 2)
+    └── discard
+
+Based on the evaluations, we have found two successful paths to reach 24:
+
+1. From the node "5 + 2 = 7 (left: 7, 4, 8)", we have the equation: (7 - 4) * 8 = 24.
+2. From the node "4 * 5 = 20 (left: 20, 8, 2)", we have the equation: (20 - 8) * 2 = 24.
+
+Thus, the final equations using all given numbers from the input are:
+1. (5 + 2 - 4) * 8 = 24
+2. (4 * 5 - 8) * 2 = 24
+```
+
+A complete example is contained in the `agents/tree_structure.gen`
 
 
 ## Roadmap

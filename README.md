@@ -203,7 +203,7 @@ Node value 2: "8 / 2 = 4 (left: 4 8 14)"
 etc.
 ```
 
-Calling the root instruction will suggest 8 possible next steps to calculate with the first 2 numbers and store these steps as tree nodes. Further processing of the agent results in building a tree that is convenient for the model to understand and infer the final answer.
+Calling the root instruction will suggest 8 possible next steps to calculate with the first 2 numbers and store these steps as tree nodes. Further work by the agent results in the construction of a tree that is convenient for the model to understand and infer the final answer.
 
 ```
 4 5 8 2

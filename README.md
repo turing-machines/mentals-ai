@@ -3,6 +3,16 @@
 A tool to build and run autonomous agents using only natural language, with loops, memory and tools.
 This is not just another AI agent framework. We are bringing a new vision of what a system for future AI applications should look like.
 
+- [Key Concepts](#key-concepts)
+    - [Instruction](#instruction)
+    - [Working Memory (context)](#working-memory)
+    - [Short-Term Memory (experimental)](#short-term-memory-experimental)
+    - [Execution Flow (loops, tree of thoughts)](#execution-flow)
+- [Roadmap](#roadmap)
+- [Getting Started](#getting-started)
+
+## Showcase
+
 Word chain game agent in a loop:
 ![Word Chain game agent in a loop](assets/word_chain.gen.gif)
 
@@ -96,7 +106,7 @@ Then read and output file content.
 The full list of native tools is listed in the file `native_tools.toml`.
 
 
-### Working memory (context)
+### Working Memory (context)
 
 Each instruction has its own working memory — context. When exiting an instruction and re-entering it, the context is kept by default. To clear the context when exiting an instruction, you can use the `## keep_context: false` directive:
 
@@ -120,7 +130,7 @@ Do all development tasks in a loop: task by task.
 Save the Python code you implement in the main.py file.
 ```
 
-### Short-term memory (experimental)
+### Short-Term Memory (experimental)
 
 Short-term memory is a memory that allows intermediate results of the agent's work to be stored and use it for further reasoning. The contents of this memory are accessible from all instruction contexts.
 
@@ -139,7 +149,7 @@ Call meme recall.
 What the meme was about?
 ```
 
-### Execution flow
+### Execution Flow
 
 The execution flow encompassing conditions, instruction calls, and loops (such as `ReAct`, 
 `Auto-CoT`, etc.), is entirely articulated in natural language. This approach allows 

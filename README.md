@@ -4,8 +4,8 @@ A tool to build and run autonomous agents using only natural language, with loop
 This is not just another AI agent framework. We are bringing a new vision of what a system for future AI applications should look like.
 
 - [Key Concepts](#key-concepts)
-    - [Instruction](#instruction)
-    - [Working Memory (context)](#working-memory)
+    - [Instruction (prompt)](#instruction-prompt)
+    - [Working Memory (context)](#working-memory-context)
     - [Short-Term Memory (experimental)](#short-term-memory-experimental)
     - [Execution Flow (loops, tree of thoughts)](#execution-flow)
 - [Roadmap](#roadmap)
@@ -34,7 +34,7 @@ Two key differences from existing agent frameworks:
 
 The agent file is a textual description of the agent instructions with a .gen extension.
 
-### Instruction
+### Instruction (prompt)
 
 Instruction is the basic component of an agent in Mentals. An agent can consist of one or more instructions, which can refer to each other. 
 

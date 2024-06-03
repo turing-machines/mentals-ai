@@ -13,8 +13,8 @@ Or more complex use cases:
 |![react](assets/react.png) | ![space_invaders.gen](assets/space_invaders.gif) | ![mario.gen](assets/mario.gif) |
 
 Two key differences from existing multi-agent frameworks: 
-* (a) the agent of any complexity is created in plain text, without using a programming language; 
-* (b) this solution does not have built-in reasoning frameworks such as ReAct; this is the basis for building any reasoning framework, including existing ones: `Tree of Thoughts`, `ReAct`, `Self-Discovery`, `Auto-CoT`, etc.
+* The agent of any complexity is created in `Markdown` without using any programming language. But you can use Python inside the agent text if you need to;
+* This solution does not have built-in reasoning frameworks such as ReAct. This is the basis for building any reasoning framework you invent, including existing ones: `Tree of Thoughts`, `ReAct`, `Self-Discovery`, `Auto-CoT`, etc.
 
 > [!NOTE]
 > Llama3 support for providers with compatible OpenAI chat completion API.
@@ -29,14 +29,14 @@ The agent file is a textual description of the agent instructions with a .gen ex
 
 Instruction is the basic component of an agent in Mentals. An agent can consist of one or more instructions, which can refer to each other. Instructions can be written in free form, but they always have a name that starts with the `#` symbol. The `## use:` directive is used to specify a reference to other instructions. Multiple references are listed separated by commas.
 
-Two instructions: `root` and `meme_explain` with a reference:
+Below is an example with two instructions `root` and `meme_explain` with a reference:
 
 ```
 # root
 ## use: meme_explain
 
 1. Create 3 memes about AGI;
-2. Then meme explain with meme per call;
+2. Then do meme explain with meme per call;
 3. Output memes and their explanations in a list.
 
 # meme_explain
@@ -68,6 +68,31 @@ Simulate request headers correctly e.g. user-agent as Mozilla and Linux.
 > [!NOTE]
 > Instruction calls are implemented separately from function/tool calls in OpenAI, allowing you to run agents with Llama3 and similar models. The instruction call implementation is open and is included in the `mentals_system.prompt` file.
 
+#### Tool
+
+Tool is a kind of instruction. Mentals has a set of native tools to handle message output, user input, file handling, Python interpreter, Bash commands, and Short-term memory.
+
+Ask user example:
+```
+# root
+## use: user_input
+
+Ask user name.
+Then output: `Welcome, user_name!`
+```
+
+File handling example:
+```
+# root
+## use: write_file, read_file
+
+Write 'Hello world' to file.
+Then read and output file content.
+```
+
+The full list of native tools is listed in the file `native_tools.toml`.
+
+
 ### Working memory (context)
 
 Each instruction has its own working memory — context. When exiting an instruction and re-entering it, the context is kept by default. To clear the context when exiting an instruction, you can use the `## keep_context: false` directive:
@@ -91,30 +116,6 @@ By default, the size of the instruction context is not limited. To limit the con
 Do all development tasks in a loop: task by task.
 Save python code you implement into main.py file.
 ```
-
-### Tool
-
-Tool is a kind of instruction. Mentals has a set of native tools to handle message output, user input, file handling, Python interpreter, Bash commands, and Short-term memory.
-
-Ask user example:
-```
-# root
-## use: user_input
-
-Ask user name.
-Then output: `Welcome, user_name!`
-```
-
-File handling example:
-```
-# root
-## use: write_file, read_file
-
-Write 'Hello world' to file.
-Then read and output file content.
-```
-
-The full list of native tools is listed in the file `native_tools.toml`.
 
 ### Short-term memory (experimental)
 
@@ -145,7 +146,7 @@ condition: `leave the loop if you are satisfied with the result`, where the LLM 
 context decides whether to leave or not. And all this without describing flow logic in 
 Python or other programming languages.
 
-#### ReAct example
+#### Reason Action (ReAct) example
 
 ```
 ## use: execute_bash_command, software_development, quality_assurance
@@ -165,15 +166,15 @@ Your available actions:
 ...
 ```
 
-#### Tree of Thoughts example
+#### Tree of Thoughts (ToT) example
 
-The idea behind ToT is to present a few ideas and then evaluate the value of the ideas. 
+The idea behind ToT is to generate multiple ideas to solve a problem and then evaluate their value. 
 Valuable ideas are kept and developed, other ideas are discarded.
 
 Let's take the example of the 24 game. The 24 puzzle is an arithmetical puzzle in which 
 the objective is to find a way to manipulate four integers so that the end result is 24.
-We first define the instruction that creates and manipulates the tree data structure. 
-The model knows what a tree is and can represent it in any format, from plain text to XML or JSON.
+First, we define the instruction that creates and manipulates the tree data structure. 
+The model knows what a tree is and can represent it in any format, from plain text to XML/JSON or any custom format.
 
 In this example, we will use the plain text format:
 
@@ -203,7 +204,7 @@ Node value 2: "8 / 2 = 4 (left: 4 8 14)"
 etc.
 ```
 
-Calling the root instruction will suggest 8 possible next steps to calculate with the first 2 numbers and store these steps as tree nodes. Further processing of the agent results in building a tree that is convenient for the model to understand and infer the final answer.
+Calling the root instruction will suggest 8 possible next steps to calculate with the first 2 numbers and store these steps as tree nodes. Further processing of the agent results in building a tree that is convenient for the model to understand and infer the final answer:
 
 ```
 4 5 8 2

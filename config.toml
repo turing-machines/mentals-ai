@@ -1,0 +1,21 @@
+# OpenAI
+API_KEY = ""
+ENDPOINT = "https://api.openai.com/v1"
+#MODEL = "gpt-4-turbo-preview"
+MODEL = "gpt-4o"
+
+# Groq 
+# rate_limit :/
+#PI_KEY = ""
+#ENDPOINT = "https://api.groq.com/openai/v1"
+#MODEL = "llama3-70b-8192"
+
+# Together
+#API_KEY = ""
+#ENDPOINT = "https://api.together.xyz/v1"
+#MODEL = "meta-llama/Llama-3-70b-chat-hf"
+
+# Fireworks
+#API_KEY = ""
+#ENDPOINT = "https://api.fireworks.ai/inference/v1"
+#MODEL = "accounts/fireworks/models/llama-v3-70b-instruct"

@@ -1,8 +1,9 @@
 # Mentals AI
 
 A tool to build and run autonomous agents using only natural language, with loops, memory and tools.
+This is not just another AI agent framework. We are bringing a new vision of what a system for future AI applications should look like.
 
-Word chain game simple agent in a loop:
+Word chain game agent in a loop:
 ![Word Chain game agent in a loop](assets/word_chain.gen.gif)
 
 > NLOP — Natural Language Operation
@@ -12,7 +13,7 @@ Or more complex use cases:
 |--------------------|-----------|--------------|
 |![react](assets/react.png) | ![space_invaders.gen](assets/space_invaders.gif) | ![mario.gen](assets/mario.gif) |
 
-Two key differences from existing multi-agent frameworks: 
+Two key differences from existing agent frameworks: 
 * The agent of any complexity is created in `Markdown` without using any programming language. But you can use Python inside the agent text if you need to;
 * This solution does not have built-in reasoning frameworks such as ReAct. This is the basis for building any reasoning framework you invent, including existing ones: `Tree of Thoughts`, `ReAct`, `Self-Discovery`, `Auto-CoT`, etc.
 
@@ -86,7 +87,7 @@ File handling example:
 # root
 ## use: write_file, read_file
 
-Write 'Hello world' to file.
+Write 'Hello world' to a file.
 Then read and output file content.
 ```
 
@@ -114,7 +115,7 @@ By default, the size of the instruction context is not limited. To limit the con
 ## max_context: 5
 
 Do all development tasks in a loop: task by task.
-Save python code you implement into main.py file.
+Save the Python code you implement in the main.py file.
 ```
 
 ### Short-term memory (experimental)

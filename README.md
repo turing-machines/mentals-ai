@@ -13,8 +13,8 @@ This is not just another AI agent framework. This is an effort to provide new in
 
 ## Showcase
 
-Word chain game agent in a loop:
-![Word Chain game agent in a loop](assets/word_chain.gen.gif)
+Word chain game in a self-loop controlled by LLM:
+![Word Chain game in a loop](assets/word_chain.gen.gif)
 
 > NLOP — Natural Language Operation
 

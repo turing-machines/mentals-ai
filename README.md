@@ -23,6 +23,15 @@ Or more complex use cases:
 |--------------------|-----------|--------------|
 |![react](assets/react.png) | ![space_invaders.gen](assets/space_invaders.gif) | ![mario.gen](assets/mario.gif) |
 
+Or help with the content:
+- Collect YouTube videos on a given topic and save to a .csv file with the videos, views, channel name, and link;
+- Get the transcription from the video and create a table of contents;
+- Take top news from Hacker News, choose a topic and write an article on the topic with the participation of the critic and save to a file.
+
+> All of the above examples are located in the `agents` folder.
+
+## Why
+
 Two key differences from existing agent frameworks: 
 * The agent of any complexity is created in `Markdown` without using any programming language. But you can use Python inside the agent text if you need to;
 * This solution does not have built-in reasoning frameworks such as ReAct. This is the basis for building any reasoning framework you invent, including existing ones: `Tree of Thoughts`, `ReAct`, `Self-Discovery`, `Auto-CoT`, etc.

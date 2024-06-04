@@ -3,7 +3,7 @@
 
 Video: https://www.youtube.com/watch?v=tR871s1jEQg
 
-Build the content of the video, with a brief description of each section and start time.
+Create a table of contents for the video, including a brief description of each section and the start time.
 Send a message with the result in markdown syntax.
 
 Use this tool:
@@ -14,4 +14,3 @@ the CLI from mistaking it for a argument name. For example to get the transcript
 the video with the ID -abc123 run:
 
 youtube_transcript_api "\-abc123"
-

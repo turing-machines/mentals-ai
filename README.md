@@ -263,7 +263,7 @@ A complete example is contained in the `agents/tree_structure.gen`
 ## Roadmap
 
 - [ ] Web UI
-- [ ] Vector database tools
+- [ ] Vector database tools -- WIP
 - [ ] Agent's experience (experimental)
 - [ ] Tools: Image generation, Browser
 
@@ -277,8 +277,8 @@ an API key, skip this step.
 
 Clone the Mentals AI repository:
 ```shell
-$ git clone https://github.com/turing-machines/mentals-ai
-$ cd mentals-ai
+git clone https://github.com/turing-machines/mentals-ai
+cd mentals-ai
 ```
 
 The API key must be placed in the `config.toml` file:
@@ -291,10 +291,10 @@ MODEL = "gpt-4o"
 
 Build project:
 ```
-$ make
+make
 ```
 
 Now you can use Mentals:
 ```shell
-$ ./build/mentals agents/loop.gen -d
+./build/mentals agents/loop.gen -d
 ```

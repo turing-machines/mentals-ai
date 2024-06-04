@@ -1,7 +1,7 @@
 # Mentals AI
 
 A tool to build and run autonomous agents using only natural language, with loops, memory and tools.
-This is not just another AI agent framework. We are bringing a new vision of what a system for future AI applications should look like.
+This is not just another AI agent framework. This is an effort to provide new insights into what the system should look like for future AI applications.
 
 - [Key Concepts](#key-concepts)
     - [Instruction (prompt)](#instruction-prompt)

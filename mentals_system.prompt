@@ -37,6 +37,15 @@ You have a list of instructions in a JSON array with instructions objects in the
 etc.
 ```
 
+If an instruction call is required, select the appropriate instruction from the 
+'Available Instructions' JSON array to call and append it to the response.
+Only instructions from the 'Available Instructions' can be used.
+
+Available Instructions:
+```plaintext
+{{instructions}}
+```
+
 After JSON object with instruction call always add <<CALL>> token.
 
 JSON format to output for instructions calling:
@@ -51,14 +60,6 @@ JSON format to output for instructions calling:
 Instruction calling examples:
 {{instruction_call_few_shot}}
 
-If an instruction call is required, select the appropriate instruction from the 
-'Available Instructions' JSON array to call and append it to the response.
-Only instructions from the 'Available Instructions' can be used.
-
-Available Instructions:
-```plaintext
-{{instructions}}
-```
 
 You have a short-term memory that may contain data you need to complete a task. 
 You can retrieve the data that you need to complete the task.
@@ -68,6 +69,7 @@ Short-Term Memory:
 ```plaintext
 {{short_term_memory}}
 ```
+
 
 Current instruction name: {{instruction_name}}.
 Call the instructions in the order specified in the current instruction.

@@ -4,6 +4,7 @@ A tool to build and run cognitive language agents using only natural language, w
 This is not just another AI agent framework. With this solution, you can focus only on the logic of the agent itself, without having to worry about writing auxiliary code in Python or any other programming language.
 In other words, this is an effort to provide new insights into what the system should look like for future AI applications.
 
+- [Examples](#-examples)
 - [Key Concepts](#-key-concepts)
     - [Instruction (prompt)](#-instruction-prompt)
     - [Working Memory (context)](#-working-memory-context)
@@ -12,7 +13,19 @@ In other words, this is an effort to provide new insights into what the system s
 - [Roadmap](#-roadmap)
 - [Getting Started](#-getting-started)
 
-## 📢 Showcase
+## 💡 The Idea
+
+The idea comes from scientific work in psychoanalysis that there is a system that controls cognitive processes and working memory, that makes retrievals from long-term memory. The LLM can be seen as "System 1" which answers questions, follows instructions, but there is no motivation, no goal setting.
+
+> The central executive is responsible for controlled processing in working memory, including but not limited to, directing attention, maintaining task goals, decision making, and memory retrieval. 
+
+The central executive can be thought of as `System 2`. More advanced agents can be built in conjunction with `Systems 1 and 2` — this is the idea behind Mentals — to provide a basic solution on which advanced cognitive agents can be built.
+
+Two key differences from existing agent frameworks: 
+* The agent of any complexity is created in `Markdown` without using any programming language. But you can use Python inside the agent text if you need to;
+* This solution does not have built-in reasoning frameworks such as ReAct. This is the basis for building any reasoning framework you invent, including existing ones: `Tree of Thoughts`, `ReAct`, `Self-Discovery`, `Auto-CoT`, etc.
+
+## 📢 Examples
 
 Word chain game in a self-loop controlled by LLM:
 ![Word Chain game in a loop](assets/word_chain.gen.gif)
@@ -29,18 +42,12 @@ Or help with the content:
 - Get the transcription from the video and create a table of contents;
 - Take top news from Hacker News, choose a topic and write an article on the topic with the participation of the critic and save to a file.
 
-> All of the above examples are located in the `agents` folder.
-
-## ✨ Why
-
-Two key differences from existing agent frameworks: 
-* The agent of any complexity is created in `Markdown` without using any programming language. But you can use Python inside the agent text if you need to;
-* This solution does not have built-in reasoning frameworks such as ReAct. This is the basis for building any reasoning framework you invent, including existing ones: `Tree of Thoughts`, `ReAct`, `Self-Discovery`, `Auto-CoT`, etc.
+All of the above examples are located in the `agents` folder.
 
 > [!NOTE]
 > Llama3 support for providers with compatible OpenAI chat completion API.
 
-## 💡 Key Concepts
+## 📔 Key Concepts
 
 The agent file is a textual description of the agent instructions with a .gen extension.
 

@@ -15,11 +15,13 @@ In other words, this is an effort to provide new insights into what the system s
 
 ## 💡 The Idea
 
-The idea came from work on psychoanalysis [Exploring Central Executive, Alan Baddeley, 1996](https://www.krigolsonteaching.com/uploads/4/3/8/4/43848243/baddeley_1996.pdf) that there is a system that controls cognitive processes and working memory, that makes retrievals from long-term memory. The LLM can be seen as `System 1`, answering questions, following instructions, but there is no motivation, no goal setting.
+The idea came from work on psychoanalysis [Exploring Central Executive, Alan Baddeley, 1996](https://www.krigolsonteaching.com/uploads/4/3/8/4/43848243/baddeley_1996.pdf) that there is a system that controls cognitive processes and working memory, that makes retrievals from long-term memory. The LLM can be seen as `System 1`, answering questions, following instructions, but there is no motivation, no goal setting. Okay, what the `System 2` is? We already have an answer from the Middle Ages, which in our time has begun to be considered in a more scientific and applied aspect:
 
-> The central executive is responsible for controlled processing in working memory, including but not limited to, directing attention, maintaining task goals, decision making, and memory retrieval. 
+> The `central executive system` is responsible for controlled processing in working memory, including but not limited to, `directing attention`, maintaining task goals, decision making, and memory retrieval.
 
-The central executive can be thought of as `System 2`. More advanced agents can be built in conjunction with `Systems 1 and 2` — this is the idea behind Mentals — to provide a basic solution on which advanced cognitive agents can be built.
+Yes, the first your thought, well, okay, not the first, but the subsequent ones may lead you to the answer: more advanced agents can be built in conjunction with `Systems 1 and 2`. LLM (System 1) as the cognitive executive and Central Executive (System 2) as the controlling unit for LLM. This is a mutual, dual relationship.
+
+**This is the idea behind Mentals — to provide a basic solution on which advanced cognitive agents can be built.**
 
 Two key differences from existing agent frameworks: 
 * The agent of any complexity is created in `Markdown` without using any programming language. But you can use Python inside the agent text if you need to;

@@ -37,16 +37,16 @@ You have a list of instructions in a JSON array with instructions objects in the
 etc.
 ```
 
-If an instruction call is required, select the appropriate instruction from the 
-'Available Instructions' JSON array to call and append it to the response.
-Only instructions from the 'Available Instructions' can be used.
+If an instruction call is required, select the appropriate instruction to call from 
+the `Available Instructions` JSON array and append it to the response. 
+Only instructions from the `Available Instructions` array can be used.
 
 Available Instructions:
 ```plaintext
 {{instructions}}
 ```
 
-After JSON object with instruction call always add <<CALL>> token.
+Always add a <<CALL>> token after a JSON object with an instruction call.
 
 JSON format to output for instructions calling:
 ```json
@@ -70,9 +70,8 @@ Short-Term Memory:
 {{short_term_memory}}
 ```
 
-
 Current instruction name: {{instruction_name}}.
-Call the instructions in the order specified in the current instruction.
+Call the other instructions in the order specified in the current instruction.
 If all tasks are completed or the instruction specify return, always attach `<<RETURN>>` 
 token to your response in the format: 
 ```plaintext

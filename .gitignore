@@ -6,7 +6,6 @@ tests/
 
 pgvector/
 snake_game/
-mario_game/
 pacman_game/
 ai_videos.csv
 

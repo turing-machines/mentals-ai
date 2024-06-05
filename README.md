@@ -1,4 +1,4 @@
-# Mentals AI
+# 🔮 Mentals AI
 
 A tool to build and run autonomous agents using only natural language, with loops, memory and tools.
 This is not just another AI agent framework. This is an effort to provide new insights into what the system should look like for future AI applications.
@@ -11,7 +11,7 @@ This is not just another AI agent framework. This is an effort to provide new in
 - [Roadmap](#roadmap)
 - [Getting Started](#getting-started)
 
-## Showcase
+## 📢 Showcase
 
 Word chain game in a self-loop controlled by LLM:
 ![Word Chain game in a loop](assets/word_chain.gen.gif)
@@ -19,7 +19,7 @@ Word chain game in a self-loop controlled by LLM:
 > NLOP — Natural Language Operation
 
 Or more complex use cases:
-| Any multi-agent interactions | Space Invaders generator | 2D platformer generator |
+| 🔄 Any multi-agent interactions | 👾 Space Invaders generator | 🍄 2D platformer generator |
 |--------------------|-----------|--------------|
 |![react](assets/react.png) | ![space_invaders.gen](assets/space_invaders.gif) | ![mario.gen](assets/mario.gif) |
 
@@ -30,7 +30,7 @@ Or help with the content:
 
 > All of the above examples are located in the `agents` folder.
 
-## Why
+## ✨ Why
 
 Two key differences from existing agent frameworks: 
 * The agent of any complexity is created in `Markdown` without using any programming language. But you can use Python inside the agent text if you need to;
@@ -39,11 +39,11 @@ Two key differences from existing agent frameworks:
 > [!NOTE]
 > Llama3 support for providers with compatible OpenAI chat completion API.
 
-## Key Concepts
+## 💡 Key Concepts
 
 The agent file is a textual description of the agent instructions with a .gen extension.
 
-### Instruction (prompt)
+### 📃 Instruction (prompt)
 
 Instruction is the basic component of an agent in Mentals. An agent can consist of one or more instructions, which can refer to each other. 
 
@@ -90,7 +90,7 @@ Simulate request headers correctly e.g. user-agent as Mozilla and Linux.
 > [!NOTE]
 > Instruction calls are implemented separately from function/tool calls in OpenAI, allowing you to run agents with Llama3 and similar models. The instruction call implementation is open and is included in the `mentals_system.prompt` file.
 
-#### Tool
+#### 🔧 Tool
 
 Tool is a kind of instruction. Mentals has a set of native tools to handle message output, user input, file handling, Python interpreter, Bash commands, and Short-term memory.
 
@@ -115,7 +115,7 @@ Then read and output file content.
 The full list of native tools is listed in the file `native_tools.toml`.
 
 
-### Working Memory (context)
+### 📑 Working Memory (context)
 
 Each instruction has its own working memory — context. When exiting an instruction and re-entering it, the context is kept by default. To clear the context when exiting an instruction, you can use the `## keep_context: false` directive:
 
@@ -139,7 +139,7 @@ Do all development tasks in a loop: task by task.
 Save the Python code you implement in the main.py file.
 ```
 
-### Short-Term Memory (experimental)
+### 📝 Short-Term Memory (experimental)
 
 Short-term memory is a memory that allows intermediate results of the agent's work to be stored and use it for further reasoning. The contents of this memory are accessible from all instruction contexts.
 
@@ -158,7 +158,7 @@ Call meme recall.
 What the meme was about?
 ```
 
-### Execution Flow
+### 🔀 Execution Flow
 
 The execution flow encompassing conditions, instruction calls, and loops (such as `ReAct`, 
 `Auto-CoT`, etc.), is entirely articulated in natural language. This approach allows 
@@ -168,7 +168,7 @@ condition: `leave the loop if you are satisfied with the result`, where the LLM 
 context decides whether to leave or not. And all this without describing flow logic in 
 Python or other programming languages.
 
-#### Reason Action (ReAct) example
+#### ⛳ Reason Action (ReAct) example
 
 ```
 ## use: execute_bash_command, software_development, quality_assurance
@@ -188,7 +188,7 @@ Your available actions:
 ...
 ```
 
-#### Tree of Thoughts (ToT) example
+#### 🌲 Tree of Thoughts (ToT) example
 
 The idea behind ToT is to generate multiple ideas to solve a problem and then evaluate their value. 
 Valuable ideas are kept and developed, other ideas are discarded.
@@ -260,14 +260,14 @@ Thus, the final equations using all given numbers from the input are:
 A complete example is contained in the `agents/tree_structure.gen`
 
 
-## Roadmap
+## 🔜 Roadmap
 
 - [ ] Web UI
 - [ ] Vector database tools -- WIP
 - [ ] Agent's experience (experimental)
 - [ ] Tools: Image generation, Browser
 
-## Getting Started
+## 🔰 Getting Started
 
 Begin by securing an OpenAI API key through the creation of an  [OpenAI
 account](https://platform.openai.com/docs/quickstart?context=node). If you already have 

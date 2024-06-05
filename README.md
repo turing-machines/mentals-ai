@@ -1,15 +1,16 @@
 # 🔮 Mentals AI
 
-A tool to build and run autonomous agents using only natural language, with loops, memory and tools.
-This is not just another AI agent framework. This is an effort to provide new insights into what the system should look like for future AI applications.
+A tool to build and run cognitive language agents using only natural language, with loops, memory and tools.
+This is not just another AI agent framework. With this solution, you can focus only on the logic of the agent itself, without having to worry about writing auxiliary code in Python or any other programming language.
+In other words, this is an effort to provide new insights into what the system should look like for future AI applications.
 
-- [Key Concepts](#key-concepts)
-    - [Instruction (prompt)](#instruction-prompt)
-    - [Working Memory (context)](#working-memory-context)
-    - [Short-Term Memory (experimental)](#short-term-memory-experimental)
-    - [Execution Flow (loops, tree of thoughts)](#execution-flow)
-- [Roadmap](#roadmap)
-- [Getting Started](#getting-started)
+- [Key Concepts](#-key-concepts)
+    - [Instruction (prompt)](#-instruction-prompt)
+    - [Working Memory (context)](#-working-memory-context)
+    - [Short-Term Memory (experimental)](#-short-term-memory-experimental)
+    - [Control flow: From strings to algorithms](#-control-flow-from-strings-to-algorithms)
+- [Roadmap](#-roadmap)
+- [Getting Started](#-getting-started)
 
 ## 📢 Showcase
 
@@ -158,9 +159,9 @@ Call meme recall.
 What the meme was about?
 ```
 
-### 🔀 Execution Flow
+### 🔀 Control flow: From strings to algorithms
 
-The execution flow encompassing conditions, instruction calls, and loops (such as `ReAct`, 
+The control flow encompassing conditions, instruction calls, and loops (such as `ReAct`, 
 `Auto-CoT`, etc.), is entirely articulated in natural language. This approach allows 
 the creation of `semantic conditions` for branching data streams. You can ask an agent 
 to play a word chain game by itself, and it will do it in a loop or write a fuzzy exit 

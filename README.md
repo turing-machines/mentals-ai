@@ -19,7 +19,7 @@ The idea came from work on psychoanalysis [Exploring Central Executive, Alan Bad
 
 > The `central executive system` is responsible for controlled processing in working memory, including but not limited to, `directing attention`, maintaining task goals, decision making, and memory retrieval.
 
-Yes, the first your thought, well, okay, not the first, but the subsequent ones may lead you to the answer: more advanced agents can be built in conjunction with `Systems 1 and 2`. LLM (System 1) as the cognitive executive and Central Executive (System 2) as the controlling unit for LLM. This is a mutual, dual relationship.
+Yes, the first your thought, well, okay, not the first, but the subsequent ones may lead you to the answer: more advanced agents can be built in conjunction with `Systems 1 and 2`. LLM `System 1` as the cognitive executive and Central Executive `System 2` as the controlling unit for LLM. This is a mutual, dual relationship.
 
 **This is the idea behind Mentals — to provide a basic solution on which advanced cognitive agents can be built.**
 

@@ -13,7 +13,7 @@ In other words, this is an effort to provide new insights into what the system s
 - [Roadmap](#-roadmap)
 - [Getting Started](#-getting-started)
 
-## 💡 The Idea
+## ☯️ The Idea
 
 The idea came from work on psychoanalysis [Exploring Central Executive, Alan Baddeley, 1996](https://www.krigolsonteaching.com/uploads/4/3/8/4/43848243/baddeley_1996.pdf) that there is a system that controls cognitive processes and working memory, that makes retrievals from long-term memory. The LLM can be seen as `System 1`, answering questions, following instructions, but there is no motivation, no goal setting. Okay, what the `System 2` is? We already have an answer from the Middle Ages, which in our time has begun to be considered in a more scientific and applied aspect:
 

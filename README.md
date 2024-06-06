@@ -4,6 +4,7 @@ A tool to build and run cognitive language agents using only natural language, w
 This is not just another AI agent framework. With this solution, you can focus only on the logic of the agent itself, without having to worry about writing auxiliary code in Python or any other programming language.
 In other words, this is an effort to provide new insights into what the system should look like for future AI applications.
 
+- [Differences from Other Frameworks](#differences-from-other-frameworks)
 - [Examples](#-examples)
 - [Key Concepts](#-key-concepts)
     - [Instruction (prompt)](#-instruction-prompt)
@@ -23,8 +24,10 @@ Your first thought, or the next, may lead you to the answer: more advanced agent
 
 **This is the idea behind Mentals — to provide a basic solution on which advanced cognitive agents can be built.**
 
+## 🆚 Differences from Other Frameworks
+
 Three key differences from existing agent frameworks: 
-* The agent executor is implemented in the system prompt. LLM determines whether a task is completed or not and plans the sequence of instruction calls;
+* The agent executor 🧠 is implemented in the system prompt. LLM determines whether a task is completed or not and plans the sequence of instruction calls;
 * The agent of any complexity is created in `Markdown` without using any programming language. But you can use Python inside the agent text if you need to;
 * This solution does not have built-in reasoning frameworks such as ReAct. This is the basis for building any reasoning framework you invent, including existing ones: `Tree of Thoughts`, `ReAct`, `Self-Discovery`, `Auto-CoT`, etc.
 

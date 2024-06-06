@@ -23,7 +23,8 @@ Your first thought, or the next, may lead you to the answer: more advanced agent
 
 **This is the idea behind Mentals — to provide a basic solution on which advanced cognitive agents can be built.**
 
-Two key differences from existing agent frameworks: 
+Three key differences from existing agent frameworks: 
+* The agent executor is implemented in the system prompt. LLM determines whether a task is completed or not and plans the sequence of instruction calls;
 * The agent of any complexity is created in `Markdown` without using any programming language. But you can use Python inside the agent text if you need to;
 * This solution does not have built-in reasoning frameworks such as ReAct. This is the basis for building any reasoning framework you invent, including existing ones: `Tree of Thoughts`, `ReAct`, `Self-Discovery`, `Auto-CoT`, etc.
 

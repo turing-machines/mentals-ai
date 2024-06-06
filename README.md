@@ -35,7 +35,7 @@ Word chain game in a self-loop controlled by LLM:
 > NLOP — Natural Language Operation
 
 Or more complex use cases:
-| 🔄 Any multi-agent interactions | 👾 Space Invaders generator | 🍄 2D platformer generator |
+| 🔄 Any multi-agent interactions | 👾 Space Invaders generator agent | 🍄 2D platformer generator agent |
 |--------------------|-----------|--------------|
 |![react](assets/react.png) | ![space_invaders.gen](assets/space_invaders.gif) | ![mario.gen](assets/mario.gif) |
 

@@ -377,7 +377,7 @@ void CentralExecutive::parse_content(std::string& content) {
     std::string json_block = get_first_instruction(json_blocks);
 
     /// TODO: Think about executor 
-    /// Clear all text after the first founded instruction in content
+    /// Clear all text after the first found instruction in content
     /// We will use this text in a working memory as a reasoning path element
     if (!json_block.empty()) {
         content = erase_text_after_specified_substring(content, json_block);

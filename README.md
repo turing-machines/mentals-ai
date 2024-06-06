@@ -13,13 +13,15 @@ In other words, this is an effort to provide new insights into what the system s
 - [Roadmap](#-roadmap)
 - [Getting Started](#-getting-started)
 
-## 💡 The Idea
+## ☯️ The Idea
 
-The idea came from work on psychoanalysis [Executive functions](https://en.wikipedia.org/wiki/Executive_functions), [Exploring Central Executive, Alan Baddeley, 1996](https://www.krigolsonteaching.com/uploads/4/3/8/4/43848243/baddeley_1996.pdf), that there is a system that controls cognitive processes and working memory, that makes retrievals from long-term memory. The LLM can be seen as "System 1" which answers questions, follows instructions, but there is no motivation, no goal setting.
+The idea came from work on psychoanalysis [Exploring Central Executive, Alan Baddeley, 1996](https://www.krigolsonteaching.com/uploads/4/3/8/4/43848243/baddeley_1996.pdf) that there is a system that controls cognitive processes and working memory, that makes retrievals from long-term memory. The LLM can be seen as `System 1`, answering questions, following instructions, but there is no motivation, no goal setting. Okay, what the `System 2` is? We already have an answer from the Middle Ages, which in our time has begun to be considered in a more scientific and applied aspect:
+
+> The `central executive system` is responsible for controlled processing in working memory, including but not limited to, `directing attention`, maintaining task goals, decision making, and memory retrieval.
 
 > The central executive (or executive functions) is responsible for controlled processing in working memory, including but not limited to, directing attention, maintaining task goals, decision making, and memory retrieval. 
 
-The central executive can be thought of as `System 2`. More advanced agents can be built in conjunction with `Systems 1 and 2` — this is the idea behind Mentals — to provide a basic solution on which advanced cognitive agents can be built.
+**This is the idea behind Mentals — to provide a basic solution on which advanced cognitive agents can be built.**
 
 Two key differences from existing agent frameworks: 
 * The agent of any complexity is created in `Markdown` without using any programming language. But you can use Python inside the agent text if you need to;
@@ -33,7 +35,7 @@ Word chain game in a self-loop controlled by LLM:
 > NLOP — Natural Language Operation
 
 Or more complex use cases:
-| 🔄 Any multi-agent interactions | 👾 Space Invaders generator | 🍄 2D platformer generator |
+| 🔄 Any multi-agent interactions | 👾 Space Invaders generator agent | 🍄 2D platformer generator agent |
 |--------------------|-----------|--------------|
 |![react](assets/react.png) | ![space_invaders.gen](assets/space_invaders.gif) | ![mario.gen](assets/mario.gif) |
 

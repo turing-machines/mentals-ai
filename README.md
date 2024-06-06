@@ -1,10 +1,8 @@
 # 🔮 Mentals AI
 
-A tool to build and run cognitive language agents using only natural language, with loops, memory and tools.
-This is not just another AI agent framework. With this solution, you can focus only on the logic of the agent itself, without having to worry about writing auxiliary code in Python or any other programming language.
-In other words, this is an effort to provide new insights into what the system should look like for future AI applications.
+Mentals AI is a tool for creating and running cognitive language agents that employ natural language processing, loops, memory, and tools. This platform goes beyond traditional AI agent frameworks, allowing you to concentrate solely on the agent's logic without the need to code in Python or any other language. Essentially, it reimagines the foundational systems for future AI applications.
 
-- [Differences from Other Frameworks](#differences-from-other-frameworks)
+- [Differences from Other Frameworks](#-differences-from-other-frameworks)
 - [Examples](#-examples)
 - [Key Concepts](#-key-concepts)
     - [Instruction (prompt)](#-instruction-prompt)
@@ -16,20 +14,19 @@ In other words, this is an effort to provide new insights into what the system s
 
 ## ☯️ The Idea
 
-The idea came from work on psychoanalysis [Executive functions](https://en.wikipedia.org/wiki/Executive_functions), [Exploring Central Executive, Alan Baddeley, 1996](https://www.krigolsonteaching.com/uploads/4/3/8/4/43848243/baddeley_1996.pdf) that there is a system that controls cognitive processes and working memory, that makes retrievals from long-term memory. The LLM can be seen as `System 1`, answering questions, following instructions, but there is no motivation, no goal setting. Okay, what the `System 2` is? We already have an answer from the Middle Ages, which in our time has begun to be considered in a more scientific and applied aspect:
+The concept originated from studies on psychoanalysis [Executive functions](https://en.wikipedia.org/wiki/Executive_functions), [Exploring Central Executive, Alan Baddeley, 1996](https://www.krigolsonteaching.com/uploads/4/3/8/4/43848243/baddeley_1996.pdf). He described a system that orchestrates cognitive processes and working memory, facilitating retrievals from long-term memory. The LLM functions as `System 1`, processing queries and executing instructions without inherent motivation or goal-setting. So, what then is `System 2`? Drawing from historical insights, now reconsidered through a scientific lens:
 
-> The central executive (or executive functions) is responsible for controlled processing in working memory, including but not limited to, directing attention, maintaining task goals, decision making, and memory retrieval.
+> The central executive, or executive functions, is crucial for controlled processing in working memory. It manages tasks including directing attention, maintaining task objectives, decision-making, and memory retrieval.
 
-Your first thought, or the next, may lead you to the answer: more advanced agents can be built in conjunction with Systems 1 and 2. LLM System 1 as the cognitive executive and Central Executive System 2 as the controlling unit for LLM. This is a mutual, dual relationship.
-
-**This is the idea behind Mentals — to provide a basic solution on which advanced cognitive agents can be built.**
+This sparks an intriguing possibility: constructing more sophisticated agents by integrating `System 1` and `System 2`. The LLM, as the cognitive executor `System 1`, works in tandem with the Central Executive `System 2`, which governs and controls the LLM. This partnership forms the dual relationship foundational to Mentals AI.
 
 ## 🆚 Differences from Other Frameworks
 
-Three key differences from existing agent frameworks: 
-* The `Agent Executor` 🧠 is implemented as a recursive loop where the LLM decides what the next loop will be: what instruction (prompt) to execute and what data to pass to that instruction based on data from previous loops. The Agent Executor logic is put in the system prompt, see [mentals_system.prompt](mentals_system.prompt). This is an important difference.
-* The agent of any complexity is created in `Markdown` without using any programming language. But you can use Python inside the agent text if you need to;
-* This solution does not have built-in reasoning frameworks such as ReAct. This is the basis for building any reasoning framework you invent, including existing ones: `Tree of Thoughts`, `ReAct`, `Self-Discovery`, `Auto-CoT`, etc.
+Mentals AI distinguishes itself from other frameworks in three significant ways:
+
+* The `Agent Executor` 🧠 operates through a recursive loop. The LLM determines the next steps: selecting instructions (prompts) and managing data based on previous loops. This recursive decision-making process is integral to our system, outlined in [mentals_system.prompt](mentals_system.prompt).
+* Agents of any complexity can be created using `Markdown`, eliminating the need for traditional programming languages. However, Python can be integrated directly into the agent's `Markdown` script if necessary.
+* Unlike platforms that include preset reasoning frameworks, Mentals AI serves as a blank canvas. It enables the creation and integration of your own reasoning frameworks,  including existing ones: `Tree of Thoughts`, `ReAct`, `Self-Discovery`, `Auto-CoT`, and others.
 
 ## 📢 Examples
 
@@ -48,7 +45,7 @@ Or help with the content:
 - Get the transcription from the video and create a table of contents;
 - Take top news from Hacker News, choose a topic and write an article on the topic with the participation of the critic and save to a file.
 
-All of the above examples are located in the `agents` folder.
+All of the above examples are located in the [agents](agents) folder.
 
 > [!NOTE]
 > Llama3 support for providers with compatible OpenAI chat completion API.
@@ -271,7 +268,7 @@ Thus, the final equations using all given numbers from the input are:
 2. (4 * 5 - 8) * 2 = 24
 ```
 
-A complete example is contained in the `agents/tree_structure.gen`
+A complete example is contained in the [agents/tree_structure.gen](agents/tree_structure.gen)
 
 
 ## 🔜 Roadmap
@@ -289,26 +286,62 @@ an API key, skip this step.
 
 ### Build and run
 
-Clone the Mentals AI repository:
+**Prerequisites**
+
+Before building the project, ensure the following dependencies are installed:
+
+- `libcurl`: Used for making HTTP requests
+- `libfmt`: Provides an API for formatting
+
+Depending on your operating system, you can install these using the following commands:
+
+**Linux**
+
+```shell
+sudo apt-get update
+sudo apt-get install libcurl4-openssl-dev libfmt-dev
+```
+
+**macOS**
+
+```shell
+brew update
+brew install curl fmt
+```
+
+**Windows**
+
+For Windows, it's recommended to use vcpkg or a similar package manager:
+
+```shell
+vcpkg install curl fmt
+```
+
+**Clone the repository**
 ```shell
 git clone https://github.com/turing-machines/mentals-ai
 cd mentals-ai
 ```
 
-The API key must be placed in the `config.toml` file:
-```
+**Configuration**
+
+Place your API key in the `config.toml` file:
+
+```bash
 # OpenAI
 API_KEY = "insert API key here"
 ENDPOINT = "https://api.openai.com/v1"
 MODEL = "gpt-4o"
 ```
 
-Build project:
-```
+**Build the project**
+
+```bash
 make
 ```
 
-Now you can use Mentals:
+**Run**
+
 ```shell
 ./build/mentals agents/loop.gen -d
 ```

@@ -24,9 +24,9 @@ This sparks an intriguing possibility: constructing more sophisticated agents by
 
 Mentals AI distinguishes itself from other frameworks in three significant ways:
 
-* The `Agent Executor` 🧠 operates through a recursive loop. The LLM determines the next steps: selecting instructions (prompts) and managing data based on previous loops. This recursive decision-making process is integral to our system, outlined in [mentals_system.prompt](mentals_system.prompt).
+* The `Agent Executor` 🧠 operates through a recursive loop. The LLM determines the next steps: selecting instructions (prompts) and managing data based on previous loops. This recursive decision-making process is integral to our system, outlined in [mentals_system.prompt](mentals_system.prompt)
 * Agents of any complexity can be created using `Markdown`, eliminating the need for traditional programming languages. However, Python can be integrated directly into the agent's `Markdown` script if necessary.
-* Unlike platforms that include preset reasoning frameworks, Mentals AI serves as a blank canvas. It enables the creation and integration of your own reasoning frameworks,  including existing ones: `Tree of Thoughts`, `ReAct`, `Self-Discovery`, `Auto-CoT`, and others.
+* Unlike platforms that include preset reasoning frameworks, Mentals AI serves as a blank canvas. It enables the creation and integration of your own reasoning frameworks,  including existing ones: `Tree of Thoughts`, `ReAct`, `Self-Discovery`, `Auto-CoT`, and others. One can also link these frameworks together into more complex sequences, even creating a network of various reasoning frameworks.
 
 ## 📢 Examples
 
@@ -52,7 +52,7 @@ All of the above examples are located in the [agents](agents) folder.
 
 ## 📔 Key Concepts
 
-The agent file is a textual description of the agent instructions with a .gen extension.
+The agent file is a textual description of the agent instructions with a `.gen` extension.
 
 ### 📃 Instruction (prompt)
 
@@ -78,18 +78,17 @@ Explain the gist of the meme in 20 words in medieval style.
 Return explanation.
 ```
 
-In this example, the `root` instruction refers to the `meme_explain` instruction. The response from 
-meme_explain is returned to the instruction from which it was called, i.e. to root.
+In this example, the `root` instruction calls the `meme_explain` instruction. The response from meme_explain is then returned to the instruction from which it was called, namely the root.
 
-An instruction can take an `input` parameter, which is automatically generated based on the context when the instruction is called. You can specify a *free-form prompt* in the `## input:` directive to specify the input data more precisely, such as a JSON object, or `null`.
+An instruction can take an `input` parameter, which is automatically generated based on the context when the instruction is called. To specify the input data more precisely, you can use a *free-form prompt* in the `## input:` directive, such as a JSON object or `null`.
 
-Using a document as an input:
+Using a document for input:
 ```
 # some_instruction
 ## input: design document only
 ```
 
-JSON object as input:
+Using a JSON object as input:
 ```
 # duckduckgo
 ## input: { search_query: search query, search_limit: search limit }
@@ -99,7 +98,7 @@ Simulate request headers correctly e.g. user-agent as Mozilla and Linux.
 ```
 
 > [!NOTE]
-> Instruction calls are implemented separately from function/tool calls in OpenAI, allowing you to run agents with Llama3 and similar models. The instruction call implementation is open and is included in the `mentals_system.prompt` file.
+> Instruction calls are implemented independently from function or tool calls at OpenAI, enabling the operation of agents with models like Llama3. The implementation of instruction calls is transparent and included in the mentals_system.prompt file.
 
 #### 🔧 Tool
 
@@ -152,9 +151,9 @@ Save the Python code you implement in the main.py file.
 
 ### 📝 Short-Term Memory (experimental)
 
-Short-term memory is a memory that allows intermediate results of the agent's work to be stored and use it for further reasoning. The contents of this memory are accessible from all instruction contexts.
+Short-term memory allows for the storage of intermediate results from an agent's activities, which can then be used for further reasoning. The contents of this memory are accessible across all instructional contexts.
 
-The `memory` tool is used to store the data. When storing, a keyword and a description of the content are generated. In the example below, the `meme_recall` instruction knows about the meme because it was previously memorized.
+The `memory` tool is used to store data. When data is stored, a keyword and a description of the content are generated. In the example below, the `meme_recall` instruction is aware of the meme because it was previously stored in memory.
 
 ```
 # root
@@ -171,13 +170,7 @@ What the meme was about?
 
 ### 🔀 Control flow: From strings to algorithms
 
-The control flow encompassing conditions, instruction calls, and loops (such as `ReAct`, 
-`Auto-CoT`, etc.), is entirely articulated in natural language. This approach allows 
-the creation of `semantic conditions` for branching data streams. You can ask an agent 
-to play a word chain game by itself, and it will do it in a loop or write a fuzzy exit 
-condition: `leave the loop if you are satisfied with the result`, where the LLM and its 
-context decides whether to leave or not. And all this without describing flow logic in 
-Python or other programming languages.
+The control flow, which includes conditions, instruction calls, and loops (such as `ReAct`, `Auto-CoT`, etc.), is fully expressed in natural language. This method enables the creation of `semantic conditions` that direct data stream branching. For instance, you can request an agent to autonomously play a word chain game in a loop or establish an ambiguous exit condition: `exit the loop if you are satisfied with the result`. Here, the language model and its context determine whether to continue or stop. All this is achieved without needing to define flow logic in Python or any other programming languages.
 
 #### ⛳ Reason Action (ReAct) example
 

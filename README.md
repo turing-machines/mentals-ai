@@ -27,7 +27,7 @@ Your first thought, or the next, may lead you to the answer: more advanced agent
 ## 🆚 Differences from Other Frameworks
 
 Three key differences from existing agent frameworks: 
-* The agent executor 🧠 is implemented in the system prompt. LLM determines whether a task is completed or not and plans the sequence of instruction calls;
+* The `Agent Executor` 🧠 is implemented as a recursive loop where the LLM decides what the next loop will be: what instruction (prompt) to execute and what data to pass to that instruction based on data from previous loops. The Agent Executor logic is put in the system prompt, see [mentals_system.prompt](mentals_system.prompt). This is an important difference.
 * The agent of any complexity is created in `Markdown` without using any programming language. But you can use Python inside the agent text if you need to;
 * This solution does not have built-in reasoning frameworks such as ReAct. This is the basis for building any reasoning framework you invent, including existing ones: `Tree of Thoughts`, `ReAct`, `Self-Discovery`, `Auto-CoT`, etc.
 

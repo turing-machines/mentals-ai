@@ -1,6 +1,6 @@
 # 🔮 Mentals AI
 
-Mentals AI is a tool designed for creating and operating agents that feature **loops**, **memory**, and various **tools**, all through straightforward **markdown syntax**. This tool moves beyond traditional methods of developing AI agents by allowing you to focus entirely on the agent's logic, without the need to write underlying code in Python or any other language. Essentially, it redefines the foundational frameworks for future AI applications.
+Mentals AI is a tool designed for creating and operating agents that feature **`loops`**, **`memory`**, and various **`tools`**, all through straightforward **`markdown syntax`**. This tool moves beyond traditional methods of developing AI agents by allowing you to focus entirely on the agent's logic, without the need to write underlying code in Python or any other language. Essentially, it redefines the foundational frameworks for future AI applications.
 
 - [Differences from Other Frameworks](#-differences-from-other-frameworks)
 - [Key Concepts](#-key-concepts)
@@ -12,7 +12,7 @@ Mentals AI is a tool designed for creating and operating agents that feature **l
 - [Getting Started](#-getting-started)
 - [The Idea](#️-the-idea)
 
-## 📢 Examples
+## 📌 Examples
 
 Word chain game in a self-loop controlled by LLM:
 ![Word Chain game in a loop](assets/word_chain.gen.gif)
@@ -42,11 +42,11 @@ Mentals AI distinguishes itself from other frameworks in three significant ways:
 * Agents of any complexity can be created using `Markdown`, eliminating the need for traditional programming languages. However, Python can be integrated directly into the agent's `Markdown` script if necessary.
 * Unlike platforms that include preset reasoning frameworks, Mentals AI serves as a blank canvas. It enables the creation and integration of your own reasoning frameworks,  including existing ones: `Tree of Thoughts`, `ReAct`, `Self-Discovery`, `Auto-CoT`, and others. One can also link these frameworks together into more complex sequences, even creating a network of various reasoning frameworks.
 
-## 📔 Key Concepts
+## 🗝️ Key Concepts
 
 The agent file is a textual description of the agent instructions with a `.gen` extension.
 
-### 📃 Instruction (prompt)
+### 📖 Instruction (prompt)
 
 Instruction is the basic component of an agent in Mentals. An agent can consist of one or more instructions, which can refer to each other. 
 
@@ -92,7 +92,7 @@ Simulate request headers correctly e.g. user-agent as Mozilla and Linux.
 > [!NOTE]
 > Instruction calls are implemented independently from function or tool calls at OpenAI, enabling the operation of agents with models like Llama3. The implementation of instruction calls is transparent and included in the mentals_system.prompt file.
 
-#### 🔧 Tool
+#### 🛠️ Tool
 
 Tool is a kind of instruction. Mentals has a set of native tools to handle message output, user input, file handling, Python interpreter, Bash commands, and Short-term memory.
 
@@ -117,7 +117,7 @@ Then read and output file content.
 The full list of native tools is listed in the file `native_tools.toml`.
 
 
-### 📑 Working Memory (context)
+### 🧠 Working Memory (context)
 
 Each instruction has its own working memory — context. When exiting an instruction and re-entering it, the context is kept by default. To clear the context when exiting an instruction, you can use the `## keep_context: false` directive:
 
@@ -141,7 +141,7 @@ Do all development tasks in a loop: task by task.
 Save the Python code you implement in the main.py file.
 ```
 
-### 📝 Short-Term Memory (experimental)
+### ⏳ Short-Term Memory (experimental)
 
 Short-term memory allows for the storage of intermediate results from an agent's activities, which can then be used for further reasoning. The contents of this memory are accessible across all instruction contexts.
 
@@ -160,11 +160,11 @@ Call meme recall.
 What the meme was about?
 ```
 
-### 🔀 Control flow: From strings to algorithms
+### ⚙️ Control flow: From strings to algorithms
 
 The control flow, which includes conditions, instruction calls, and loops (such as `ReAct`, `Auto-CoT`, etc.), is fully expressed in natural language. This method enables the creation of `semantic conditions` that direct data stream branching. For instance, you can request an agent to autonomously play a word chain game in a loop or establish an ambiguous exit condition: `exit the loop if you are satisfied with the result`. Here, the language model and its context determine whether to continue or stop. All this is achieved without needing to define flow logic in Python or any other programming languages.
 
-#### ⛳ Reason Action (ReAct) example
+#### ⚖️ Reason Action (ReAct) example
 
 ```
 ## use: execute_bash_command, software_development, quality_assurance
@@ -184,7 +184,7 @@ Your available actions:
 ...
 ```
 
-#### 🌲 Tree of Thoughts (ToT) example
+#### 🌳 Tree of Thoughts (ToT) example
 
 The idea behind ToT is to generate multiple ideas to solve a problem and then evaluate their value. 
 Valuable ideas are kept and developed, other ideas are discarded.
@@ -256,14 +256,14 @@ Thus, the final equations using all given numbers from the input are:
 A complete example is contained in the [agents/tree_structure.gen](agents/tree_structure.gen)
 
 
-## 🔜 Roadmap
+## 🗺️ Roadmap
 
 - [ ] Web UI
 - [ ] Vector database tools -- WIP
 - [ ] Agent's experience (experimental)
 - [ ] Tools: Image generation, Browser
 
-## 🔰 Getting Started
+## 🚀 Getting Started
 
 Begin by securing an OpenAI API key through the creation of an  [OpenAI
 account](https://platform.openai.com/docs/quickstart?context=node). If you already have 
@@ -331,7 +331,7 @@ make
 ./build/mentals agents/loop.gen -d
 ```
 
-## ☯️ The Idea
+## ✨ The Idea
 
 The concept originated from studies on psychoanalysis [Executive functions](https://en.wikipedia.org/wiki/Executive_functions), [Exploring Central Executive, Alan Baddeley, 1996](https://www.krigolsonteaching.com/uploads/4/3/8/4/43848243/baddeley_1996.pdf). He described a system that orchestrates cognitive processes and working memory, facilitating retrievals from long-term memory. The LLM functions as `System 1`, processing queries and executing instructions without inherent motivation or goal-setting. So, what then is `System 2`? Drawing from historical insights, now reconsidered through a scientific lens:
 

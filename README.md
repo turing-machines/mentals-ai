@@ -1,9 +1,12 @@
 # 🔮 Mentals AI
 
-Mentals AI is a tool for creating and running cognitive language agents that employ natural language processing, loops, memory, and tools. This platform goes beyond traditional AI agent frameworks, allowing you to concentrate solely on the agent's logic without the need to code in Python or any other language. Essentially, it reimagines the foundational systems for future AI applications.
+Mentals AI is a tool for creating and running agents that employ **loops, memory, and tools**. This platform goes beyond traditional AI agent frameworks, allowing you to concentrate solely on the agent's logic without the need to code in Python or any other language. Essentially, it reimagines the foundational systems for future AI applications.
 
+> [!NOTE]
+> Llama3 support for providers with compatible OpenAI chat completion API.
+
+- [The Idea](#️-the-idea)
 - [Differences from Other Frameworks](#-differences-from-other-frameworks)
-- [Examples](#-examples)
 - [Key Concepts](#-key-concepts)
     - [Instruction (prompt)](#-instruction-prompt)
     - [Working Memory (context)](#-working-memory-context)
@@ -11,22 +14,6 @@ Mentals AI is a tool for creating and running cognitive language agents that emp
     - [Control flow: From strings to algorithms](#-control-flow-from-strings-to-algorithms)
 - [Roadmap](#-roadmap)
 - [Getting Started](#-getting-started)
-
-## ☯️ The Idea
-
-The concept originated from studies on psychoanalysis [Executive functions](https://en.wikipedia.org/wiki/Executive_functions), [Exploring Central Executive, Alan Baddeley, 1996](https://www.krigolsonteaching.com/uploads/4/3/8/4/43848243/baddeley_1996.pdf). He described a system that orchestrates cognitive processes and working memory, facilitating retrievals from long-term memory. The LLM functions as `System 1`, processing queries and executing instructions without inherent motivation or goal-setting. So, what then is `System 2`? Drawing from historical insights, now reconsidered through a scientific lens:
-
-> The central executive, or executive functions, is crucial for controlled processing in working memory. It manages tasks including directing attention, maintaining task objectives, decision-making, and memory retrieval.
-
-This sparks an intriguing possibility: constructing more sophisticated agents by integrating `System 1` and `System 2`. The LLM, as the cognitive executor `System 1`, works in tandem with the Central Executive `System 2`, which governs and controls the LLM. This partnership forms the dual relationship foundational to Mentals AI.
-
-## 🆚 Differences from Other Frameworks
-
-Mentals AI distinguishes itself from other frameworks in three significant ways:
-
-* The `Agent Executor` 🧠 operates through a recursive loop. The LLM determines the next steps: selecting instructions (prompts) and managing data based on previous loops. This recursive decision-making process is integral to our system, outlined in [mentals_system.prompt](mentals_system.prompt)
-* Agents of any complexity can be created using `Markdown`, eliminating the need for traditional programming languages. However, Python can be integrated directly into the agent's `Markdown` script if necessary.
-* Unlike platforms that include preset reasoning frameworks, Mentals AI serves as a blank canvas. It enables the creation and integration of your own reasoning frameworks,  including existing ones: `Tree of Thoughts`, `ReAct`, `Self-Discovery`, `Auto-CoT`, and others. One can also link these frameworks together into more complex sequences, even creating a network of various reasoning frameworks.
 
 ## 📢 Examples
 
@@ -47,8 +34,21 @@ Or help with the content:
 
 All of the above examples are located in the [agents](agents) folder.
 
-> [!NOTE]
-> Llama3 support for providers with compatible OpenAI chat completion API.
+## ☯️ The Idea
+
+The concept originated from studies on psychoanalysis [Executive functions](https://en.wikipedia.org/wiki/Executive_functions), [Exploring Central Executive, Alan Baddeley, 1996](https://www.krigolsonteaching.com/uploads/4/3/8/4/43848243/baddeley_1996.pdf). He described a system that orchestrates cognitive processes and working memory, facilitating retrievals from long-term memory. The LLM functions as `System 1`, processing queries and executing instructions without inherent motivation or goal-setting. So, what then is `System 2`? Drawing from historical insights, now reconsidered through a scientific lens:
+
+> The central executive, or executive functions, is crucial for controlled processing in working memory. It manages tasks including directing attention, maintaining task objectives, decision-making, and memory retrieval.
+
+This sparks an intriguing possibility: constructing more sophisticated agents by integrating `System 1` and `System 2`. The LLM, as the cognitive executor `System 1`, works in tandem with the Central Executive `System 2`, which governs and controls the LLM. This partnership forms the dual relationship foundational to Mentals AI.
+
+## 🆚 Differences from Other Frameworks
+
+Mentals AI distinguishes itself from other frameworks in three significant ways:
+
+* The `Agent Executor` 🧠 operates through a recursive loop. The LLM determines the next steps: selecting instructions (prompts) and managing data based on previous loops. This recursive decision-making process is integral to our system, outlined in [mentals_system.prompt](mentals_system.prompt)
+* Agents of any complexity can be created using `Markdown`, eliminating the need for traditional programming languages. However, Python can be integrated directly into the agent's `Markdown` script if necessary.
+* Unlike platforms that include preset reasoning frameworks, Mentals AI serves as a blank canvas. It enables the creation and integration of your own reasoning frameworks,  including existing ones: `Tree of Thoughts`, `ReAct`, `Self-Discovery`, `Auto-CoT`, and others. One can also link these frameworks together into more complex sequences, even creating a network of various reasoning frameworks.
 
 ## 📔 Key Concepts
 
@@ -277,7 +277,7 @@ Begin by securing an OpenAI API key through the creation of an  [OpenAI
 account](https://platform.openai.com/docs/quickstart?context=node). If you already have 
 an API key, skip this step.
 
-### Build and run
+### 🏗️ Build and run
 
 **Prerequisites**
 

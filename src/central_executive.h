@@ -50,8 +50,16 @@ class CentralExecutive : public std::enable_shared_from_this<CentralExecutive> {
         ///
         Logger* logger;
 
+#if defined(__PGVECTOR__)
+        pqxx::connection& conn_ref;
+#endif
+
     public:
         CentralExecutive();
+#if defined(__PGVECTOR__)
+        ControlUnit(pqxx::connection& conn);
+#endif
+
         ~CentralExecutive();
         ///
         void set_state_variable(const std::string& name, const std::string& value);

@@ -43,7 +43,13 @@ int main(int argc, char *argv[]) {
     }
 
     /// Init central executive
+#if defined(__PGVECTOR__)
+    pqxx::connection conn("dbname=memory user=postgres password=postgres hostaddr=127.0.0.1 port=5432");
+    auto ce = std::make_shared<CentralExecutive>(conn);
+#else
     auto ce = std::make_shared<CentralExecutive>();
+#endif
+
     ce->llm.set_provider(endpoint, api_key);
     ce->llm.set_model(model);
     /// Set central executive state variables

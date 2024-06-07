@@ -3,14 +3,14 @@
 Mentals AI is a tool designed for creating and operating agents that feature **`loops`**, **`memory`**, and various **`tools`**, all through straightforward **`markdown syntax`**. This tool moves beyond traditional methods of developing AI agents by allowing you to focus entirely on the agent's logic, without the need to write underlying code in Python or any other language. Essentially, it redefines the foundational frameworks for future AI applications.
 
 - [Differences from Other Frameworks](#-differences-from-other-frameworks)
-- [Key Concepts](#-key-concepts)
+- [Key Concepts](#️-key-concepts)
     - [Instruction (prompt)](#-instruction-prompt)
     - [Working Memory (context)](#-working-memory-context)
     - [Short-Term Memory (experimental)](#-short-term-memory-experimental)
     - [Control flow: From strings to algorithms](#-control-flow-from-strings-to-algorithms)
-- [Roadmap](#-roadmap)
+- [Roadmap](#️-roadmap)
 - [Getting Started](#-getting-started)
-- [The Idea](#️-the-idea)
+- [The Idea](#-the-idea)
 
 ## 📌 Examples
 

@@ -18,6 +18,24 @@ CentralExecutive::CentralExecutive() {
     unguard()
 }
 
+#if defined(__PGVECTOR__)
+CentralExecutive::ControlUnit(pqxx::connection& conn) : conn_ref(conn) {
+
+    guard("CentralExecutive::CentralExecutive")
+    ///
+    logger = Logger::get_instance();
+    /// Load central executive instructions
+    central_executive_instruction = read_file("mentals_system.prompt");
+    if (central_executive_instruction.empty()) {
+        throw "Failed to load central executive instructions";
+    }
+    /// Initial central executive state
+    central_executive_state = json::object();
+    ///
+    unguard()
+}
+#endif
+
 CentralExecutive::~CentralExecutive() {
     /// Clean up Python environment
     code_interpreter.delete_virtual_environment();

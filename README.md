@@ -1,6 +1,6 @@
 # 🔮 Mentals AI
 
-Mentals AI is a platform designed for creating and operating agents that feature **loops**, **memory**, and various **tools**, all through straightforward **markdown syntax**. This platform moves beyond traditional methods of developing AI agents by allowing you to focus entirely on the agent's logic, without the need to write underlying code in Python or any other language. Essentially, it redefines the foundational frameworks for future AI applications.
+Mentals AI is a tool designed for creating and operating agents that feature **loops**, **memory**, and various **tools**, all through straightforward **markdown syntax**. This tool moves beyond traditional methods of developing AI agents by allowing you to focus entirely on the agent's logic, without the need to write underlying code in Python or any other language. Essentially, it redefines the foundational frameworks for future AI applications.
 
 - [Differences from Other Frameworks](#-differences-from-other-frameworks)
 - [Key Concepts](#-key-concepts)
@@ -10,6 +10,7 @@ Mentals AI is a platform designed for creating and operating agents that feature
     - [Control flow: From strings to algorithms](#-control-flow-from-strings-to-algorithms)
 - [Roadmap](#-roadmap)
 - [Getting Started](#-getting-started)
+- [The Idea](#️-the-idea)
 
 ## 📢 Examples
 
@@ -32,14 +33,6 @@ All of the above examples are located in the [agents](agents) folder.
 
 > [!NOTE]
 > Llama3 support is available for providers using a compatible OpenAI API.
-
-## ☯️ The Idea
-
-The concept originated from studies on psychoanalysis [Executive functions](https://en.wikipedia.org/wiki/Executive_functions), [Exploring Central Executive, Alan Baddeley, 1996](https://www.krigolsonteaching.com/uploads/4/3/8/4/43848243/baddeley_1996.pdf). He described a system that orchestrates cognitive processes and working memory, facilitating retrievals from long-term memory. The LLM functions as `System 1`, processing queries and executing instructions without inherent motivation or goal-setting. So, what then is `System 2`? Drawing from historical insights, now reconsidered through a scientific lens:
-
-> The central executive, or executive functions, is crucial for controlled processing in working memory. It manages tasks including directing attention, maintaining task objectives, decision-making, and memory retrieval.
-
-This sparks an intriguing possibility: constructing more sophisticated agents by integrating `System 1` and `System 2`. The LLM, as the cognitive executor `System 1`, works in tandem with the Central Executive `System 2`, which governs and controls the LLM. This partnership forms the dual relationship foundational to Mentals AI.
 
 ## 🆚 Differences from Other Frameworks
 
@@ -337,3 +330,11 @@ make
 ```shell
 ./build/mentals agents/loop.gen -d
 ```
+
+## ☯️ The Idea
+
+The concept originated from studies on psychoanalysis [Executive functions](https://en.wikipedia.org/wiki/Executive_functions), [Exploring Central Executive, Alan Baddeley, 1996](https://www.krigolsonteaching.com/uploads/4/3/8/4/43848243/baddeley_1996.pdf). He described a system that orchestrates cognitive processes and working memory, facilitating retrievals from long-term memory. The LLM functions as `System 1`, processing queries and executing instructions without inherent motivation or goal-setting. So, what then is `System 2`? Drawing from historical insights, now reconsidered through a scientific lens:
+
+> The central executive, or executive functions, is crucial for controlled processing in working memory. It manages tasks including directing attention, maintaining task objectives, decision-making, and memory retrieval.
+
+This sparks an intriguing possibility: constructing more sophisticated agents by integrating `System 1` and `System 2`. The LLM, as the cognitive executor `System 1`, works in tandem with the Central Executive `System 2`, which governs and controls the LLM. This partnership forms the dual relationship foundational to Mentals AI.

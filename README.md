@@ -2,10 +2,6 @@
 
 Mentals AI is a tool for creating and running agents that employ **loops, memory, and tools**. This platform goes beyond traditional AI agent frameworks, allowing you to concentrate solely on the agent's logic without the need to code in Python or any other language. Essentially, it reimagines the foundational systems for future AI applications.
 
-> [!NOTE]
-> Llama3 support for providers with compatible OpenAI chat completion API.
-
-- [The Idea](#️-the-idea)
 - [Differences from Other Frameworks](#-differences-from-other-frameworks)
 - [Key Concepts](#-key-concepts)
     - [Instruction (prompt)](#-instruction-prompt)
@@ -33,6 +29,9 @@ Or help with the content:
 - Take top news from Hacker News, choose a topic and write an article on the topic with the participation of the critic and save to a file.
 
 All of the above examples are located in the [agents](agents) folder.
+
+> [!NOTE]
+> Llama3 support is available for providers using a compatible OpenAI API.
 
 ## ☯️ The Idea
 

@@ -256,7 +256,7 @@ void CentralExecutive::execute() {
             ///trim_by_terminal_width(curr_instr.prompt)
         );
     } else {
-        start_spinner(fmt::format("{} [{}]", curr_instr.label, nlop+1).c_str());
+        ///start_spinner(fmt::format("{} [{}]", curr_instr.label, nlop+1).c_str());
     }
 
     logger->log("-----------------------------");
@@ -298,7 +298,7 @@ void CentralExecutive::execute() {
         std::string completion = central_executive_state["output"].get<std::string>();
         completion = string_in_line(completion);
         completion += "\n";
-        stop_spinner(completion);
+        ///stop_spinner(completion);
     }
 
     execute(); /// Recursive call

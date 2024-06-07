@@ -151,7 +151,7 @@ Save the Python code you implement in the main.py file.
 
 ### 📝 Short-Term Memory (experimental)
 
-Short-term memory allows for the storage of intermediate results from an agent's activities, which can then be used for further reasoning. The contents of this memory are accessible across all instructional contexts.
+Short-term memory allows for the storage of intermediate results from an agent's activities, which can then be used for further reasoning. The contents of this memory are accessible across all instruction contexts.
 
 The `memory` tool is used to store data. When data is stored, a keyword and a description of the content are generated. In the example below, the `meme_recall` instruction is aware of the meme because it was previously stored in memory.
 

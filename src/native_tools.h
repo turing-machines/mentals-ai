@@ -31,7 +31,7 @@ std::string tool_send_message(std::shared_ptr<CentralExecutive> ce_ref, json arg
             std::string completion = ce_ref->central_executive_state["output"];
             completion = string_in_line(completion);
             completion += "\n";
-            stop_spinner(completion);
+            //stop_spinner(completion);
         }
         std::string message = args["message"];
         std::cout << GREEN << "[message] " << RESET << message << "\n";

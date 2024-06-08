@@ -5,7 +5,7 @@
 ///
 
 #include "platform.h"
-#include "central_executive.h"
+#include "agent_executor.h"
 
 bool debug{false};
 std::atomic<bool> spinner_active{false};
@@ -45,19 +45,19 @@ int main(int argc, char *argv[]) {
     /// Init central executive
 #if defined(__PGVECTOR__)
     pqxx::connection conn("dbname=memory user=postgres password=postgres hostaddr=127.0.0.1 port=5432");
-    auto ce = std::make_shared<CentralExecutive>(conn);
+    auto agent_executor = std::make_shared<AgentExecutor>(conn);
 #else
-    auto ce = std::make_shared<CentralExecutive>();
+    auto agent_executor = std::make_shared<AgentExecutor>();
 #endif
 
-    ce->llm.set_provider(endpoint, api_key);
-    ce->llm.set_model(model);
+    agent_executor->llm.set_provider(endpoint, api_key);
+    agent_executor->llm.set_model(model);
     /// Set central executive state variables
-    ce->set_state_variable("current_date", get_current_date());
-    ce->set_state_variable("platform_info", platform_info);
+    agent_executor->set_state_variable("current_date", get_current_date());
+    agent_executor->set_state_variable("platform_info", platform_info);
 
     /// Init native tools
-    if (!ce->init_native_tools("native_tools.toml")) {
+    if (!agent_executor->init_native_tools("native_tools.toml")) {
         throw std::runtime_error("Failed to init native tools");
     }
 
@@ -73,10 +73,10 @@ int main(int argc, char *argv[]) {
     }
 
     /// Init agent
-    ce->init_agent(instructions);
+    agent_executor->init_agent(instructions);
 
     /// Run agent from root instruction
-    ce->run_agent_thread("root", input);
+    agent_executor->run_agent_thread("root", input);
 
     /// Final stat
     fmt::print(
@@ -86,10 +86,10 @@ int main(int argc, char *argv[]) {
         "Total tokens: {}\n"
         "Total NLOP: {}\n"
         "NLOPS: {:.2f}\n",
-        RESET, ce->toks,
-        ce->usage["completion_tokens"].get<int>(),
-        ce->usage["total_tokens"].get<int>(),
-        ce->nlop, ce->nlops
+        RESET, agent_executor->toks,
+        agent_executor->usage["completion_tokens"].get<int>(),
+        agent_executor->usage["total_tokens"].get<int>(),
+        agent_executor->nlop, agent_executor->nlops
     );
 
     exit(EXIT_SUCCESS);

@@ -1,6 +1,6 @@
 # 🔮 Mentals AI
 
-Mentals AI is a tool designed for creating and operating agents that feature **`loops`**, **`memory`**, and various **`tools`**, all through straightforward **`markdown syntax`**. This tool moves beyond traditional methods of developing AI agents by allowing you to focus entirely on the agent's logic, without the need to write underlying code in Python or any other language. Essentially, it redefines the foundational frameworks for future AI applications.
+Mentals AI is a tool designed for creating and operating agents that feature **`loops`**, **`memory`**, and various **`tools`**, all through straightforward **`markdown syntax`**. This tool enables you to concentrate solely on the agent’s logic, eliminating the necessity to compose underlying code in Python or any other language. Essentially, it redefines the foundational frameworks for future AI applications.
 
 - [Differences from Other Frameworks](#-differences-from-other-frameworks)
 - [Key Concepts](#️-key-concepts)

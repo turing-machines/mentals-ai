@@ -2,7 +2,7 @@
 
 #include "core.h"
 
-std::string tool_memory(std::shared_ptr<CentralExecutive> ce_ref, json args) {
+std::string tool_memory(std::shared_ptr<AgentExecutor> ce_ref, json args) {
     std::string answer;
     assert(args.contains("keyword") && "tool_memory must contain the 'keyword' key.");
     assert(args.contains("content") && "tool_memory must contain the 'content' key.");
@@ -24,11 +24,11 @@ std::string tool_memory(std::shared_ptr<CentralExecutive> ce_ref, json args) {
     return answer;
 }
 
-std::string tool_send_message(std::shared_ptr<CentralExecutive> ce_ref, json args) {
+std::string tool_send_message(std::shared_ptr<AgentExecutor> ce_ref, json args) {
     std::string answer;
     if (args.contains("message")) {
         if (!debug) {
-            std::string completion = ce_ref->central_executive_state["output"];
+            std::string completion = ce_ref->agent_executor_state["output"];
             completion = string_in_line(completion);
             completion += "\n";
             stop_spinner(completion);
@@ -43,11 +43,11 @@ std::string tool_send_message(std::shared_ptr<CentralExecutive> ce_ref, json arg
     return answer;
 }
 
-std::string tool_user_input(std::shared_ptr<CentralExecutive> ce_ref, json args) {
+std::string tool_user_input(std::shared_ptr<AgentExecutor> ce_ref, json args) {
     std::string answer;
     if (args.contains("prompt")) {
         if (!debug) {
-            std::string completion = ce_ref->central_executive_state["output"].get<std::string>();
+            std::string completion = ce_ref->agent_executor_state["output"].get<std::string>();
             completion = string_in_line(completion);
             completion += "\n";
             stop_spinner(completion);
@@ -63,7 +63,7 @@ std::string tool_user_input(std::shared_ptr<CentralExecutive> ce_ref, json args)
     return answer;
 }
 
-std::string tool_read_file(std::shared_ptr<CentralExecutive> ce_ref, json args) {
+std::string tool_read_file(std::shared_ptr<AgentExecutor> ce_ref, json args) {
     (void)ce_ref;
     std::string answer;
     if (args.contains("file_path")) {
@@ -83,7 +83,7 @@ std::string tool_read_file(std::shared_ptr<CentralExecutive> ce_ref, json args) 
     return answer;
 }
 
-std::string tool_write_file(std::shared_ptr<CentralExecutive> ce_ref, json args) {
+std::string tool_write_file(std::shared_ptr<AgentExecutor> ce_ref, json args) {
     (void)ce_ref;
     std::string answer;
     if (args.contains("file_path")) {
@@ -104,7 +104,7 @@ std::string tool_write_file(std::shared_ptr<CentralExecutive> ce_ref, json args)
     return answer;
 }
 
-std::string tool_append_file(std::shared_ptr<CentralExecutive> ce_ref, json args) {
+std::string tool_append_file(std::shared_ptr<AgentExecutor> ce_ref, json args) {
     (void)ce_ref;
     std::string answer;
     if (args.contains("file_path")) {
@@ -125,7 +125,7 @@ std::string tool_append_file(std::shared_ptr<CentralExecutive> ce_ref, json args
     return answer;
 }
 
-std::string tool_execute_bash_command(std::shared_ptr<CentralExecutive> ce_ref, json args) {
+std::string tool_execute_bash_command(std::shared_ptr<AgentExecutor> ce_ref, json args) {
     (void)ce_ref;
     std::string answer;
     if (args.contains("command")) {
@@ -148,7 +148,7 @@ std::string tool_execute_bash_command(std::shared_ptr<CentralExecutive> ce_ref, 
     return answer;
 }
 
-std::string tool_execute_python_script(std::shared_ptr<CentralExecutive> ce_ref, json args) {
+std::string tool_execute_python_script(std::shared_ptr<AgentExecutor> ce_ref, json args) {
     std::string answer;
     if (args.contains("script")) {
         std::string script = std::string(args["script"]);

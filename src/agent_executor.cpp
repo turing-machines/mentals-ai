@@ -1,49 +1,49 @@
-#include "central_executive.h"
+#include "agent_executor.h"
 #include "tool_registry.h"
 #include "native_tools.h"
 
-CentralExecutive::CentralExecutive() {
+AgentExecutor::AgentExecutor() {
 
-    guard("CentralExecutive::CentralExecutive")
+    guard("AgentExecutor::AgentExecutor")
     ///
     logger = Logger::get_instance();
     /// Load central executive instructions
-    central_executive_instruction = read_file("mentals_system.prompt");
-    if (central_executive_instruction.empty()) {
+    agent_executor_instruction = read_file("mentals_system.prompt");
+    if (agent_executor_instruction.empty()) {
         throw "Failed to load central executive instructions";
     }
     /// Initial central executive state
-    central_executive_state = json::object();
+    agent_executor_state = json::object();
     ///
     unguard()
 }
 
 #if defined(__PGVECTOR__)
-CentralExecutive::ControlUnit(pqxx::connection& conn) : conn_ref(conn) {
+AgentExecutor::AgentExecutor(pqxx::connection& conn) : conn_ref(conn) {
 
-    guard("CentralExecutive::CentralExecutive")
+    guard("AgentExecutor::AgentExecutor")
     ///
     logger = Logger::get_instance();
     /// Load central executive instructions
-    central_executive_instruction = read_file("mentals_system.prompt");
-    if (central_executive_instruction.empty()) {
+    agent_executor_instruction = read_file("mentals_system.prompt");
+    if (agent_executor_instruction.empty()) {
         throw "Failed to load central executive instructions";
     }
     /// Initial central executive state
-    central_executive_state = json::object();
+    agent_executor_state = json::object();
     ///
     unguard()
 }
 #endif
 
-CentralExecutive::~CentralExecutive() {
+AgentExecutor::~AgentExecutor() {
     /// Clean up Python environment
     code_interpreter.delete_virtual_environment();
 }
 
-bool CentralExecutive::init_native_tools(const std::string& file_path) {
+bool AgentExecutor::init_native_tools(const std::string& file_path) {
 
-    guard("CentralExecutive::init_native_tools")
+    guard("AgentExecutor::init_native_tools")
 
     auto native_instructions_toml = toml::parse_file(file_path);
     auto instructions = native_instructions_toml["instruction"].as_array();
@@ -71,11 +71,11 @@ bool CentralExecutive::init_native_tools(const std::string& file_path) {
     return true;
 }
 
-void CentralExecutive::set_state_variable(const std::string& name, const std::string& value) {
-    central_executive_state.emplace(name, value);
+void AgentExecutor::set_state_variable(const std::string& name, const std::string& value) {
+    agent_executor_state.emplace(name, value);
 }
 
-void CentralExecutive::init_agent(std::map<std::string, Instruction>& inst) {
+void AgentExecutor::init_agent(std::map<std::string, Instruction>& inst) {
     /// Prepare agent
     std::cout << YELLOW << "Init agent...\n";
     logger->log("*****************************");
@@ -92,7 +92,7 @@ void CentralExecutive::init_agent(std::map<std::string, Instruction>& inst) {
 }
 
 /// @brief Run agent thread
-std::string CentralExecutive::run_agent_thread(const std::string& entry_instruction, 
+std::string AgentExecutor::run_agent_thread(const std::string& entry_instruction, 
     const std::string& input, std::optional<liboai::Conversation> context) {
 
     /// Reset
@@ -104,7 +104,7 @@ std::string CentralExecutive::run_agent_thread(const std::string& entry_instruct
     ///
     std::cout << YELLOW << "Init working memory...\n";
     ///
-    central_executive_state["return"] = "false";
+    agent_executor_state["return"] = "false";
 
     /// TODO: fill short term memory with global variables or incoming data
     ///
@@ -137,10 +137,10 @@ std::string CentralExecutive::run_agent_thread(const std::string& entry_instruct
     /// Nlop per second
     nlops = nlop * 1e6 / static_cast<double>(total_time);
 
-    return central_executive_state["output"];
+    return agent_executor_state["output"];
 }
 
-void CentralExecutive::add_agent_instruction(const std::string& name, 
+void AgentExecutor::add_agent_instruction(const std::string& name, 
     const std::string& description, const std::string& input_prompt) {
     agent_instructions.push_back({
         { "name"            , name          },
@@ -152,8 +152,8 @@ void CentralExecutive::add_agent_instruction(const std::string& name,
     });
 }
 
-void CentralExecutive::prepare_agent_instructions(int word_count_limit) {
-    guard("CentralExecutive::prepare_agent_instructions")
+void AgentExecutor::prepare_agent_instructions(int word_count_limit) {
+    guard("AgentExecutor::prepare_agent_instructions")
     /// Init array
     agent_instructions = json::array();
 
@@ -194,15 +194,15 @@ void CentralExecutive::prepare_agent_instructions(int word_count_limit) {
     unguard()
 }
 
-void CentralExecutive::update_state(const Instruction& instruction) {
-    guard("CentralExecutive::update_state")
+void AgentExecutor::update_state(const Instruction& instruction) {
+    guard("AgentExecutor::update_state")
 
     /// Set active instruction
-    central_executive_state["instruction_name"] = instruction.label;
-    central_executive_state["instruction"] = instruction.prompt;
+    agent_executor_state["instruction_name"] = instruction.label;
+    agent_executor_state["instruction"] = instruction.prompt;
 
     /// Update short term memory
-    central_executive_state["short_term_memory"] = short_term_memory.dump(4);
+    agent_executor_state["short_term_memory"] = short_term_memory.dump(4);
 
     /// Prepare active instructions
     json active_instructions;
@@ -229,30 +229,30 @@ void CentralExecutive::update_state(const Instruction& instruction) {
         one_shot += "\n}\n```<<CALL>>";
         few_shot += one_shot + "\n\n";
     }
-    central_executive_state["instruction_call_few_shot"] = few_shot;
+    agent_executor_state["instruction_call_few_shot"] = few_shot;
 
     /// Write available to call instructions for current instruction
-    central_executive_state["instructions"] = active_instructions.dump(4);
+    agent_executor_state["instructions"] = active_instructions.dump(4);
 
     /// Update system prompt
-    std::string system = render_template(central_executive_instruction, central_executive_state);
+    std::string system = render_template(agent_executor_instruction, agent_executor_state);
     working_memory->SetSystemData(system);
 
     unguard()
 }
 
 /// @brief Execute instruction 1 NLOP
-void CentralExecutive::execute() {
-    ///guard("CentralExecutive::execute")
+void AgentExecutor::execute() {
+    ///guard("AgentExecutor::execute")
 
     /// If terminated, exit from execute
-    if (central_executive_state["return"] == "true") {
+    if (agent_executor_state["return"] == "true") {
         return;
     }
 
     /// Fetch current instruction
     Instruction curr_instr = instructions.at(
-        central_executive_state["instruction_name"].get<std::string>()
+        agent_executor_state["instruction_name"].get<std::string>()
     );
 
     /// Debug info
@@ -313,7 +313,7 @@ void CentralExecutive::execute() {
     }
 
     if (!debug) {
-        std::string completion = central_executive_state["output"].get<std::string>();
+        std::string completion = agent_executor_state["output"].get<std::string>();
         completion = string_in_line(completion);
         completion += "\n";
         stop_spinner(completion);
@@ -324,7 +324,7 @@ void CentralExecutive::execute() {
     ///unguard()
 }
 
-void CentralExecutive::apply_instruction_response(std::shared_ptr<liboai::Conversation> working_memory,
+void AgentExecutor::apply_instruction_response(std::shared_ptr<liboai::Conversation> working_memory,
     const std::string& content,
     const std::string& name, 
     const std::string& result) {
@@ -336,8 +336,8 @@ void CentralExecutive::apply_instruction_response(std::shared_ptr<liboai::Conver
     working_memory->AddAssistantData(message);
 }
 
-void CentralExecutive::stop(const std::string &content) {
-    guard("CentralExecutive::stop")
+void AgentExecutor::stop(const std::string &content) {
+    guard("AgentExecutor::stop")
 
     /// Return from instruction
     if (instructions_call_stack.size() > 1) {
@@ -346,7 +346,7 @@ void CentralExecutive::stop(const std::string &content) {
 
         /// Clear context if not keep
         if (!next_instr.keep_context) {
-            working_contexts.erase(central_executive_state["instruction_name"]);
+            working_contexts.erase(agent_executor_state["instruction_name"]);
         }
 
         /// Remove latest instruction from call stack
@@ -365,7 +365,7 @@ void CentralExecutive::stop(const std::string &content) {
             /// Add response to context from executed instruction
             apply_instruction_response(working_memory,
                 last_response,
-                central_executive_state["instruction_name"], 
+                agent_executor_state["instruction_name"], 
                 content
             );
         }
@@ -374,18 +374,18 @@ void CentralExecutive::stop(const std::string &content) {
         update_state(next_instr);
     } else { 
         /// Exit from root instruction
-        central_executive_state["return"] = "true";
+        agent_executor_state["return"] = "true";
     }
     
     unguard()
 }
 
-void CentralExecutive::parse_content(std::string& content) {
-    ///guard("CentralExecutive::parse_content")
+void AgentExecutor::parse_content(std::string& content) {
+    ///guard("AgentExecutor::parse_content")
 
     /// Fetch current instruction
     Instruction curr_instr = instructions.at(
-        central_executive_state["instruction_name"].get<std::string>()
+        agent_executor_state["instruction_name"].get<std::string>()
     );
 
     /// Find and save as a text all similar to json object structures
@@ -400,7 +400,7 @@ void CentralExecutive::parse_content(std::string& content) {
     if (!json_block.empty()) {
         content = erase_text_after_specified_substring(content, json_block);
     }
-    central_executive_state["output"] = content;
+    agent_executor_state["output"] = content;
     ///
     if (debug) {
         std::cout << YELLOW << "[output]\t" << content << "\n";
@@ -471,7 +471,7 @@ void CentralExecutive::parse_content(std::string& content) {
                     if(input != "null") {
                         working_memory->AddUserData(input, "user");
                     }
-                    ///central_executive_state["input"] = input;
+                    ///agent_executor_state["input"] = input;
                 }
             } else {
                 /// Unknown instruction
@@ -479,7 +479,7 @@ void CentralExecutive::parse_content(std::string& content) {
                 /// Enrich json answer
                 std::string enriched_answer = llm.enrich_json_answer(content);
                 working_memory->AddAssistantData(enriched_answer);
-                central_executive_state["output"] = enriched_answer;
+                agent_executor_state["output"] = enriched_answer;
                 if (debug) {
                     std::cout << "Enriched json answer: " << enriched_answer << "\n";
                 }

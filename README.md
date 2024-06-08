@@ -7,7 +7,7 @@ Mentals AI is a tool designed for creating and operating agents that feature **`
     - [Instruction (prompt)](#-instruction-prompt)
     - [Working Memory (context)](#-working-memory-context)
     - [Short-Term Memory (experimental)](#-short-term-memory-experimental)
-    - [Control flow: From strings to algorithms](#-control-flow-from-strings-to-algorithms)
+    - [Control flow: From strings to algorithms](#️-control-flow-from-strings-to-algorithms)
 - [Roadmap](#️-roadmap)
 - [Getting Started](#-getting-started)
 - [The Idea](#-the-idea)

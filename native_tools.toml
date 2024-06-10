@@ -46,7 +46,7 @@ description = "dependencies separated by spaces need to be installed to execute 
 name = "execute_bash_command"
 description = """Bash command to execute.
 Call this instruction if you need to execute a bash command.
-Use the bash command from reponse in markdown syntax or generate a new one.
+Use the bash command from response in markdown syntax or generate a new one.
 1. Do strings with escape charactres and use double quotes;
 2. For http requests, if the url string has spaces, insert a '+' between words."""
 [[instruction.parameters]]

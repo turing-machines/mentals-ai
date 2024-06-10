@@ -33,6 +33,10 @@
 #include "nlohmann/json.hpp"
 #include "toml++/toml.hpp"
 
+#if defined(__PGVECTOR__)
+#include <pgvector/pqxx.hpp>
+#endif
+
 extern bool debug;
 extern std::atomic<bool> spinner_active;
 extern std::thread spinner_thread;

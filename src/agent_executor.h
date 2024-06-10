@@ -11,7 +11,7 @@ class ToolRegistry;
 ///
 /// @brief Instructions execution
 ///
-class CentralExecutive : public std::enable_shared_from_this<CentralExecutive> {
+class AgentExecutor : public std::enable_shared_from_this<AgentExecutor> {
     public:
         /// Natural language processor
         LLM llm;
@@ -22,7 +22,7 @@ class CentralExecutive : public std::enable_shared_from_this<CentralExecutive> {
         /// access to the short term memory data
         json short_term_memory;
         ///
-        json central_executive_state;
+        json agent_executor_state;
         /// Stat
         int nlop;
         double nlops;
@@ -35,7 +35,7 @@ class CentralExecutive : public std::enable_shared_from_this<CentralExecutive> {
         ///friend class ToolRegistry;
         std::unique_ptr<ToolRegistry> tools;
         ///
-        std::string central_executive_instruction;
+        std::string agent_executor_instruction;
         /// Loaded native instructions
         json native_instructions;
         /// Loaded agent instructions
@@ -50,9 +50,17 @@ class CentralExecutive : public std::enable_shared_from_this<CentralExecutive> {
         ///
         Logger* logger;
 
+#if defined(__PGVECTOR__)
+        pqxx::connection& conn_ref;
+#endif
+
     public:
-        CentralExecutive();
-        ~CentralExecutive();
+        AgentExecutor();
+#if defined(__PGVECTOR__)
+        AgentExecutor(pqxx::connection& conn);
+#endif
+
+        ~AgentExecutor();
         ///
         void set_state_variable(const std::string& name, const std::string& value);
         bool init_native_tools(const std::string& file_path);

@@ -111,3 +111,30 @@ description = "insert a brief description of the content here"
 [[instruction.parameters]]
 name = "content"
 description = "insert here content to memorize as a plain text"
+
+#####################################
+### List collections
+#####################################
+[[instruction]]
+name = "list_collections"
+description = """List all collections from long-term memory"""
+
+#####################################
+### Create collection
+#####################################
+[[instruction]]
+name = "create_collection"
+description = """Create collection"""
+[[instruction.parameters]]
+name = "name"
+description = """Collection name"""
+
+#####################################
+### Delete collection
+#####################################
+[[instruction]]
+name = "delete_collection"
+description = """Delete collection"""
+[[instruction.parameters]]
+name = "name"
+description = """Collection name"""

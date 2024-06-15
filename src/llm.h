@@ -59,7 +59,7 @@ class LLM {
             return liboai::Response();
         }
 
-        vdb::Vector embedding(const std::string& text) {
+        vdb::vector embedding(const std::string& text) {
             guard("LLM::embedding")
             liboai::Response response = oai.Embedding->create(
                 "text-embedding-ada-002",
@@ -67,9 +67,9 @@ class LLM {
                 text
             );
             json jres = response["data"][0]["embedding"];
-            return vdb::Vector({ jres.begin(), jres.end() });
+            return vdb::vector({ jres.begin(), jres.end() });
             unguard()
-            return vdb::Vector();
+            return vdb::vector();
         }
 
         /// TODO: Refine

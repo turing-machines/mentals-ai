@@ -11,13 +11,16 @@ private:
     Logger* logger;
 
 public:
-    PgVector(const std::string &conn_info);
+    PgVector(const std::string& conn_info);
     ~PgVector();
 
     tl::expected<void, std::string> connect();
     tl::expected<json, std::string> list_collections();
-    tl::expected<std::string, std::string> create_collection(const std::string &table_name, EmbeddingModel model);
-    tl::expected<std::string, std::string> delete_collection(const std::string &table_name);
-    tl::expected<void, std::string> write_content(const std::string &table_name, const std::string &content, 
-        const vdb::Vector &embedding);
+    tl::expected<std::string, std::string> create_collection(const std::string& table_name, EmbeddingModel model);
+    tl::expected<std::string, std::string> delete_collection(const std::string& table_name);
+    tl::expected<void, std::string> write_content(const std::string& table_name, const std::string& content, 
+        const vdb::vector& embedding);
+    tl::expected<json, std::string> search_content(const std::string& table_name, 
+        const vdb::vector& search_vector,
+        int limit);
 };

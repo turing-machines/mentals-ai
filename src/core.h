@@ -114,16 +114,16 @@ enum class EmbeddingModel {
 };
 
 namespace vdb {
-    class Vector {
+    class vector {
         public:
-            Vector() = default;
-            Vector(const std::vector<float>& value) { __value = value; }
-            Vector(std::vector<float>&& value) { __value = std::move(value); }
-            Vector(const float* value, size_t n) { __value = std::vector<float>{value, value + n}; }
+            vector() = default;
+            vector(const std::vector<float>& value) { __value = value; }
+            vector(std::vector<float>&& value) { __value = std::move(value); }
+            vector(const float* value, size_t n) { __value = std::vector<float>{value, value + n}; }
             size_t dimensions() const { return __value.size(); }
             operator const std::vector<float>() const { return __value; }
-            friend bool operator==(const Vector& lhs, const Vector& rhs) { return lhs.__value == rhs.__value; }
-            friend std::ostream& operator<<(std::ostream& os, const Vector& value) {
+            friend bool operator==(const vector& lhs, const vector& rhs) { return lhs.__value == rhs.__value; }
+            friend std::ostream& operator<<(std::ostream& os, const vector& value) {
                 os << "[";
                 for (size_t i = 0; i < value.__value.size(); i++) {
                     if (i > 0) { os << ","; }

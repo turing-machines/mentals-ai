@@ -49,18 +49,42 @@ int main(int argc, char *argv[]) {
         );
     }
 
-    /*std::string conn_info = fmt::format("dbname={} user={} password={} hostaddr={} port={}", 
+    LLM llm;
+    llm.set_provider(endpoint, api_key);
+    llm.set_model(model);
+
+    std::string conn_info = fmt::format("dbname={} user={} password={} hostaddr={} port={}", 
         dbname, user, password, hostaddr, port);
 
     PgVector db(conn_info);
     db.connect();
-    std::cout << db.list_collections() << std::endl;
-    db.create_collection("vector_table", EmbeddingModel::ada002);
-    std::cout << db.list_collections() << std::endl;
-    db.delete_collection("vector_table");
-*/
+    
+    db.delete_collection("tools");
+    
+    db.create_collection("tools", EmbeddingModel::ada002);
 
-    /// Init central executive
+    auto res = db.list_collections();
+
+    if(res) {
+        std::cout << "Collections: " << *res << "\n\n";
+    }
+
+    std::string content = "Hello world";
+    vdb::vector vec = llm.embedding(content);
+
+    ///std::cout << "Vector: " << vec << "\n\n";
+
+    db.write_content("tools", content, vec);
+
+    vdb::vector search_vec = llm.embedding("Test");
+
+    auto search_res = db.search_content("tools", search_vec, 3);
+
+    if(search_res) {
+        std::cout << "List: " << *search_res << "\n\n";
+    }
+
+  /*  /// Init central executive
     ///auto agent_executor = std::make_shared<AgentExecutor>(conn);
     auto agent_executor = std::make_shared<AgentExecutor>();
 
@@ -105,7 +129,7 @@ int main(int argc, char *argv[]) {
         agent_executor->usage["total_tokens"].get<int>(),
         agent_executor->nlop, agent_executor->nlops
     );
-
+*/
     exit(EXIT_SUCCESS);
 
     unguard()

@@ -2,6 +2,8 @@
 
 Mentals AI is a tool designed for creating and operating agents that feature **`loops`**, **`memory`**, and various **`tools`**, all through straightforward **`markdown`** file with a .gen extension. Think of an agent file as an executable file. You focus entirely on the logic of the agent, eliminating the necessity to write scaffolding code in Python or any other language. Essentially, it redefines the foundational frameworks for future AI applications.
 
+> [!NOTE] [work in progress] A local vector database to store your chats with the agents as well as your private information.
+
 - [Getting Started](#-getting-started)
 - [Differences from Other Frameworks](#-differences-from-other-frameworks)
 - [Key Concepts](#️-key-concepts)

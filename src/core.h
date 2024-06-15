@@ -29,6 +29,7 @@
 #include <cassert>
 #include <fmt/core.h>
 
+#include "tl/expected.hpp"
 #include "treehh/tree.hh"
 #include "nlohmann/json.hpp"
 #include "toml++/toml.hpp"
@@ -125,10 +126,8 @@ namespace vdb {
             friend std::ostream& operator<<(std::ostream& os, const Vector& value) {
                 os << "[";
                 for (size_t i = 0; i < value.__value.size(); i++) {
-                    if (i > 0) {
-                        os << ",";
-                    }
-                    os << value.__value[i];
+                    if (i > 0) { os << ","; }
+                    os << fmt::format("{:.6f}", value.__value[i]);
                 }
                 os << "]";
                 return os;

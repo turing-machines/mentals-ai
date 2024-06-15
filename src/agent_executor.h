@@ -51,13 +51,13 @@ class AgentExecutor : public std::enable_shared_from_this<AgentExecutor> {
         Logger* logger;
 
 #if defined(__PGVECTOR__)
-        pqxx::connection& conn_ref;
+//        pqxx::connection& conn_ref;
 #endif
 
     public:
         AgentExecutor();
 #if defined(__PGVECTOR__)
-        AgentExecutor(pqxx::connection& conn);
+ ///       AgentExecutor(pqxx::connection& conn);
 #endif
 
         ~AgentExecutor();

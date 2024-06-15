@@ -33,9 +33,7 @@
 #include "nlohmann/json.hpp"
 #include "toml++/toml.hpp"
 
-#if defined(__PGVECTOR__)
-#include <pgvector/pqxx.hpp>
-#endif
+#include <pqxx/pqxx>
 
 extern bool debug;
 extern std::atomic<bool> spinner_active;
@@ -109,6 +107,37 @@ void print_tree(const tree<std::string>& tr);
 tree<std::string>::pre_order_iterator find_node(const tree<std::string>& tr, const std::string& node_value);
 bool append_child(tree<std::string>& tr, const std::string& node_value, const std::string& child_value);
 
+enum class EmbeddingModel {
+    ada002 = 1536,
+    large3 = 3072
+};
+
+namespace vdb {
+    class Vector {
+        public:
+            Vector() = default;
+            Vector(const std::vector<float>& value) { __value = value; }
+            Vector(std::vector<float>&& value) { __value = std::move(value); }
+            Vector(const float* value, size_t n) { __value = std::vector<float>{value, value + n}; }
+            size_t dimensions() const { return __value.size(); }
+            operator const std::vector<float>() const { return __value; }
+            friend bool operator==(const Vector& lhs, const Vector& rhs) { return lhs.__value == rhs.__value; }
+            friend std::ostream& operator<<(std::ostream& os, const Vector& value) {
+                os << "[";
+                for (size_t i = 0; i < value.__value.size(); i++) {
+                    if (i > 0) {
+                        os << ",";
+                    }
+                    os << value.__value[i];
+                }
+                os << "]";
+                return os;
+            }
+
+        private:
+            std::vector<float> __value;
+    };
+}
 
 #define guard(method_name) \
     std::string __method = method_name; \

@@ -5,6 +5,8 @@ SRC_DIRS := ./src
 
 LOGS_DIR := ./logs
 
+VERBOSE ?= 1
+
 # Find all the C and C++ files we want to compile
 SRCS := $(shell find $(SRC_DIRS) -name '*.cpp' -or -name '*.c' -or -name '*.s')
 
@@ -22,19 +24,24 @@ INC_FLAGS := $(addprefix -I,$(INC_DIRS))
 OS := $(shell uname -s)
 ifeq ($(OS),Linux)
     CPPFLAGS += -DLINUX
-    LDFLAGS := -lrt -lpthread -lcurl -lfmt
+    LDFLAGS := -lrt -lpthread -lcurl -lfmt -lpqxx -lpq
 endif
 ifeq ($(OS),Darwin)
     CPPFLAGS += -DMACOS
-    LDFLAGS := -lpthread -lcurl -lfmt
+    LDFLAGS := -lpthread -lcurl -lfmt -lpqxx -lpq
 endif
 ifeq ($(OS),Windows_NT)
     CPPFLAGS += -DWIN32
-    LDFLAGS := -lws2_32 -lcurl -lfmt
+    LDFLAGS := -lws2_32 -lcurl -lfmt -lpqxx -lpq
+endif
+
+ifeq ($(VERBOSE),1)
+    CXXFLAGS += -v
+    LDFLAGS += -v
 endif
 
 # The -MMD and -MP flags together generate Makefiles for us!
-CPPFLAGS += $(INC_FLAGS) -MMD -MP
+CPPFLAGS += $(INC_FLAGS) -MMD -MP #-D__PGVECTOR__
 CXXFLAGS := -std=c++20 -Wall -Wextra -Werror -O3 -march=native
 
 # Default to clang if available and version is >= 14, otherwise use gcc

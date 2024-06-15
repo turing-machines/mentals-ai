@@ -18,7 +18,7 @@ AgentExecutor::AgentExecutor() {
     unguard()
 }
 
-#if defined(__PGVECTOR__)
+/*#if defined(__PGVECTOR__)
 AgentExecutor::AgentExecutor(pqxx::connection& conn) : conn_ref(conn) {
 
     guard("AgentExecutor::AgentExecutor")
@@ -35,6 +35,7 @@ AgentExecutor::AgentExecutor(pqxx::connection& conn) : conn_ref(conn) {
     unguard()
 }
 #endif
+*/
 
 AgentExecutor::~AgentExecutor() {
     /// Clean up Python environment

@@ -56,33 +56,61 @@ int main(int argc, char *argv[]) {
     std::string conn_info = fmt::format("dbname={} user={} password={} hostaddr={} port={}", 
         dbname, user, password, hostaddr, port);
 
-    PgVector db(conn_info);
-    db.connect();
-    
-    db.delete_collection("tools");
-    
-    db.create_collection("tools", EmbeddingModel::ada002);
+    PgVector vdb(conn_info);
+    vdb.connect();
 
-    auto res = db.list_collections();
+    /*vdb.delete_collection("tools");   
+    //vdb.create_collection("tools", EmbeddingModel::oai_ada002);
+    vdb.create_collection("tools", EmbeddingModel::oai_3large);
 
-    if(res) {
+    auto res = vdb.list_collections();
+
+    if (res) {
         std::cout << "Collections: " << *res << "\n\n";
     }
 
-    std::string content = "Hello world";
-    vdb::vector vec = llm.embedding(content);
+    auto native_instructions_toml = toml::parse_file("native_tools.toml");
+    auto tools = native_instructions_toml["instruction"].as_array();
 
-    ///std::cout << "Vector: " << vec << "\n\n";
+    std::stringstream ss;
+    ss << toml::json_formatter{ *tools };
+    json native_instructions = json::parse(ss.str());
 
-    db.write_content("tools", content, vec);
+    for (auto& item : native_instructions) {
+        std::string tool_text;
+        //tool_text = item.dump(4);
+        //tool_text = std::string(item["name"]);
+        tool_text = std::string(item["name"]) + "\n" + std::string(item["description"]);
+        if (item.contains("parameters")) {
+            for (auto& param : item["parameters"]) {
+                tool_text += "\n" 
+                    + std::string(param["name"]) + " : " 
+                    + std::string(param["description"]);
+            }
+        }
+        //tool_text = std::string(item["description"]);
+        std::cout << tool_text << "\n-------\n";
+        vdb::vector vec = llm.embedding(tool_text);
+        vdb.write_content("tools", item["name"], vec);
+    }*/
 
-    vdb::vector search_vec = llm.embedding("Test");
+    GenFile gen;
+    auto [variables, instructions] = gen.load_from_file(filename);
 
-    auto search_res = db.search_content("tools", search_vec, 3);
+    std::string search_text = instructions["root"].prompt;
 
-    if(search_res) {
-        std::cout << "List: " << *search_res << "\n\n";
+    std::cout << "Search text:\n" << search_text << "\n\n";
+
+    std::cout << "Tools: " << vector_to_comma_separated_string(instructions["root"].use) << "\n\n";
+
+    vdb::vector search_vec = llm.embedding(search_text);
+
+    auto search_res = vdb.search_content("tools", search_vec, 5, vdb::QueryType::cosine_similarity);
+
+    if (search_res) {
+        std::cout << "Search results:\n" << (*search_res).dump(4) << "\n\n";
     }
+
 
   /*  /// Init central executive
     ///auto agent_executor = std::make_shared<AgentExecutor>(conn);

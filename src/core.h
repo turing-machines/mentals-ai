@@ -109,11 +109,23 @@ tree<std::string>::pre_order_iterator find_node(const tree<std::string>& tr, con
 bool append_child(tree<std::string>& tr, const std::string& node_value, const std::string& child_value);
 
 enum class EmbeddingModel {
-    ada002 = 1536,
-    large3 = 3072
+    oai_ada002 = 1536,
+    oai_3large = 3072
 };
 
 namespace vdb {
+
+    enum class QueryType {
+        embedding,
+        distance,
+        cosine_similarity
+    };
+
+    struct QueryInfo {
+        std::string sql_clause;
+        std::optional<std::string> result_field;
+    };
+
     class vector {
         public:
             vector() = default;

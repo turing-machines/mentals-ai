@@ -42,7 +42,7 @@ endif
 
 # The -MMD and -MP flags together generate Makefiles for us!
 CPPFLAGS += $(INC_FLAGS) -MMD -MP #-D__PGVECTOR__
-CXXFLAGS := -std=c++20 -Wall -Wextra -Werror -O3 -march=native
+CXXFLAGS := -std=c++20 -Wall -Wextra -O3 -march=native # -Werror
 
 # Default to clang if available and version is >= 14, otherwise use gcc
 CXX := $(shell which clang++ || which g++)

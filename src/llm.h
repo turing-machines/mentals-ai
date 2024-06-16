@@ -62,8 +62,8 @@ class LLM {
         vdb::vector embedding(const std::string& text) {
             guard("LLM::embedding")
             liboai::Response response = oai.Embedding->create(
-                "text-embedding-ada-002",
-                //"text-embedding-3-large",
+                //"text-embedding-ada-002",
+                "text-embedding-3-large",
                 text
             );
             json jres = response["data"][0]["embedding"];

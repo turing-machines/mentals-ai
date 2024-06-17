@@ -1,6 +1,8 @@
 # root
 ## use: youtube_search, write_file, execute_bash_command, execute_python_script
 
+Use write file, bash commands, python scripts.
+
 Find ten youtube videos related to AI. Sort by the number of views.
 
 Save videos to ai_videos.csv with video title, url, views, channel name, 

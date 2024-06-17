@@ -29,13 +29,12 @@
 #include <cassert>
 #include <fmt/core.h>
 
+#include "tl/expected.hpp"
 #include "treehh/tree.hh"
 #include "nlohmann/json.hpp"
 #include "toml++/toml.hpp"
 
-#if defined(__PGVECTOR__)
-#include <pgvector/pqxx.hpp>
-#endif
+#include <pqxx/pqxx>
 
 extern bool debug;
 extern std::atomic<bool> spinner_active;
@@ -109,6 +108,47 @@ void print_tree(const tree<std::string>& tr);
 tree<std::string>::pre_order_iterator find_node(const tree<std::string>& tr, const std::string& node_value);
 bool append_child(tree<std::string>& tr, const std::string& node_value, const std::string& child_value);
 
+enum class EmbeddingModel {
+    oai_ada002 = 1536,
+    oai_3large = 3072
+};
+
+namespace vdb {
+
+    enum class QueryType {
+        embedding,
+        distance,
+        cosine_similarity
+    };
+
+    struct QueryInfo {
+        std::string sql_clause;
+        std::optional<std::string> result_field;
+    };
+
+    class vector {
+        public:
+            vector() = default;
+            vector(const std::vector<float>& value) { __value = value; }
+            vector(std::vector<float>&& value) { __value = std::move(value); }
+            vector(const float* value, size_t n) { __value = std::vector<float>{value, value + n}; }
+            size_t dimensions() const { return __value.size(); }
+            operator const std::vector<float>() const { return __value; }
+            friend bool operator==(const vector& lhs, const vector& rhs) { return lhs.__value == rhs.__value; }
+            friend std::ostream& operator<<(std::ostream& os, const vector& value) {
+                os << "[";
+                for (size_t i = 0; i < value.__value.size(); i++) {
+                    if (i > 0) { os << ","; }
+                    os << fmt::format("{:.6f}", value.__value[i]);
+                }
+                os << "]";
+                return os;
+            }
+
+        private:
+            std::vector<float> __value;
+    };
+}
 
 #define guard(method_name) \
     std::string __method = method_name; \

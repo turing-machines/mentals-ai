@@ -5,6 +5,7 @@
 ///
 
 #include "platform.h"
+#include "pgvector.h"
 #include "agent_executor.h"
 
 bool debug{false};
@@ -26,10 +27,16 @@ int main(int argc, char *argv[]) {
     logger->log("\n" + platform_info);
 
     /// Load config
-    auto config             = toml::parse_file("config.toml");
-    std::string endpoint    = config["ENDPOINT"].value_or<std::string>("");
-    std::string api_key     = config["API_KEY"].value_or<std::string>("");
-    std::string model       = config["MODEL"].value_or<std::string>("");
+    auto config     = toml::parse_file("config.toml");
+    auto endpoint   = config["llm"]["endpoint"].value_or<std::string>("");
+    auto api_key    = config["llm"]["api_key"].value_or<std::string>("");
+    auto model      = config["llm"]["model"].value_or<std::string>("");
+    auto dbname     = config["vdb"]["dbname"].value_or<std::string>("memory");
+    auto user       = config["vdb"]["user"].value_or<std::string>("postgres");
+    auto password   = config["vdb"]["password"].value_or<std::string>("postgres");
+    auto hostaddr   = config["vdb"]["hostaddr"].value_or<std::string>("127.0.0.1");
+    auto port       = config["vdb"]["port"].value_or<std::string>("5432");
+
     if (debug) {
         fmt::print(
             "Endpoint:\t{}\n"
@@ -42,13 +49,65 @@ int main(int argc, char *argv[]) {
         );
     }
 
+    /*LLM llm;
+    llm.set_provider(endpoint, api_key);
+    llm.set_model(model);
+
+    std::string conn_info = fmt::format("dbname={} user={} password={} hostaddr={} port={}", 
+        dbname, user, password, hostaddr, port);
+
+    PgVector vdb(conn_info);
+    vdb.connect();
+
+    vdb.delete_collection("tools");   
+    //vdb.create_collection("tools", EmbeddingModel::oai_ada002);
+    vdb.create_collection("tools", EmbeddingModel::oai_3large);
+
+    auto res = vdb.list_collections();
+
+    if (res) {
+        std::cout << "Collections: " << *res << "\n\n";
+    }
+
+    auto native_instructions_toml = toml::parse_file("native_tools.toml");
+    auto tools = native_instructions_toml["instruction"].as_array();
+
+    std::stringstream ss;
+    ss << toml::json_formatter{ *tools };
+    json native_instructions = json::parse(ss.str());
+
+    for (auto& item : native_instructions) {
+        std::string tool_text;
+        //tool_text = item.dump(4);
+        //tool_text = std::string(item["name"]);
+        tool_text = std::string(item["name"]) + "\n" + std::string(item["description"]);
+        if (item.contains("parameters")) {
+            for (auto& param : item["parameters"]) {
+                tool_text += "\n" 
+                    + std::string(param["name"]) + " : " 
+                    + std::string(param["description"]);
+            }
+        }
+        //tool_text = std::string(item["description"]);
+        std::cout << tool_text << "\n-------\n";
+        vdb::vector vec = llm.embedding(tool_text);
+        vdb.write_content("tools", item["name"], vec);
+    }
+
+    GenFile gen;
+    auto [variables, instructions] = gen.load_from_file(filename);
+    std::string search_text = instructions["root"].prompt;
+    std::cout << "Search text:\n" << search_text << "\n\n";
+    std::cout << "Tools: " << vector_to_comma_separated_string(instructions["root"].use) << "\n\n";
+    vdb::vector search_vec = llm.embedding(search_text);
+    auto search_res = vdb.search_content("tools", search_vec, 5, vdb::QueryType::cosine_similarity);
+    if (search_res) {
+        std::cout << "Search results:\n" << (*search_res).dump(4) << "\n\n";
+    }*/
+
     /// Init central executive
-#if defined(__PGVECTOR__)
-    pqxx::connection conn("dbname=memory user=postgres password=postgres hostaddr=127.0.0.1 port=5432");
-    auto agent_executor = std::make_shared<AgentExecutor>(conn);
-#else
+    ///auto agent_executor = std::make_shared<AgentExecutor>(conn);
     auto agent_executor = std::make_shared<AgentExecutor>();
-#endif
 
     agent_executor->llm.set_provider(endpoint, api_key);
     agent_executor->llm.set_model(model);

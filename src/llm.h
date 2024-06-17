@@ -59,20 +59,18 @@ class LLM {
             return liboai::Response();
         }
 
-#if defined(__PGVECTOR__)
-        pgvector::Vector embedding(const std::string& text) {
+        vdb::vector embedding(const std::string& text) {
             guard("LLM::embedding")
             liboai::Response response = oai.Embedding->create(
-                "text-embedding-ada-002",
-                //"text-embedding-3-large",
+                //"text-embedding-ada-002",
+                "text-embedding-3-large",
                 text
             );
             json jres = response["data"][0]["embedding"];
-            return pgvector::Vector({ jres.begin(), jres.end() });
+            return vdb::vector({ jres.begin(), jres.end() });
             unguard()
-            return pgvector::Vector();
+            return vdb::vector();
         }
-#endif
 
         /// TODO: Refine
         std::string rag(std::string input, std::string data) {

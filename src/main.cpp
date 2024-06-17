@@ -49,7 +49,7 @@ int main(int argc, char *argv[]) {
         );
     }
 
-    LLM llm;
+    /*LLM llm;
     llm.set_provider(endpoint, api_key);
     llm.set_model(model);
 
@@ -59,7 +59,7 @@ int main(int argc, char *argv[]) {
     PgVector vdb(conn_info);
     vdb.connect();
 
-    /*vdb.delete_collection("tools");   
+    vdb.delete_collection("tools");   
     //vdb.create_collection("tools", EmbeddingModel::oai_ada002);
     vdb.create_collection("tools", EmbeddingModel::oai_3large);
 
@@ -92,27 +92,20 @@ int main(int argc, char *argv[]) {
         std::cout << tool_text << "\n-------\n";
         vdb::vector vec = llm.embedding(tool_text);
         vdb.write_content("tools", item["name"], vec);
-    }*/
+    }
 
     GenFile gen;
     auto [variables, instructions] = gen.load_from_file(filename);
-
     std::string search_text = instructions["root"].prompt;
-
     std::cout << "Search text:\n" << search_text << "\n\n";
-
     std::cout << "Tools: " << vector_to_comma_separated_string(instructions["root"].use) << "\n\n";
-
     vdb::vector search_vec = llm.embedding(search_text);
-
     auto search_res = vdb.search_content("tools", search_vec, 5, vdb::QueryType::cosine_similarity);
-
     if (search_res) {
         std::cout << "Search results:\n" << (*search_res).dump(4) << "\n\n";
-    }
+    }*/
 
-
-  /*  /// Init central executive
+    /// Init central executive
     ///auto agent_executor = std::make_shared<AgentExecutor>(conn);
     auto agent_executor = std::make_shared<AgentExecutor>();
 
@@ -157,7 +150,7 @@ int main(int argc, char *argv[]) {
         agent_executor->usage["total_tokens"].get<int>(),
         agent_executor->nlop, agent_executor->nlops
     );
-*/
+
     exit(EXIT_SUCCESS);
 
     unguard()

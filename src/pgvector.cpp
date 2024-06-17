@@ -84,6 +84,18 @@ expected<void, std::string> PgVector::write_content(const std::string& table_nam
     return {};
 }
 
+json pqxx_result_to_json(const pqxx::result& result) {
+    json json_result = json::array();
+    for (const auto& row : result) {
+        json json_row;
+        for (int colnum = 0; colnum < row.size(); ++colnum) {
+            json_row[result.column_name(colnum)] = row[colnum].c_str();
+        }
+        json_result.push_back(json_row);
+    }
+    return json_result;
+}
+
 expected<json, std::string> PgVector::search_content(const std::string& table_name, 
     const vdb::vector& search_vector, int limit, vdb::QueryType type) {
     guard("PgVector::search_content");
@@ -103,6 +115,11 @@ expected<json, std::string> PgVector::search_content(const std::string& table_na
 
     pqxx::result res = txn.exec_params(sql, (std::ostringstream() << search_vector).str());
     txn.commit();
+
+    json j_res = pqxx_result_to_json(res);
+
+    std::cout << j_res.dump(4);
+
     json results = json::array();
     for (auto row : res) {
         json item;

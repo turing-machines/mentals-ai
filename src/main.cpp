@@ -49,7 +49,7 @@ int main(int argc, char *argv[]) {
         );
     }
 
-    /*LLM llm;
+    LLM llm;
     llm.set_provider(endpoint, api_key);
     llm.set_model(model);
 
@@ -59,9 +59,11 @@ int main(int argc, char *argv[]) {
     PgVector vdb(conn_info);
     vdb.connect();
 
-    vdb.delete_collection("tools");   
-    //vdb.create_collection("tools", EmbeddingModel::oai_ada002);
-    vdb.create_collection("tools", EmbeddingModel::oai_3large);
+    vdb.delete_collection("tools");
+    //vdb.delete_collection("gens");
+    vdb.create_collection("tools", EmbeddingModel::oai_ada002);
+    ///vdb.create_collection("gens", EmbeddingModel::oai_ada002);
+    //vdb.create_collection("tools", EmbeddingModel::oai_3large);
 
     auto res = vdb.list_collections();
 
@@ -103,8 +105,14 @@ int main(int argc, char *argv[]) {
     auto search_res = vdb.search_content("tools", search_vec, 5, vdb::QueryType::cosine_similarity);
     if (search_res) {
         std::cout << "Search results:\n" << (*search_res).dump(4) << "\n\n";
-    }*/
+    }
 
+    auto info = vdb.get_collection_info("tools");
+    if(info) {
+        std::cout << "tools info: " << (*info).dump(4) << "\n\n";
+    }
+
+    /*
     /// Init central executive
     ///auto agent_executor = std::make_shared<AgentExecutor>(conn);
     auto agent_executor = std::make_shared<AgentExecutor>();
@@ -149,7 +157,7 @@ int main(int argc, char *argv[]) {
         agent_executor->usage["completion_tokens"].get<int>(),
         agent_executor->usage["total_tokens"].get<int>(),
         agent_executor->nlop, agent_executor->nlops
-    );
+    );*/
 
     exit(EXIT_SUCCESS);
 

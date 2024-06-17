@@ -37,8 +37,9 @@ public:
 
     expected<void, std::string> connect();
     expected<json, std::string> list_collections();
-    expected<std::string, std::string> create_collection(const std::string& table_name, EmbeddingModel model);
+    expected<json, std::string> create_collection(const std::string& table_name, EmbeddingModel model);
     expected<std::string, std::string> delete_collection(const std::string& table_name);
+    expected<json, std::string> get_collection_info(const std::string& table_name);
     expected<void, std::string> write_content(const std::string& table_name, const std::string& content, 
         const vdb::vector& embedding);
     expected<json, std::string> search_content(const std::string& table_name, const vdb::vector& search_vector, 

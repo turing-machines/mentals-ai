@@ -28,6 +28,7 @@
 #include <stdexcept>
 #include <cassert>
 #include <fmt/core.h>
+#include <fmt/format.h>
 
 #include "tl/expected.hpp"
 #include "treehh/tree.hh"
@@ -111,6 +112,18 @@ bool append_child(tree<std::string>& tr, const std::string& node_value, const st
 enum class EmbeddingModel {
     oai_ada002 = 1536,
     oai_3large = 3072
+};
+
+template <>
+struct fmt::formatter<EmbeddingModel> : formatter<std::string> {
+    auto format(EmbeddingModel c, format_context& ctx) {
+        std::string name = "Unknown";
+        switch (c) {
+            case EmbeddingModel::oai_ada002: name = "text-embedding-ada-002"; break;
+            case EmbeddingModel::oai_3large: name = "text-embedding-3-large"; break;
+        }
+        return formatter<std::string>::format(name, ctx);
+    }
 };
 
 namespace vdb {

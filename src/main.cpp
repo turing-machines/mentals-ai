@@ -108,7 +108,7 @@ int main(int argc, char *argv[]) {
     }
 
     auto info = vdb.get_collection_info("tools");
-    if(info) {
+    if (info) {
         std::cout << "tools info: " << (*info).dump(4) << "\n\n";
     }
 

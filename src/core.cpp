@@ -108,6 +108,11 @@ std::string vector_to_comma_separated_string(const std::vector<std::string>& vec
     return result;
 }
 
+std::ostream& operator<<(std::ostream& os, const std::vector<std::string>& vec) {
+    os << vector_to_comma_separated_string(vec);
+    return os;
+}
+
 std::string escape_json(const std::string& json_str) {
     std::string escaped;
     for (char c : json_str) {

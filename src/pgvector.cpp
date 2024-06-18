@@ -15,8 +15,9 @@ expected<void, std::string> PgVector::connect() {
         return unexpected<std::string>("Failed to connect to database");
     }
     logger->log(fmt::format("Connected to database: {}", conn->dbname()));
-    unguard();
     return {};
+    unguard();
+    return unexpected<std::string>("");
 }
 
 json pqxx_result_to_json(const pqxx::result& result) {

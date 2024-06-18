@@ -60,8 +60,8 @@ int main(int argc, char *argv[]) {
     vdb.connect();
 
     vdb.delete_collection("tools");
-    //vdb.delete_collection("gens");
-    vdb.create_collection("tools", EmbeddingModel::oai_ada002);
+    vdb.delete_collection("gens");
+    vdb.create_collection("tools", EmbeddingModel::oai_3small);
     ///vdb.create_collection("gens", EmbeddingModel::oai_ada002);
     //vdb.create_collection("tools", EmbeddingModel::oai_3large);
 
@@ -92,16 +92,16 @@ int main(int argc, char *argv[]) {
         }
         //tool_text = std::string(item["description"]);
         std::cout << tool_text << "\n-------\n";
-        vdb::vector vec = llm.embedding(tool_text);
+        vdb::vector vec = llm.embedding(tool_text); //, EmbeddingModel::oai_3large);
         vdb.write_content("tools", item["name"], vec);
     }
 
     GenFile gen;
     auto [variables, instructions] = gen.load_from_file(filename);
     std::string search_text = instructions["root"].prompt;
-    std::cout << "Search text:\n" << search_text << "\n\n";
-    std::cout << "Tools: " << vector_to_comma_separated_string(instructions["root"].use) << "\n\n";
-    vdb::vector search_vec = llm.embedding(search_text);
+    fmt::print("Search text:\n{}\n\n", search_text);
+    fmt::print("Tools: {}\n\n", instructions["root"].use);
+    vdb::vector search_vec = llm.embedding(search_text); //, EmbeddingModel::oai_3large);
     auto search_res = vdb.search_content("tools", search_vec, 5, vdb::QueryType::cosine_similarity);
     if (search_res) {
         std::cout << "Search results:\n" << (*search_res).dump(4) << "\n\n";

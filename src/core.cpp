@@ -512,3 +512,18 @@ bool append_child(tree<std::string>& tr, const std::string& node_value, const st
     }
     return false;
 }
+
+long get_timestamp() {
+    auto now = std::chrono::system_clock::now();
+    auto duration_since_epoch = now.time_since_epoch();
+    auto seconds_since_epoch = std::chrono::duration_cast<std::chrono::seconds>(duration_since_epoch).count();
+    return seconds_since_epoch;
+}
+
+std::string gen_index(const std::string& data) {
+    std::hash<std::string> hasher;
+    auto hashed = hasher(data);
+    std::stringstream ss;
+    ss << std::hex << hashed;
+    return ss.str().substr(0, 8);
+}

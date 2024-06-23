@@ -1,7 +1,11 @@
 # 🔮 Mentals AI
 
-Mentals AI is a tool designed for creating and operating agents that feature **`loops`**, **`memory`**, and various **`tools`**, all through straightforward **`markdown`** agent file with a `.gen` extension. Think of an agent file as an executable file. You focus entirely on the logic of the agent, eliminating the necessity to compose scaffolding code in Python or any other language. Essentially, it redefines the foundational frameworks for future AI applications.
+Mentals AI is a tool designed for creating and operating agents that feature **`loops`**, **`memory`**, and various **`tools`**, all through straightforward **`markdown`** file with a .gen extension. Think of an agent file as an executable file. You focus entirely on the logic of the agent, eliminating the necessity to write scaffolding code in Python or any other language. Essentially, it redefines the foundational frameworks for future AI applications.
 
+> [!NOTE] 
+> [work in progress] A local vector database to store your chats with the agents as well as your private information.
+
+- [Getting Started](#-getting-started)
 - [Differences from Other Frameworks](#-differences-from-other-frameworks)
 - [Key Concepts](#️-key-concepts)
     - [Instruction (prompt)](#-instruction-prompt)
@@ -9,7 +13,6 @@ Mentals AI is a tool designed for creating and operating agents that feature **`
     - [Short-Term Memory (experimental)](#-short-term-memory-experimental)
     - [Control flow: From strings to algorithms](#️-control-flow-from-strings-to-algorithms)
 - [Roadmap](#️-roadmap)
-- [Getting Started](#-getting-started)
 - [The Idea](#-the-idea)
 
 ## 📌 Examples
@@ -33,6 +36,82 @@ All of the above examples are located in the [agents](agents) folder.
 
 > [!NOTE]
 > Llama3 support is available for providers using a compatible OpenAI API.
+
+## 🚀 Getting Started
+
+Begin by securing an OpenAI API key through the creation of an  [OpenAI
+account](https://platform.openai.com/docs/quickstart?context=node). If you already have 
+an API key, skip this step.
+
+### 🏗️ Build and run
+
+**Prerequisites**
+
+Before building the project, ensure the following dependencies are installed:
+
+- `libcurl`: Used for making HTTP requests
+- `libfmt`: Provides an API for formatting
+- `pgvector`: Vector operations with PostgreSQL
+
+Depending on your operating system, you can install these using the following commands:
+
+**Linux**
+
+```shell
+sudo apt-get update
+sudo apt-get install libcurl4-openssl-dev libfmt-dev
+```
+
+**macOS**
+
+```shell
+brew update
+brew install curl fmt
+```
+
+**Windows**
+
+For Windows, it's recommended to use vcpkg or a similar package manager:
+
+```shell
+vcpkg install curl fmt
+```
+
+**pgvector installation**
+
+- [Build from sources](https://github.com/pgvector/pgvector?tab=readme-ov-file#installation)
+- [Docker, Homebrew, PGXN, APT, etc.](https://github.com/pgvector/pgvector?tab=readme-ov-file#additional-installation-methods)
+
+
+**Clone the repository**
+```shell
+git clone https://github.com/turing-machines/mentals-ai
+cd mentals-ai
+```
+
+**Configuration**
+
+Place your API key in the `config.toml` file:
+
+```bash
+[llm]
+# OpenAI
+api_key = ""
+endpoint = "https://api.openai.com/v1"
+model = "gpt-4o"
+```
+
+**Build the project**
+
+```bash
+make
+```
+
+**Run**
+
+```shell
+./build/mentals agents/loop.gen -d
+```
 
 ## 🆚 Differences from Other Frameworks
 
@@ -263,73 +342,6 @@ A complete example is contained in the [agents/tree_structure.gen](agents/tree_s
 - [ ] Agent's experience (experimental)
 - [ ] Tools: Image generation, Browser
 
-## 🚀 Getting Started
-
-Begin by securing an OpenAI API key through the creation of an  [OpenAI
-account](https://platform.openai.com/docs/quickstart?context=node). If you already have 
-an API key, skip this step.
-
-### 🏗️ Build and run
-
-**Prerequisites**
-
-Before building the project, ensure the following dependencies are installed:
-
-- `libcurl`: Used for making HTTP requests
-- `libfmt`: Provides an API for formatting
-
-Depending on your operating system, you can install these using the following commands:
-
-**Linux**
-
-```shell
-sudo apt-get update
-sudo apt-get install libcurl4-openssl-dev libfmt-dev
-```
-
-**macOS**
-
-```shell
-brew update
-brew install curl fmt
-```
-
-**Windows**
-
-For Windows, it's recommended to use vcpkg or a similar package manager:
-
-```shell
-vcpkg install curl fmt
-```
-
-**Clone the repository**
-```shell
-git clone https://github.com/turing-machines/mentals-ai
-cd mentals-ai
-```
-
-**Configuration**
-
-Place your API key in the `config.toml` file:
-
-```bash
-# OpenAI
-API_KEY = "insert API key here"
-ENDPOINT = "https://api.openai.com/v1"
-MODEL = "gpt-4o"
-```
-
-**Build the project**
-
-```bash
-make
-```
-
-**Run**
-
-```shell
-./build/mentals agents/loop.gen -d
-```
 
 ## ✨ The Idea
 

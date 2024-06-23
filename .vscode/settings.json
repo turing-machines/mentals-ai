@@ -74,5 +74,13 @@
         "set": "cpp",
         "cinttypes": "cpp"
     },
-    "cmake.sourceDirectory": "/home/costa-al/control_unit/liboai"
+    "cmake.sourceDirectory": "/home/costa-al/control_unit/liboai",
+    "CodeGPT.apiKey": "CodeGPT Plus Beta",
+    "makefile.launchConfigurations": [
+        {
+            "cwd": "/home/costa-al/control_unit/build",
+            "binaryPath": "/home/costa-al/control_unit/build/mentals",
+            "binaryArgs": []
+        }
+    ]
 }

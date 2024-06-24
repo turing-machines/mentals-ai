@@ -3,6 +3,8 @@
 #include <thread>
 #include <atomic>
 #include <string>
+#include <limits>
+#include <random>
 #include <iostream>
 #include <cstdio>
 #include <sstream>
@@ -37,6 +39,8 @@
 
 #include <pqxx/pqxx>
 
+#define MAX_INTEGER std::numeric_limits<int>::max()
+
 extern bool debug;
 extern std::atomic<bool> spinner_active;
 extern std::thread spinner_thread;
@@ -67,34 +71,6 @@ struct Instruction {
     std::vector<std::string> use;
     bool keep_context;
     int max_context;
-};
-
-struct Message {
-    std::string index;
-    std::string timestamp;
-    std::string name;
-    std::string role;
-    std::string content;
-
-    json to_json() const {
-        return {
-            { "index"       , index     }, 
-            { "timestamp"   , timestamp }, 
-            { "name"        , name      }, 
-            { "role"        , role      }, 
-            { "content"     , content   }
-        };
-    }
-
-    static Message from_json(const json& j) {
-        return {
-            j.at("index").get<std::string>(),
-            j.at("timestamp").get<std::string>(),
-            j.at("name").get<std::string>(),
-            j.at("role").get<std::string>(),
-            j.at("content").get<std::string>()
-        };
-    }
 };
 
 void print_help();
@@ -141,9 +117,11 @@ void stop_spinner(const std::string& text);
 void print_tree(const tree<std::string>& tr);
 tree<std::string>::pre_order_iterator find_node(const tree<std::string>& tr, const std::string& node_value);
 bool append_child(tree<std::string>& tr, const std::string& node_value, const std::string& child_value);
-long get_timestamp();
+long long get_timestamp();
+std::mt19937& get_random_engine();
+int get_random_number(int min, int max);
 std::string gen_index(const std::string& data);
-
+std::string gen_index();
 
 template <>
 struct fmt::formatter<std::vector<std::string>> {

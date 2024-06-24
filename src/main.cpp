@@ -6,6 +6,7 @@
 
 #include "platform.h"
 #include "pgvector.h"
+#include "context.h"
 #include "agent_executor.h"
 
 bool debug{false};
@@ -49,6 +50,7 @@ int main(int argc, char *argv[]) {
         );
     }
 
+/*
     LLM llm;
     llm.set_provider(endpoint, api_key);
     llm.set_model(model);
@@ -93,7 +95,10 @@ int main(int argc, char *argv[]) {
         //tool_text = std::string(item["description"]);
         std::cout << tool_text << "\n-------\n";
         vdb::vector vec = llm.embedding(tool_text); //, EmbeddingModel::oai_3large);
-        vdb.write_content("tools", item["name"], vec);
+        
+        std::string idx = gen_index();
+
+        vdb.write_content("tools", idx, item["name"], vec);
     }
 
     GenFile gen;
@@ -111,8 +116,8 @@ int main(int argc, char *argv[]) {
     if (info) {
         std::cout << "tools info: " << (*info).dump(4) << "\n\n";
     }
+*/
 
-    /*
     /// Init central executive
     ///auto agent_executor = std::make_shared<AgentExecutor>(conn);
     auto agent_executor = std::make_shared<AgentExecutor>();
@@ -157,7 +162,7 @@ int main(int argc, char *argv[]) {
         agent_executor->usage["completion_tokens"].get<int>(),
         agent_executor->usage["total_tokens"].get<int>(),
         agent_executor->nlop, agent_executor->nlops
-    );*/
+    );
 
     exit(EXIT_SUCCESS);
 

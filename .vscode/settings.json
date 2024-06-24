@@ -75,7 +75,6 @@
         "cinttypes": "cpp"
     },
     "cmake.sourceDirectory": "/home/costa-al/control_unit/liboai",
-    "CodeGPT.apiKey": "CodeGPT Plus Beta",
     "makefile.launchConfigurations": [
         {
             "cwd": "/home/costa-al/control_unit/build",

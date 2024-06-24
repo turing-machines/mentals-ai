@@ -3,6 +3,33 @@
 #include "core.h"
 
 
+struct Message {
+    std::string index;
+    std::string timestamp;
+    std::string name;
+    std::string role;
+    std::string content;
+
+    json to_json() const {
+        return {
+            { "index"       , index     },
+            { "name"        , name      }, 
+            { "role"        , role      }, 
+            { "content"     , content   }
+        };
+    }
+
+    static Message from_json(const json& j) {
+        return {
+            j.at("index").get<std::string>(),
+            j.at("timestamp").get<std::string>(),
+            j.at("name").get<std::string>(),
+            j.at("role").get<std::string>(),
+            j.at("content").get<std::string>()
+        };
+    }
+};
+
 class Context {
 public:
     Context() {}
@@ -10,6 +37,8 @@ public:
         deserialize(json_obj);
     }
     Context(const Context& other) : __messages(other.__messages) {}
+
+    friend std::ostream& operator<<(std::ostream& os, const Context& context);
 
     Context& operator+=(const Context& other) {
         for (const auto& message : other.__messages) {
@@ -30,7 +59,8 @@ public:
 
     void add_message(const std::string& name, const std::string& role, const std::string& content) {
         std::string timestamp = to_string(get_timestamp());
-        std::string index = gen_index(timestamp);
+        std::string random = to_string(get_random_number(1, MAX_INTEGER));
+        std::string index = gen_index(timestamp + random);
         add_message({ index, timestamp, name, role, content });
     }
 
@@ -85,3 +115,8 @@ private:
     std::vector<Message> __messages;
 
 };
+
+std::ostream& operator<<(std::ostream& os, const Context& context) {
+    os << context.serialize().dump(4);
+    return os;
+}

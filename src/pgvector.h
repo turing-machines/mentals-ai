@@ -52,8 +52,13 @@ public:
         EmbeddingModel model = EmbeddingModel::oai_3small);
     expected<std::string, std::string> delete_collection(const std::string& table_name);
     expected<json, std::string> get_collection_info(const std::string& table_name);
-    expected<void, std::string> write_content(const std::string& table_name, const std::string& content, 
-        const vdb::vector& embedding);
+    expected<void, std::string> write_content(
+        const std::string& table_name,
+        const std::string& content_id, 
+        const std::string& content, 
+        const vdb::vector& embedding, 
+        const std::optional<std::string>& name = std::nullopt, 
+        const std::optional<std::string>& desc = std::nullopt);
     expected<json, std::string> search_content(const std::string& table_name, const vdb::vector& search_vector, 
         int limit, vdb::QueryType type = vdb::QueryType::embedding);
 };

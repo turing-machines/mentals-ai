@@ -6,6 +6,7 @@
 
 #include "platform.h"
 #include "pgvector.h"
+#include "context.h"
 #include "agent_executor.h"
 
 bool debug{false};
@@ -49,7 +50,8 @@ int main(int argc, char *argv[]) {
         );
     }
 
-    /*LLM llm;
+/*
+    LLM llm;
     llm.set_provider(endpoint, api_key);
     llm.set_model(model);
 
@@ -59,9 +61,11 @@ int main(int argc, char *argv[]) {
     PgVector vdb(conn_info);
     vdb.connect();
 
-    vdb.delete_collection("tools");   
-    //vdb.create_collection("tools", EmbeddingModel::oai_ada002);
-    vdb.create_collection("tools", EmbeddingModel::oai_3large);
+    vdb.delete_collection("tools");
+    vdb.delete_collection("gens");
+    vdb.create_collection("tools", EmbeddingModel::oai_3small);
+    ///vdb.create_collection("gens", EmbeddingModel::oai_ada002);
+    //vdb.create_collection("tools", EmbeddingModel::oai_3large);
 
     auto res = vdb.list_collections();
 
@@ -90,20 +94,29 @@ int main(int argc, char *argv[]) {
         }
         //tool_text = std::string(item["description"]);
         std::cout << tool_text << "\n-------\n";
-        vdb::vector vec = llm.embedding(tool_text);
-        vdb.write_content("tools", item["name"], vec);
+        vdb::vector vec = llm.embedding(tool_text); //, EmbeddingModel::oai_3large);
+        
+        std::string idx = gen_index();
+
+        vdb.write_content("tools", idx, item["name"], vec);
     }
 
     GenFile gen;
     auto [variables, instructions] = gen.load_from_file(filename);
     std::string search_text = instructions["root"].prompt;
-    std::cout << "Search text:\n" << search_text << "\n\n";
-    std::cout << "Tools: " << vector_to_comma_separated_string(instructions["root"].use) << "\n\n";
-    vdb::vector search_vec = llm.embedding(search_text);
+    fmt::print("Search text:\n{}\n\n", search_text);
+    fmt::print("Tools: {}\n\n", instructions["root"].use);
+    vdb::vector search_vec = llm.embedding(search_text); //, EmbeddingModel::oai_3large);
     auto search_res = vdb.search_content("tools", search_vec, 5, vdb::QueryType::cosine_similarity);
     if (search_res) {
         std::cout << "Search results:\n" << (*search_res).dump(4) << "\n\n";
-    }*/
+    }
+
+    auto info = vdb.get_collection_info("tools");
+    if (info) {
+        std::cout << "tools info: " << (*info).dump(4) << "\n\n";
+    }
+*/
 
     /// Init central executive
     ///auto agent_executor = std::make_shared<AgentExecutor>(conn);

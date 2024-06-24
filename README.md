@@ -51,6 +51,7 @@ Before building the project, ensure the following dependencies are installed:
 
 - `libcurl`: Used for making HTTP requests
 - `libfmt`: Provides an API for formatting
+- `pgvector`: Vector operations with PostgreSQL
 
 Depending on your operating system, you can install these using the following commands:
 
@@ -75,6 +76,12 @@ For Windows, it's recommended to use vcpkg or a similar package manager:
 ```shell
 vcpkg install curl fmt
 ```
+
+**pgvector installation**
+
+- [Build from sources](https://github.com/pgvector/pgvector?tab=readme-ov-file#installation)
+- [Docker, Homebrew, PGXN, APT, etc.](https://github.com/pgvector/pgvector?tab=readme-ov-file#additional-installation-methods)
+
 
 **Clone the repository**
 ```shell

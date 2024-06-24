@@ -270,7 +270,7 @@ void AgentExecutor::execute() {
             "[keep_context]\t{}\n",
             ///"[instruction]\t{}\n",
             GREEN, RESET, instructions_call_stack.size(), curr_instr.temp, curr_instr.label,
-            trim_by_terminal_width(desc), vector_to_comma_separated_string(curr_instr.use),
+            trim_by_terminal_width(desc), curr_instr.use,
             curr_instr.keep_context
             ///trim_by_terminal_width(curr_instr.prompt)
         );

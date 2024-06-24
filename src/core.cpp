@@ -108,6 +108,11 @@ std::string vector_to_comma_separated_string(const std::vector<std::string>& vec
     return result;
 }
 
+std::ostream& operator<<(std::ostream& os, const std::vector<std::string>& vec) {
+    os << vector_to_comma_separated_string(vec);
+    return os;
+}
+
 std::string escape_json(const std::string& json_str) {
     std::string escaped;
     for (char c : json_str) {
@@ -506,4 +511,36 @@ bool append_child(tree<std::string>& tr, const std::string& node_value, const st
         return true;
     }
     return false;
+}
+
+long long get_timestamp() {
+    auto now = std::chrono::system_clock::now();
+    auto duration_since_epoch = now.time_since_epoch();
+    auto milliseconds_since_epoch = std::chrono::duration_cast<std::chrono::milliseconds>(duration_since_epoch).count();
+    return milliseconds_since_epoch;
+}
+
+std::mt19937& get_random_engine() {
+    static std::random_device rd;
+    static std::mt19937 gen(rd());
+    return gen;
+}
+
+int get_random_number(int min, int max) {
+    std::uniform_int_distribution<> dist(min, max);
+    return dist(get_random_engine());
+}
+
+std::string gen_index(const std::string& data) {
+    std::hash<std::string> hasher;
+    auto hashed = hasher(data);
+    std::stringstream ss;
+    ss << std::hex << hashed;
+    return ss.str().substr(0, 8);
+}
+
+std::string gen_index() {
+    std::string rnd = to_string(get_random_number(1, MAX_INTEGER));
+    std::string tms = to_string(get_timestamp());
+    return gen_index(tms+rnd);
 }

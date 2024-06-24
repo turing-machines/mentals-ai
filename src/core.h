@@ -3,6 +3,8 @@
 #include <thread>
 #include <atomic>
 #include <string>
+#include <limits>
+#include <random>
 #include <iostream>
 #include <cstdio>
 #include <sstream>
@@ -28,6 +30,7 @@
 #include <stdexcept>
 #include <cassert>
 #include <fmt/core.h>
+#include <fmt/format.h>
 
 #include "tl/expected.hpp"
 #include "treehh/tree.hh"
@@ -35,6 +38,8 @@
 #include "toml++/toml.hpp"
 
 #include <pqxx/pqxx>
+
+#define MAX_INTEGER std::numeric_limits<int>::max()
 
 extern bool debug;
 extern std::atomic<bool> spinner_active;
@@ -53,7 +58,11 @@ const std::string MAGENTA   = "\033[35m";
 const std::string CYAN      = "\033[36m";
 const std::string RESET     = "\033[0m";
 
-/// Instruction spec with properties
+enum class EmbeddingModel {
+    oai_3small = 1536,
+    oai_3large = 3072
+};
+
 struct Instruction {
     std::string label;
     std::string prompt;
@@ -74,6 +83,7 @@ std::string trim_by_terminal_width(const std::string& text);
 std::string string_in_line(const std::string& text);
 void print_in_line(const std::string& color, const std::string& opcode, const std::string& text);
 std::string vector_to_comma_separated_string(const std::vector<std::string>& vec);
+std::ostream& operator<<(std::ostream& os, const std::vector<std::string>& vec);
 std::string escape_json(const std::string& json_str);
 std::string render_template(const std::string& template_str, const std::map<std::string, std::string>& values_map);
 std::string read_file(const std::string& file_path);
@@ -107,10 +117,37 @@ void stop_spinner(const std::string& text);
 void print_tree(const tree<std::string>& tr);
 tree<std::string>::pre_order_iterator find_node(const tree<std::string>& tr, const std::string& node_value);
 bool append_child(tree<std::string>& tr, const std::string& node_value, const std::string& child_value);
+long long get_timestamp();
+std::mt19937& get_random_engine();
+int get_random_number(int min, int max);
+std::string gen_index(const std::string& data);
+std::string gen_index();
 
-enum class EmbeddingModel {
-    oai_ada002 = 1536,
-    oai_3large = 3072
+template <>
+struct fmt::formatter<std::vector<std::string>> {
+    constexpr auto parse(format_parse_context& ctx) -> decltype(ctx.begin()) {
+        auto it = ctx.begin(), end = ctx.end();
+        if (it != end && *it != '}') {
+            throw fmt::format_error("invalid format");
+        }
+        return it;
+    }
+    template <typename FormatContext>
+    auto format(const std::vector<std::string>& vec, FormatContext& ctx) -> decltype(ctx.out()) {
+        return format_to(ctx.out(), "{}", vector_to_comma_separated_string(vec));
+    }
+};
+
+template <>
+struct fmt::formatter<EmbeddingModel> : formatter<std::string> {
+    auto format(EmbeddingModel c, format_context& ctx) {
+        std::string name = "Unknown";
+        switch (c) {
+            case EmbeddingModel::oai_3small: name = "text-embedding-3-small"; break;
+            case EmbeddingModel::oai_3large: name = "text-embedding-3-large"; break;
+        }
+        return formatter<std::string>::format(name, ctx);
+    }
 };
 
 namespace vdb {
@@ -127,26 +164,38 @@ namespace vdb {
     };
 
     class vector {
-        public:
-            vector() = default;
-            vector(const std::vector<float>& value) { __value = value; }
-            vector(std::vector<float>&& value) { __value = std::move(value); }
-            vector(const float* value, size_t n) { __value = std::vector<float>{value, value + n}; }
-            size_t dimensions() const { return __value.size(); }
-            operator const std::vector<float>() const { return __value; }
-            friend bool operator==(const vector& lhs, const vector& rhs) { return lhs.__value == rhs.__value; }
-            friend std::ostream& operator<<(std::ostream& os, const vector& value) {
-                os << "[";
-                for (size_t i = 0; i < value.__value.size(); i++) {
-                    if (i > 0) { os << ","; }
-                    os << fmt::format("{:.6f}", value.__value[i]);
-                }
-                os << "]";
-                return os;
+    public:
+        vector() : model(std::nullopt) {}
+        vector(const std::vector<float>& value, std::optional<EmbeddingModel> model = std::nullopt) 
+            : __value(value), model(model) {}
+        vector(std::vector<float>&& value, std::optional<EmbeddingModel> model = std::nullopt) 
+            : __value(std::move(value)), model(model) {}
+        vector(const float* value, size_t n, std::optional<EmbeddingModel> model = std::nullopt) 
+            : __value(value, value + n), model(model) {}
+        size_t dimensions() const { return __value.size(); }
+        std::string get_model_name() const {
+            if (model) {
+                return fmt::format("{}", *model);
+            } else {
+                return "No model set";
             }
+        }
+        void set_model(EmbeddingModel new_model) { model = new_model; }
+        operator const std::vector<float>&() const { return __value; }
+        friend bool operator==(const vector& lhs, const vector& rhs) { return lhs.__value == rhs.__value; }
+        friend std::ostream& operator<<(std::ostream& os, const vector& value) {
+            os << "[";
+            for (size_t i = 0; i < value.__value.size(); i++) {
+                if (i > 0) { os << ","; }
+                os << fmt::format("{:.6f}", value.__value[i]);
+            }
+            os << "]";
+            return os;
+        }
 
-        private:
-            std::vector<float> __value;
+    private:
+        std::vector<float> __value;
+        std::optional<EmbeddingModel> model;
     };
 }
 

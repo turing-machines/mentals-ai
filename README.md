@@ -79,6 +79,9 @@ vcpkg install curl fmt
 
 **pgvector installation**
 
+> [!NOTE]
+> In the `main` branch you can skip this step
+
 - [Build from sources](https://github.com/pgvector/pgvector?tab=readme-ov-file#installation)
 - [Docker, Homebrew, PGXN, APT, etc.](https://github.com/pgvector/pgvector?tab=readme-ov-file#additional-installation-methods)
 

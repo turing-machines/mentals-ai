@@ -87,10 +87,11 @@ cd mentals-ai
 Place your API key in the `config.toml` file:
 
 ```bash
+[llm]
 # OpenAI
-API_KEY = "insert API key here"
-ENDPOINT = "https://api.openai.com/v1"
-MODEL = "gpt-4o"
+api_key = ""
+endpoint = "https://api.openai.com/v1"
+model = "gpt-4o"
 ```
 
 **Build the project**

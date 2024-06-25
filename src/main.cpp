@@ -9,10 +9,41 @@
 #include "context.h"
 #include "agent_executor.h"
 
+#include "pdf_file.h"
+
 bool debug{false};
 std::atomic<bool> spinner_active{false};
 std::thread spinner_thread;
 std::string completion_text;
+
+/// Naive method just for testing purposes
+/// TODO: Different strategies e.g. w/ pages, paragraph, overlapping etc. 
+std::vector<std::string> split_text_by_sentences(const std::string& text, int sentences_per_chunk) {
+    std::vector<std::string> chunks;
+    std::istringstream stream(text);
+    std::string sentence;
+    std::string chunk;
+    int count = 0;
+    while (std::getline(stream, sentence, '.')) {
+        sentence.erase(sentence.begin(), 
+            std::find_if(sentence.begin(), sentence.end(), [](unsigned char ch) {
+            return !std::isspace(ch);
+        }));
+        if (!sentence.empty()) {
+            chunk += sentence + ".";
+            count++;
+        }
+        if (count == sentences_per_chunk) {
+            chunks.push_back(chunk);
+            chunk = "";
+            count = 0;
+        }
+    }
+    if (!chunk.empty()) {
+        chunks.push_back(chunk);
+    }
+    return chunks;
+}
 
 int main(int argc, char *argv[]) {
 
@@ -50,8 +81,28 @@ int main(int argc, char *argv[]) {
         );
     }
 
-/*
-    LLM llm;
+    std::unique_ptr<FileInterface> file = std::make_unique<PdfFile>();
+
+    auto file_res = file->open("assets/ThusSpokeZarathustra.pdf");
+    if (!file_res) {
+        std::cerr << file_res.error() << std::endl;
+        exit(EXIT_FAILURE);
+    }
+
+    auto read_res = file->read();
+    if (!read_res) {
+        std::cerr << read_res.error() << std::endl;
+        exit(EXIT_FAILURE);
+    }
+
+    std::vector<std::string> chunks = split_text_by_sentences(read_res.value(), 10);
+
+    file->close();
+
+    std::cout << chunks[100] << "\n\n";
+
+
+/*    LLM llm;
     llm.set_provider(endpoint, api_key);
     llm.set_model(model);
 
@@ -98,7 +149,7 @@ int main(int argc, char *argv[]) {
         
         std::string idx = gen_index();
 
-        vdb.write_content("tools", idx, item["name"], vec);
+        vdb.write_content("tools", idx, item["name"], vec, item["name"]);
     }
 
     GenFile gen;
@@ -118,6 +169,7 @@ int main(int argc, char *argv[]) {
     }
 */
 
+/*
     /// Init central executive
     ///auto agent_executor = std::make_shared<AgentExecutor>(conn);
     auto agent_executor = std::make_shared<AgentExecutor>();
@@ -163,6 +215,7 @@ int main(int argc, char *argv[]) {
         agent_executor->usage["total_tokens"].get<int>(),
         agent_executor->nlop, agent_executor->nlops
     );
+*/
 
     exit(EXIT_SUCCESS);
 

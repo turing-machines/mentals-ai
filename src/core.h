@@ -37,7 +37,6 @@
 #include "nlohmann/json.hpp"
 #include "toml++/toml.hpp"
 
-#include <pqxx/pqxx>
 
 #define MAX_INTEGER std::numeric_limits<int>::max()
 
@@ -46,8 +45,9 @@ extern std::atomic<bool> spinner_active;
 extern std::thread spinner_thread;
 extern std::string completion_text;
 
-using json = nlohmann::json;
 using std::to_string;
+using tl::expected, tl::unexpected;
+using json = nlohmann::json;
 
 /// ANSI escape codes for coloring text
 const std::string RED       = "\033[31m";

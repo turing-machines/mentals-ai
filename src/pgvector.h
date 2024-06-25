@@ -3,7 +3,7 @@
 #include "core.h"
 #include "logger.h"
 
-using tl::expected, tl::unexpected;
+#include <pqxx/pqxx>
 
 /*
 <-> - L2 distance

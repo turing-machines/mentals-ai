@@ -47,12 +47,15 @@ public:
     ~PgVector();
 
     expected<void, std::string> connect();
+    std::unique_ptr<pqxx::work> create_transaction();
+    void commit_transaction(std::unique_ptr<pqxx::work>& txn);
     expected<json, std::string> list_collections();
     expected<json, std::string> create_collection(const std::string& table_name, 
         EmbeddingModel model = EmbeddingModel::oai_3small);
     expected<std::string, std::string> delete_collection(const std::string& table_name);
     expected<json, std::string> get_collection_info(const std::string& table_name);
     expected<void, std::string> write_content(
+        pqxx::work& txn,
         const std::string& table_name,
         const std::string& content_id, 
         const std::string& content, 

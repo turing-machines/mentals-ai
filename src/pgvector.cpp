@@ -20,6 +20,14 @@ expected<void, std::string> PgVector::connect() {
     return unexpected<std::string>("");
 }
 
+std::unique_ptr<pqxx::work> PgVector::create_transaction() {
+    return std::make_unique<pqxx::work>(*conn);
+}
+
+void PgVector::commit_transaction(std::unique_ptr<pqxx::work>& txn) {
+    txn->commit();
+}
+
 json pqxx_result_to_json(const pqxx::result& result) {
     json j_result = json::array();
     for (const auto& row : result) {
@@ -135,6 +143,7 @@ expected<json, std::string> PgVector::get_collection_info(const std::string& tab
 }
 
 expected<void, std::string> PgVector::write_content(
+    pqxx::work& txn,
     const std::string& table_name,
     const std::string& content_id, 
     const std::string& content, 
@@ -145,7 +154,6 @@ expected<void, std::string> PgVector::write_content(
     if (!conn || !conn->is_open()) {
         return unexpected<std::string>("Connection to vector db is not open");
     }
-    pqxx::work txn(*conn);
     std::string sql = fmt::format(
         "INSERT INTO {} (content_id, name, meta, content, embedding) VALUES ($1, $2, $3, $4, $5)", 
         table_name
@@ -154,7 +162,6 @@ expected<void, std::string> PgVector::write_content(
     std::string desc_value = desc ? *desc : "";
     txn.exec_params(sql, content_id, name_value, desc_value, content, 
         (std::ostringstream() << embedding).str());
-    txn.commit();
     unguard();
     return {};
 }

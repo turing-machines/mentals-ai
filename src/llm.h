@@ -71,6 +71,10 @@ public:
         return vdb::vector();
     }
 
+    std::future<vdb::vector> embedding_async(const std::string& text, EmbeddingModel model = EmbeddingModel::oai_3small) {
+        return std::async(std::launch::async, &LLM::embedding, this, text, model);
+    }
+
     /// TODO: Refine
     std::string rag(std::string input, std::string data) {
         std::string result;

@@ -16,6 +16,7 @@
 #include <iomanip>
 #include <memory>
 #include <stack>
+#include <future>
 #include <algorithm>
 #include <functional>
 #include <optional>

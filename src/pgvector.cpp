@@ -145,7 +145,8 @@ expected<json, std::string> PgVector::get_collection_info(const std::string& tab
 expected<void, std::string> PgVector::write_content(
     pqxx::work& txn,
     const std::string& table_name,
-    const std::string& content_id, 
+    const std::string& content_id,
+    const int chunk_id,
     const std::string& content, 
     const vdb::vector& embedding, 
     const std::optional<std::string>& name, 
@@ -165,6 +166,17 @@ expected<void, std::string> PgVector::write_content(
         (std::ostringstream() << embedding).str());
     unguard();
     return {};
+}
+
+expected<void, std::string> PgVector::write_content(
+    pqxx::work& txn,
+    const std::string& table_name,
+    const mem_chunk& chunk
+) {
+    return write_content(txn, table_name,
+        chunk.content_id, chunk.chunk_id, /// Content address in memory content_id:chunk_id
+        chunk.content, chunk.embedding,
+        chunk.name, chunk.meta);
 }
 
 expected<json, std::string> PgVector::search_content(

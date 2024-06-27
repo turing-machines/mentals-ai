@@ -69,6 +69,7 @@ int main(int argc, char *argv[]) {
     MemoryController memc(llm, vdb);
     memc.set_model(embedding_model::oai_3small);
 
+
     memc.delete_collection("books");
     memc.create_collection("books");
 
@@ -93,6 +94,7 @@ int main(int argc, char *argv[]) {
 
     memc.write_chunks("books");
 
+
     std::string query = input; /// "What does he thinks about life?";
 
     /// Read most relevant 20 chunks
@@ -103,8 +105,10 @@ int main(int argc, char *argv[]) {
         liboai::Conversation conv;
         conv.SetSystemData(
             "You are a helpful assistant.\n"
-            "Answer the user's question in no more than 300 words. "
-            "Use content from the json array below:\n\n" +
+            "Answer the user's question in no more than 300 words.\n"
+            "Use the content below to answer the user's question.\n"
+            "At the end of your answer, cite references for chunks in memory.\n\n"
+            "----- CONTENT SECTION -----\n" +
             (*chunks_res).dump(4)
         );
         conv.AddUserData(query, "user");

@@ -17,6 +17,8 @@ std::atomic<bool> spinner_active{false};
 std::thread spinner_thread;
 std::string completion_text;
 
+int mem_total_tokens{0};
+
 
 int main(int argc, char *argv[]) {
 
@@ -64,20 +66,16 @@ int main(int argc, char *argv[]) {
     PgVector vdb(conn_info);
     vdb.connect();
 
-    EmbeddingModel embed_model = EmbeddingModel::oai_3small;
+    MemoryController memc(llm, vdb);
+
+    embedding_model embed_model = embedding_model::oai_3small;
 
     vdb.delete_collection("books");
     vdb.create_collection("books", embed_model);
 
-    /// Memory controller routines
-    /// 1. Read data from source
-    /// 2. Chunking
-    /// 3. Embedding in parallel (keep chunk sequence)
-    /// 4. Write data to vdb
+   std::string file_name = "ThusSpokeZarathustra.pdf";
 
-    std::string file_name = "ThusSpokeZarathustra.pdf";
-
-    /// Step 1: Read data from source
+    fmt::print("\033[0mLoading file: {}\n", file_name);
     std::unique_ptr<FileInterface> file = std::make_unique<PdfFile>();
     auto file_res = file->open("assets/" + file_name);
     if (!file_res) {
@@ -91,51 +89,56 @@ int main(int argc, char *argv[]) {
     }
     file->close();
 
-    /// TODO: Move to memory controller
-    /// Implement MemoryController class
+    fmt::print("\033[0mChunking...\n");
+    std::vector<std::string> chunks = split_text_by_sentences(read_res.value(), 20);
 
-    /// Step 2: Chunking
-    std::vector<std::string> chunks = split_text_by_sentences(read_res.value(), 5);
-
-    /// Step 3: Embedding 
-    std::vector<std::future<MemChunk>> futures;
+    /// Call memory controller
     std::string idx = gen_index();
-    for (std::size_t i = 0; i < chunks.size(); ++i) {
-        std::string chunk_text = chunks[i]; 
-        fmt::print("\033[0mmem_chunk #{}: Processing started.\n", i);
-        futures.push_back(std::async(std::launch::async, 
-            process_chunks_async, std::ref(llm), embed_model, 
-            i, idx, chunk_text, file_name, std::nullopt));
-    }
+    memc.process_chunks(embed_model, chunks, idx, file_name);
+    memc.write_chunks("books");
 
-    /// Step 4: Write to storage
-    auto txn = vdb.create_transaction();
-    for (auto& fut : futures) {
-        MemChunk res = fut.get();
-        vdb.write_content(*txn, "books", res.idx, res.content, res.embedding, res.name, res.meta);
-        fmt::print("\033[0mmem_chunk #{}: Data written to memory.\n", res.chunk_id);
-    }
-    vdb.commit_transaction(txn);
-    fmt::print("All chunks have been processed.\n");
+    std::string search_text = input; /// "What does he thinks about life?";
 
-    ///
-    /// Fetch data
-    ///
-    std::string search_text = "What he thinks about ego?";
-    fmt::print("\nSearch text:\n{}\n\n", search_text);
-    vdb::vector search_vec = llm.embedding(search_text, embed_model);
-    auto search_res = vdb.search_content("books", search_vec, 5, vdb::QueryType::cosine_similarity);
+    ///memc.read_chunks("books", search_text, embed_model);
+
+    /// Read data
+    fmt::print("Question: {}\n\n", search_text);
+    liboai::Response response = llm.embedding(search_text, embed_model);
+    json jres = response["data"][0]["embedding"];
+    vdb::vector search_vec = vdb::vector({ jres.begin(), jres.end() }, embed_model);
+    auto search_res = vdb.search_content("books", search_vec, 20, vdb::query_type::cosine_similarity);
+
     if (search_res) {
-        std::cout << "Search results:\n" << (*search_res).dump(4) << "\n\n";
+        //std::cout << "Search results:\n" << (*search_res).dump(4) << "\n\n";
+        liboai::Conversation conv;
+        conv.SetSystemData(
+            "You are a helpful assistant.\n"
+            "Answer the user's question in no more than 300 words. "
+            "Use content from the json array below:\n\n" +
+            (*search_res).dump(4)
+        );
+        conv.AddUserData(search_text, "user");
+        liboai::Response response = llm.chat_completion(conv, 0.5);
+        json content = json::parse(std::string(response.content));
+        if (content.contains("choices")) {
+            for (auto& choice : content["choices"].items()) {
+                if (choice.value().contains("message")) {
+                    json message = choice.value()["message"];
+                    std::string content = std::string(message["content"]);
+                    if (!content.empty()) {
+                        fmt::print("\n-----\n{}\n\n", content);
+                    }
+                }
+            }
+        }
     }
-
 
 /*
     vdb.delete_collection("tools");
     vdb.delete_collection("gens");
-    vdb.create_collection("tools", EmbeddingModel::oai_3small);
-    ///vdb.create_collection("gens", EmbeddingModel::oai_ada002);
-    //vdb.create_collection("tools", EmbeddingModel::oai_3large);
+    vdb.create_collection("tools", embedding_model::oai_3small);
+    ///vdb.create_collection("gens", embedding_model::oai_ada002);
+    //vdb.create_collection("tools", embedding_model::oai_3large);
 
     auto res = vdb.list_collections();
 
@@ -164,7 +167,7 @@ int main(int argc, char *argv[]) {
         }
         //tool_text = std::string(item["description"]);
         std::cout << tool_text << "\n-------\n";
-        vdb::vector vec = llm.embedding(tool_text); //, EmbeddingModel::oai_3large);
+        vdb::vector vec = llm.embedding(tool_text); //, embedding_model::oai_3large);
         
         std::string idx = gen_index();
 
@@ -176,8 +179,8 @@ int main(int argc, char *argv[]) {
     std::string search_text = instructions["root"].prompt;
     fmt::print("Search text:\n{}\n\n", search_text);
     fmt::print("Tools: {}\n\n", instructions["root"].use);
-    vdb::vector search_vec = llm.embedding(search_text); //, EmbeddingModel::oai_3large);
-    auto search_res = vdb.search_content("tools", search_vec, 5, vdb::QueryType::cosine_similarity);
+    vdb::vector search_vec = llm.embedding(search_text); //, embedding_model::oai_3large);
+    auto search_res = vdb.search_content("tools", search_vec, 5, vdb::query_type::cosine_similarity);
     if (search_res) {
         std::cout << "Search results:\n" << (*search_res).dump(4) << "\n\n";
     }

@@ -544,3 +544,32 @@ std::string gen_index() {
     std::string tms = to_string(get_timestamp());
     return gen_index(tms+rnd);
 }
+
+/// Naive method just for testing purposes
+/// TODO: Different strategies e.g. w/ pages, paragraph, overlapping etc. 
+std::vector<std::string> split_text_by_sentences(const std::string& text, int sentences_per_chunk) {
+    std::vector<std::string> chunks;
+    std::istringstream stream(text);
+    std::string sentence;
+    std::string chunk;
+    int count = 0;
+    while (std::getline(stream, sentence, '.')) {
+        sentence.erase(sentence.begin(), 
+            std::find_if(sentence.begin(), sentence.end(), [](unsigned char ch) {
+            return !std::isspace(ch);
+        }));
+        if (!sentence.empty()) {
+            chunk += sentence + ".";
+            count++;
+        }
+        if (count == sentences_per_chunk) {
+            chunks.push_back(chunk);
+            chunk = "";
+            count = 0;
+        }
+    }
+    if (!chunk.empty()) {
+        chunks.push_back(chunk);
+    }
+    return chunks;
+}

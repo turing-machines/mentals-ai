@@ -56,7 +56,7 @@ expected<json, std::string> PgVector::list_collections() {
     return unexpected<std::string>("Error when fetching the collection list");
 }
 
-expected<json, std::string> PgVector::create_collection(const std::string& table_name, EmbeddingModel model) {
+expected<json, std::string> PgVector::create_collection(const std::string& table_name, embedding_model model) {
     guard("PgVector::create_collection");
     if (!conn || !conn->is_open()) {
         return unexpected<std::string>("Connection to vector db is not open");
@@ -149,7 +149,8 @@ expected<void, std::string> PgVector::write_content(
     const std::string& content, 
     const vdb::vector& embedding, 
     const std::optional<std::string>& name, 
-    const std::optional<std::string>& desc) {
+    const std::optional<std::string>& desc
+) {
     guard("PgVector::write_content");
     if (!conn || !conn->is_open()) {
         return unexpected<std::string>("Connection to vector db is not open");
@@ -166,8 +167,11 @@ expected<void, std::string> PgVector::write_content(
     return {};
 }
 
-expected<json, std::string> PgVector::search_content(const std::string& table_name, 
-    const vdb::vector& search_vector, int limit, vdb::QueryType type) {
+expected<json, std::string> PgVector::search_content(
+    const std::string& table_name, 
+    const vdb::vector& search_vector,
+    int limit, vdb::query_type type
+) {
     guard("PgVector::search_content");
     if (!conn || !conn->is_open()) {
         return unexpected<std::string>("Connection to vector db is not open");

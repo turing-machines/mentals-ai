@@ -36,10 +36,10 @@ private:
     Logger* logger;
 
 private:
-    std::map<vdb::QueryType, vdb::QueryInfo> query_options = {
-        { vdb::QueryType::embedding         , { QUERY_EMBEDDING         , std::nullopt          }},
-        { vdb::QueryType::distance          , { QUERY_DISTANCE          , "distance"            }},
-        { vdb::QueryType::cosine_similarity , { QUERY_COSINE_SIMILARITY , "cosine_similarity"   }}
+    std::map<vdb::query_type, vdb::query_info> query_options = {
+        { vdb::query_type::embedding         , { QUERY_EMBEDDING         , std::nullopt          }},
+        { vdb::query_type::distance          , { QUERY_DISTANCE          , "distance"            }},
+        { vdb::query_type::cosine_similarity , { QUERY_COSINE_SIMILARITY , "cosine_similarity"   }}
      };
 
 public:
@@ -51,7 +51,7 @@ public:
     void commit_transaction(std::unique_ptr<pqxx::work>& txn);
     expected<json, std::string> list_collections();
     expected<json, std::string> create_collection(const std::string& table_name, 
-        EmbeddingModel model = EmbeddingModel::oai_3small);
+        embedding_model model = embedding_model::oai_3small);
     expected<std::string, std::string> delete_collection(const std::string& table_name);
     expected<json, std::string> get_collection_info(const std::string& table_name);
     expected<void, std::string> write_content(
@@ -63,5 +63,5 @@ public:
         const std::optional<std::string>& name = std::nullopt, 
         const std::optional<std::string>& desc = std::nullopt);
     expected<json, std::string> search_content(const std::string& table_name, const vdb::vector& search_vector, 
-        int limit, vdb::QueryType type = vdb::QueryType::embedding);
+        int limit, vdb::query_type type = vdb::query_type::embedding);
 };

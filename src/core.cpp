@@ -544,3 +544,58 @@ std::string gen_index() {
     std::string tms = to_string(get_timestamp());
     return gen_index(tms+rnd);
 }
+
+/// Naive method just for testing purposes
+/// TODO: Different strategies e.g. w/ pages, paragraph, overlapping etc. 
+std::vector<std::string> split_text_by_sentences(const std::string& text, int sentences_per_chunk) {
+    std::vector<std::string> chunks;
+    std::istringstream stream(text);
+    std::string sentence;
+    std::string chunk;
+    int count = 0;
+    while (std::getline(stream, sentence, '.')) {
+        sentence.erase(sentence.begin(), 
+            std::find_if(sentence.begin(), sentence.end(), [](unsigned char ch) {
+            return !std::isspace(ch);
+        }));
+        if (!sentence.empty()) {
+            chunk += sentence + ".";
+            count++;
+        }
+        if (count == sentences_per_chunk) {
+            chunks.push_back(chunk);
+            chunk = "";
+            count = 0;
+        }
+    }
+    if (!chunk.empty()) {
+        chunks.push_back(chunk);
+    }
+    return chunks;
+}
+
+bool is_valid_utf8(const std::string &str) {
+    std::wstring_convert<std::codecvt_utf8<wchar_t>> conv;
+    try {
+        std::wstring wstr = conv.from_bytes(str);
+    } catch (const std::range_error &) {
+        return false;
+    }
+    return true;
+}
+
+std::string remove_invalid_utf8(const std::string &str) {
+    std::string result;
+    std::wstring_convert<std::codecvt_utf8<wchar_t>> conv;
+    for (char ch : str) {
+        if ((ch & 0x80) == 0) {
+            result += ch;
+        } else {
+            try {
+                std::string tmp(1, ch);
+                result += conv.to_bytes(conv.from_bytes(tmp));
+            } catch (const std::range_error &) { /*skip invalid utf-8 byte */ }
+        }
+    }
+    return result;
+}

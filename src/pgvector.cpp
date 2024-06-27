@@ -20,6 +20,14 @@ expected<void, std::string> PgVector::connect() {
     return unexpected<std::string>("");
 }
 
+std::unique_ptr<pqxx::work> PgVector::create_transaction() {
+    return std::make_unique<pqxx::work>(*conn);
+}
+
+void PgVector::commit_transaction(std::unique_ptr<pqxx::work>& txn) {
+    txn->commit();
+}
+
 json pqxx_result_to_json(const pqxx::result& result) {
     json j_result = json::array();
     for (const auto& row : result) {
@@ -48,7 +56,7 @@ expected<json, std::string> PgVector::list_collections() {
     return unexpected<std::string>("Error when fetching the collection list");
 }
 
-expected<json, std::string> PgVector::create_collection(const std::string& table_name, EmbeddingModel model) {
+expected<json, std::string> PgVector::create_collection(const std::string& table_name, embedding_model model) {
     guard("PgVector::create_collection");
     if (!conn || !conn->is_open()) {
         return unexpected<std::string>("Connection to vector db is not open");
@@ -135,17 +143,19 @@ expected<json, std::string> PgVector::get_collection_info(const std::string& tab
 }
 
 expected<void, std::string> PgVector::write_content(
+    pqxx::work& txn,
     const std::string& table_name,
-    const std::string& content_id, 
+    const std::string& content_id,
+    const int chunk_id,
     const std::string& content, 
     const vdb::vector& embedding, 
     const std::optional<std::string>& name, 
-    const std::optional<std::string>& desc) {
+    const std::optional<std::string>& desc
+) {
     guard("PgVector::write_content");
     if (!conn || !conn->is_open()) {
         return unexpected<std::string>("Connection to vector db is not open");
     }
-    pqxx::work txn(*conn);
     std::string sql = fmt::format(
         "INSERT INTO {} (content_id, name, meta, content, embedding) VALUES ($1, $2, $3, $4, $5)", 
         table_name
@@ -154,25 +164,26 @@ expected<void, std::string> PgVector::write_content(
     std::string desc_value = desc ? *desc : "";
     txn.exec_params(sql, content_id, name_value, desc_value, content, 
         (std::ostringstream() << embedding).str());
-    txn.commit();
     unguard();
     return {};
 }
 
-json pqxx_result_to_json(const pqxx::result& result) {
-    json json_result = json::array();
-    for (const auto& row : result) {
-        json json_row;
-        for (int colnum = 0; colnum < row.size(); ++colnum) {
-            json_row[result.column_name(colnum)] = row[colnum].c_str();
-        }
-        json_result.push_back(json_row);
-    }
-    return json_result;
+expected<void, std::string> PgVector::write_content(
+    pqxx::work& txn,
+    const std::string& table_name,
+    const mem_chunk& chunk
+) {
+    return write_content(txn, table_name,
+        chunk.content_id, chunk.chunk_id, /// Content address in memory content_id:chunk_id
+        chunk.content, chunk.embedding,
+        chunk.name, chunk.meta);
 }
 
-expected<json, std::string> PgVector::search_content(const std::string& table_name, 
-    const vdb::vector& search_vector, int limit, vdb::QueryType type) {
+expected<json, std::string> PgVector::search_content(
+    const std::string& table_name, 
+    const vdb::vector& search_vector,
+    int limit, vdb::query_type type
+) {
     guard("PgVector::search_content");
     if (!conn || !conn->is_open()) {
         return unexpected<std::string>("Connection to vector db is not open");

@@ -59,16 +59,21 @@ public:
         return liboai::Response();
     }
 
-    vdb::vector embedding(const std::string& text, EmbeddingModel model = EmbeddingModel::oai_3small) {
+    liboai::Response embedding(const std::string& text, embedding_model model = embedding_model::oai_3small) {
         guard("LLM::embedding")
         liboai::Response response = oai.Embedding->create(
             fmt::format("{}", model),
             text
         );
-        json jres = response["data"][0]["embedding"];
-        return vdb::vector({ jres.begin(), jres.end() }, model);
+        //json jres = response["data"][0]["embedding"];
+        //std::cout << response << "\n\n";
+        return response; //vdb::vector({ jres.begin(), jres.end() }, model);
         unguard()
-        return vdb::vector();
+        return liboai::Response();
+    }
+
+    std::future<liboai::Response> embedding_async(const std::string& text, embedding_model model = embedding_model::oai_3small) {
+        return std::async(std::launch::async, &LLM::embedding, this, text, model);
     }
 
     /// TODO: Refine

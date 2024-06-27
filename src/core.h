@@ -16,6 +16,8 @@
 #include <iomanip>
 #include <memory>
 #include <stack>
+#include <future>
+#include <deque>
 #include <algorithm>
 #include <functional>
 #include <optional>
@@ -29,6 +31,8 @@
 #include <type_traits>
 #include <stdexcept>
 #include <cassert>
+#include <codecvt>
+#include <locale>
 #include <fmt/core.h>
 #include <fmt/format.h>
 
@@ -37,7 +41,6 @@
 #include "nlohmann/json.hpp"
 #include "toml++/toml.hpp"
 
-#include <pqxx/pqxx>
 
 #define MAX_INTEGER std::numeric_limits<int>::max()
 
@@ -46,8 +49,9 @@ extern std::atomic<bool> spinner_active;
 extern std::thread spinner_thread;
 extern std::string completion_text;
 
-using json = nlohmann::json;
 using std::to_string;
+using tl::expected, tl::unexpected;
+using json = nlohmann::json;
 
 /// ANSI escape codes for coloring text
 const std::string RED       = "\033[31m";
@@ -58,7 +62,7 @@ const std::string MAGENTA   = "\033[35m";
 const std::string CYAN      = "\033[36m";
 const std::string RESET     = "\033[0m";
 
-enum class EmbeddingModel {
+enum class embedding_model {
     oai_3small = 1536,
     oai_3large = 3072
 };
@@ -122,6 +126,10 @@ std::mt19937& get_random_engine();
 int get_random_number(int min, int max);
 std::string gen_index(const std::string& data);
 std::string gen_index();
+std::vector<std::string> split_text_by_sentences(const std::string& text, int sentences_per_chunk);
+bool is_valid_utf8(const std::string &str);
+std::string remove_invalid_utf8(const std::string &str);
+
 
 template <>
 struct fmt::formatter<std::vector<std::string>> {
@@ -139,12 +147,12 @@ struct fmt::formatter<std::vector<std::string>> {
 };
 
 template <>
-struct fmt::formatter<EmbeddingModel> : formatter<std::string> {
-    auto format(EmbeddingModel c, format_context& ctx) {
+struct fmt::formatter<embedding_model> : formatter<std::string> {
+    auto format(embedding_model c, format_context& ctx) {
         std::string name = "Unknown";
         switch (c) {
-            case EmbeddingModel::oai_3small: name = "text-embedding-3-small"; break;
-            case EmbeddingModel::oai_3large: name = "text-embedding-3-large"; break;
+            case embedding_model::oai_3small: name = "text-embedding-3-small"; break;
+            case embedding_model::oai_3large: name = "text-embedding-3-large"; break;
         }
         return formatter<std::string>::format(name, ctx);
     }
@@ -152,13 +160,13 @@ struct fmt::formatter<EmbeddingModel> : formatter<std::string> {
 
 namespace vdb {
 
-    enum class QueryType {
+    enum class query_type {
         embedding,
         distance,
         cosine_similarity
     };
 
-    struct QueryInfo {
+    struct query_info {
         std::string sql_clause;
         std::optional<std::string> result_field;
     };
@@ -166,11 +174,11 @@ namespace vdb {
     class vector {
     public:
         vector() : model(std::nullopt) {}
-        vector(const std::vector<float>& value, std::optional<EmbeddingModel> model = std::nullopt) 
+        vector(const std::vector<float>& value, std::optional<embedding_model> model = std::nullopt) 
             : __value(value), model(model) {}
-        vector(std::vector<float>&& value, std::optional<EmbeddingModel> model = std::nullopt) 
+        vector(std::vector<float>&& value, std::optional<embedding_model> model = std::nullopt) 
             : __value(std::move(value)), model(model) {}
-        vector(const float* value, size_t n, std::optional<EmbeddingModel> model = std::nullopt) 
+        vector(const float* value, size_t n, std::optional<embedding_model> model = std::nullopt) 
             : __value(value, value + n), model(model) {}
         size_t dimensions() const { return __value.size(); }
         std::string get_model_name() const {
@@ -180,7 +188,7 @@ namespace vdb {
                 return "No model set";
             }
         }
-        void set_model(EmbeddingModel new_model) { model = new_model; }
+        void set_model(embedding_model new_model) { model = new_model; }
         operator const std::vector<float>&() const { return __value; }
         friend bool operator==(const vector& lhs, const vector& rhs) { return lhs.__value == rhs.__value; }
         friend std::ostream& operator<<(std::ostream& os, const vector& value) {
@@ -195,9 +203,18 @@ namespace vdb {
 
     private:
         std::vector<float> __value;
-        std::optional<EmbeddingModel> model;
+        std::optional<embedding_model> model;
     };
 }
+
+struct mem_chunk {
+    std::string content_id;
+    int chunk_id;
+    std::string content;
+    vdb::vector embedding;
+    std::optional<std::string> name;
+    std::optional<std::string> meta;
+};
 
 #define guard(method_name) \
     std::string __method = method_name; \

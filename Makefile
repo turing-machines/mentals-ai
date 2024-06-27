@@ -5,7 +5,7 @@ SRC_DIRS := ./src
 
 LOGS_DIR := ./logs
 
-VERBOSE ?= 1
+VERBOSE ?= 0
 
 # Find all the C and C++ files we want to compile
 SRCS := $(shell find $(SRC_DIRS) -name '*.cpp' -or -name '*.c' -or -name '*.s')
@@ -20,15 +20,19 @@ DEPS := $(OBJS:.o=.d)
 INC_DIRS := $(shell find $(SRC_DIRS) -type d)
 INC_FLAGS := $(addprefix -I,$(INC_DIRS))
 
+# Add Poppler include directory
+POPPLER_INCLUDE := $(shell pkg-config --cflags-only-I poppler-cpp)
+INC_FLAGS += $(POPPLER_INCLUDE)
+
 # Conditional configuration for OS-specific flags
 OS := $(shell uname -s)
 ifeq ($(OS),Linux)
     CPPFLAGS += -DLINUX
-    LDFLAGS := -lrt -lpthread -lcurl -lfmt -lpqxx -lpq
+    LDFLAGS := -lrt -lpthread -lcurl -lfmt -lpqxx -lpq $(shell pkg-config --libs poppler-cpp)
 endif
 ifeq ($(OS),Darwin)
     CPPFLAGS += -DMACOS
-    LDFLAGS := -lpthread -lcurl -lfmt -lpqxx -lpq
+    LDFLAGS := -lpthread -lcurl -lfmt -lpqxx -lpq $(shell pkg-config --libs poppler-cpp)
 endif
 ifeq ($(OS),Windows_NT)
     CPPFLAGS += -DWIN32

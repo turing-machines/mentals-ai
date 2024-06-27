@@ -67,11 +67,10 @@ int main(int argc, char *argv[]) {
     vdb.connect();
 
     MemoryController memc(llm, vdb);
+    memc.set_model(embedding_model::oai_3small);
 
-    embedding_model embed_model = embedding_model::oai_3small;
-
-    vdb.delete_collection("books");
-    vdb.create_collection("books", embed_model);
+    memc.delete_collection("books");
+    memc.create_collection("books");
 
    std::string file_name = "ThusSpokeZarathustra.pdf";
 
@@ -92,32 +91,25 @@ int main(int argc, char *argv[]) {
     fmt::print("\033[0mChunking...\n");
     std::vector<std::string> chunks = split_text_by_sentences(read_res.value(), 20);
 
-    /// Call memory controller
-    std::string idx = gen_index();
-    memc.process_chunks(embed_model, chunks, idx, file_name);
+    /// Write data
+    memc.process_chunks(chunks, file_name);
     memc.write_chunks("books");
 
-    std::string search_text = input; /// "What does he thinks about life?";
+    std::string query = input; /// "What does he thinks about life?";
 
-    ///memc.read_chunks("books", search_text, embed_model);
+    /// Read 20 chunks
+    auto chunks_res = memc.read_chunks("books", query, 20);
 
-    /// Read data
-    fmt::print("Question: {}\n\n", search_text);
-    liboai::Response response = llm.embedding(search_text, embed_model);
-    json jres = response["data"][0]["embedding"];
-    vdb::vector search_vec = vdb::vector({ jres.begin(), jres.end() }, embed_model);
-    auto search_res = vdb.search_content("books", search_vec, 20, vdb::query_type::cosine_similarity);
-
-    if (search_res) {
+    if (chunks_res) {
         //std::cout << "Search results:\n" << (*search_res).dump(4) << "\n\n";
         liboai::Conversation conv;
         conv.SetSystemData(
             "You are a helpful assistant.\n"
             "Answer the user's question in no more than 300 words. "
             "Use content from the json array below:\n\n" +
-            (*search_res).dump(4)
+            (*chunks_res).dump(4)
         );
-        conv.AddUserData(search_text, "user");
+        conv.AddUserData(query, "user");
         liboai::Response response = llm.chat_completion(conv, 0.5);
         json content = json::parse(std::string(response.content));
         if (content.contains("choices")) {

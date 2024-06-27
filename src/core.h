@@ -208,8 +208,8 @@ namespace vdb {
 }
 
 struct mem_chunk {
+    std::string content_id;
     int chunk_id;
-    std::string idx;
     std::string content;
     vdb::vector embedding;
     std::optional<std::string> name;

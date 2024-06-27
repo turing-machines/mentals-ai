@@ -75,6 +75,7 @@ expected<json, std::string> PgVector::create_collection(const std::string& table
         "CREATE TABLE IF NOT EXISTS {} ("
         "id bigserial PRIMARY KEY, "
         "content_id TEXT, "
+        "chunk_id INTEGER, "
         "name TEXT, "
         "meta TEXT, "
         "content TEXT, "
@@ -145,7 +146,8 @@ expected<json, std::string> PgVector::get_collection_info(const std::string& tab
 expected<void, std::string> PgVector::write_content(
     pqxx::work& txn,
     const std::string& table_name,
-    const std::string& content_id, 
+    const std::string& content_id,
+    const int chunk_id,
     const std::string& content, 
     const vdb::vector& embedding, 
     const std::optional<std::string>& name, 
@@ -156,15 +158,26 @@ expected<void, std::string> PgVector::write_content(
         return unexpected<std::string>("Connection to vector db is not open");
     }
     std::string sql = fmt::format(
-        "INSERT INTO {} (content_id, name, meta, content, embedding) VALUES ($1, $2, $3, $4, $5)", 
+        "INSERT INTO {} (content_id, chunk_id, name, meta, content, embedding) VALUES ($1, $2, $3, $4, $5, $6)", 
         table_name
     );
     std::string name_value = name ? *name : "";
     std::string desc_value = desc ? *desc : "";
-    txn.exec_params(sql, content_id, name_value, desc_value, content, 
+    txn.exec_params(sql, content_id, chunk_id, name_value, desc_value, content, 
         (std::ostringstream() << embedding).str());
     unguard();
     return {};
+}
+
+expected<void, std::string> PgVector::write_content(
+    pqxx::work& txn,
+    const std::string& table_name,
+    const mem_chunk& chunk
+) {
+    return write_content(txn, table_name,
+        chunk.content_id, chunk.chunk_id, /// Content address in memory content_id:chunk_id
+        chunk.content, chunk.embedding,
+        chunk.name, chunk.meta);
 }
 
 expected<json, std::string> PgVector::search_content(
@@ -191,11 +204,12 @@ expected<json, std::string> PgVector::search_content(
     json j_result = json::array();
     for (auto row : res) {
         json item;
-        item["content_id"] = row["content_id"].c_str();
-        item["content"] = row["content"].c_str();
-        item["name"] = row["name"].c_str();
-        item["meta"] = row["meta"].c_str();
-        item["created_at"] = row["created_at"].c_str();
+        item["content_id"]  = row["content_id"].c_str();
+        item["chunk_id"]    = row["chunk_id"].as<int>();
+        item["content"]     = row["content"].c_str();
+        item["name"]        = row["name"].c_str();
+        item["meta"]        = row["meta"].c_str();
+        item["created_at"]  = row["created_at"].c_str();
         if (query_info.result_field) {
             item[*query_info.result_field] = row[*query_info.result_field].as<double>();
         }

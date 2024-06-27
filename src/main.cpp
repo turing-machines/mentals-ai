@@ -72,32 +72,30 @@ int main(int argc, char *argv[]) {
     memc.delete_collection("books");
     memc.create_collection("books");
 
-   std::string file_name = "ThusSpokeZarathustra.pdf";
+    std::vector<std::string> file_names = {
+        "assets/thus_spoke_zarathustra.pdf",
+        "assets/15_the_spirit_in_man_art_and_literature.pdf",
+        "assets/psychology_and_religion.pdf"
+    };
 
-    fmt::print("\033[0mLoading file: {}\n", file_name);
     std::unique_ptr<FileInterface> file = std::make_unique<PdfFile>();
-    auto file_res = file->open("assets/" + file_name);
-    if (!file_res) {
-        std::cerr << file_res.error() << std::endl;
-        exit(EXIT_FAILURE);
+    for (const auto& file_name : file_names) {
+        fmt::print("\033[0mLoading file: {}\n", file_name);
+        auto file_res = file->read_file(file_name);
+        if (!file_res) {
+            std::cerr << file_res.error() << std::endl;
+            continue;
+        }
+        fmt::print("\033[0m{} chunking...\n", file_name);
+        std::vector<std::string> chunks = split_text_by_sentences(file_res.value(), 20);
+        memc.process_chunks(chunks, file_name);
     }
-    auto read_res = file->read();
-    if (!read_res) {
-        std::cerr << read_res.error() << std::endl;
-        exit(EXIT_FAILURE);
-    }
-    file->close();
 
-    fmt::print("\033[0mChunking...\n");
-    std::vector<std::string> chunks = split_text_by_sentences(read_res.value(), 20);
-
-    /// Write data
-    memc.process_chunks(chunks, file_name);
     memc.write_chunks("books");
 
     std::string query = input; /// "What does he thinks about life?";
 
-    /// Read 20 chunks
+    /// Read most relevant 20 chunks
     auto chunks_res = memc.read_chunks("books", query, 20);
 
     if (chunks_res) {

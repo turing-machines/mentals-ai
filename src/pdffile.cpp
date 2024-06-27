@@ -33,3 +33,16 @@ expected<std::string, std::string> PdfFile::read() {
     unguard();
     return {};
 }
+
+expected<std::string, std::string> PdfFile::read_file(const std::string& file_path) {
+    auto file_res = open(file_path);
+    if (!file_res) {
+        unexpected(file_res.error());
+    }
+    auto read_res = read();
+    if (!read_res) {
+        unexpected(read_res.error());
+    }
+    close();
+    return read_res.value();
+}

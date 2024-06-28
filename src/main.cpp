@@ -99,7 +99,7 @@ int main(int argc, char *argv[]) {
     auto chunks_res = memc.read_chunks("books", query, 20);
 
     if (chunks_res) {
-        //std::cout << "Search results:\n" << (*chunks_res).dump(4) << "\n\n";
+        //std::cout << "Search results:\n" << (*chunks_res).dump(4) << "\n\n"; 
 
         liboai::Conversation conv;
         conv.SetSystemData(

@@ -102,8 +102,12 @@ public:
                 chunk->content_id, chunk->chunk_id);
         }
         __vdb.commit_transaction(txn);
-        fmt::print("\n{} chunks have been processed\n{} failed chunks\n"
-            "{} processed tokens\n{:.2f} MB of data processed\n",
+        fmt::print(
+            "\n----------------\n"
+            "{} chunks have been processed\n"
+            "{} failed chunks\n"
+            "{} processed tokens\n"
+            "{:.2f} MB of data processed\n",
             mem_chunks.size(), failed_chunks.size(), processed_tokens, processed_kb / 1024.0);
         futures.clear();
         {

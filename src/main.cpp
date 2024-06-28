@@ -69,7 +69,6 @@ int main(int argc, char *argv[]) {
     MemoryController memc(llm, vdb);
     memc.set_model(embedding_model::oai_3small);
 
-/*
     memc.delete_collection("books");
     memc.create_collection("books");
 
@@ -93,7 +92,6 @@ int main(int argc, char *argv[]) {
     }
 
     memc.write_chunks("books");
-*/
 
     std::string query = input; /// "What does he thinks about life?";
 

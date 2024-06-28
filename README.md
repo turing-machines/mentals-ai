@@ -49,9 +49,10 @@ an API key, skip this step.
 
 Before building the project, ensure the following dependencies are installed:
 
-- `libcurl`: Used for making HTTP requests
-- `libfmt`: Provides an API for formatting
-- `pgvector`: Vector operations with PostgreSQL
+- libcurl: Used for making HTTP requests
+- libfmt: Provides an API for formatting
+- pgvector: Vector operations with PostgreSQL
+- poppler: Required for PDF processing
 
 Depending on your operating system, you can install these using the following commands:
 
@@ -59,14 +60,14 @@ Depending on your operating system, you can install these using the following co
 
 ```shell
 sudo apt-get update
-sudo apt-get install libcurl4-openssl-dev libfmt-dev
+sudo apt-get install libcurl4-openssl-dev libfmt-dev libpoppler-dev
 ```
 
 **macOS**
 
 ```shell
 brew update
-brew install curl fmt
+brew install curl fmt poppler
 ```
 
 **Windows**
@@ -74,10 +75,13 @@ brew install curl fmt
 For Windows, it's recommended to use vcpkg or a similar package manager:
 
 ```shell
-vcpkg install curl fmt
+vcpkg install curl fmt poppler
 ```
 
 **pgvector installation**
+
+> [!NOTE]
+> In the `main` branch you can skip this step
 
 - [Build from sources](https://github.com/pgvector/pgvector?tab=readme-ov-file#installation)
 - [Docker, Homebrew, PGXN, APT, etc.](https://github.com/pgvector/pgvector?tab=readme-ov-file#additional-installation-methods)

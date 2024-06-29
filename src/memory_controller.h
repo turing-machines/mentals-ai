@@ -74,7 +74,9 @@ public:
         const std::optional<std::string>& name = std::nullopt,
         const std::optional<std::string>& meta = std::nullopt
     ) {
-        std::string content_id = gen_index();
+        std::string content_id;
+        if (name && !name->empty()) { content_id = gen_index(*name); }
+            else { content_id = gen_index(); }
         for (size_t chunk_id = 0; chunk_id < chunks.size(); ++chunk_id) {
             std::string chunk_content = chunks[chunk_id];
             fmt::print("mem_chunk #{}#{}: Processing started.\n", content_id, chunk_id);

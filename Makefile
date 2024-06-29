@@ -20,19 +20,23 @@ DEPS := $(OBJS:.o=.d)
 INC_DIRS := $(shell find $(SRC_DIRS) -type d)
 INC_FLAGS := $(addprefix -I,$(INC_DIRS))
 
-# Add Poppler include directory
+# Add Poppler include directories
 POPPLER_INCLUDE := $(shell pkg-config --cflags-only-I poppler-cpp)
 INC_FLAGS += $(POPPLER_INCLUDE)
+
+# Add Poco include directory
+POCO_INCLUDE := -I/usr/include/Poco
+INC_FLAGS += $(POCO_INCLUDE)
 
 # Conditional configuration for OS-specific flags
 OS := $(shell uname -s)
 ifeq ($(OS),Linux)
     CPPFLAGS += -DLINUX
-    LDFLAGS := -lrt -lpthread -lcurl -lfmt -lpqxx -lpq $(shell pkg-config --libs poppler-cpp)
+    LDFLAGS := -lrt -lpthread -lcurl -lfmt -lpqxx -lpq $(shell pkg-config --libs poppler-cpp) -lPocoFoundation
 endif
 ifeq ($(OS),Darwin)
     CPPFLAGS += -DMACOS
-    LDFLAGS := -lpthread -lcurl -lfmt -lpqxx -lpq $(shell pkg-config --libs poppler-cpp)
+    LDFLAGS := -lpthread -lcurl -lfmt -lpqxx -lpq $(shell pkg-config --libs poppler-cpp) -lPocoFoundation
 endif
 ifeq ($(OS),Windows_NT)
     CPPFLAGS += -DWIN32

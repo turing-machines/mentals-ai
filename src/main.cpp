@@ -10,7 +10,7 @@
 #include "memory_controller.h"
 #include "agent_executor.h"
 
-#include "pdffile.h"
+#include "text_formats/pdffile.h"
 
 bool debug{false};
 std::atomic<bool> spinner_active{false};
@@ -72,22 +72,23 @@ int main(int argc, char *argv[]) {
     memc.delete_collection("books");
     memc.create_collection("books");
 
-    std::vector<std::string> file_names = {
+    std::vector<std::string> file_paths = {
         "assets/thus_spoke_zarathustra.pdf",
         "assets/15_the_spirit_in_man_art_and_literature.pdf",
         "assets/psychology_and_religion.pdf"
     };
 
     std::unique_ptr<FileInterface> file = std::make_unique<PdfFile>();
-    for (const auto& file_name : file_names) {
-        fmt::print("\033[0mLoading file: {}\n", file_name);
-        auto file_res = file->read_file(file_name);
+    for (const auto& file_path : file_paths) {
+        fmt::print("\033[0mLoading file: {}\n", file_path);
+        auto file_res = file->read(file_path);
         if (!file_res) {
             std::cerr << file_res.error() << std::endl;
             continue;
         }
-        fmt::print("\033[0m{} chunking...\n", file_name);
+        fmt::print("\033[0m{} chunking...\n", file_path);
         std::vector<std::string> chunks = split_text_by_sentences(file_res.value(), 20);
+        std::string file_name = get_filename_w_ext(file_path);
         memc.process_chunks(chunks, file_name);
     }
 

@@ -34,7 +34,7 @@ expected<std::string, std::string> PdfFile::read() {
     return {};
 }
 
-expected<std::string, std::string> PdfFile::read_file(const std::string& file_path) {
+expected<std::string, std::string> PdfFile::read(const std::string& file_path) {
     auto file_res = open(file_path);
     if (!file_res) {
         unexpected(file_res.error());

@@ -4,8 +4,10 @@
             "name": "Linux",
             "includePath": [
                 "${workspaceFolder}/**",
-                "${workspaceFolder}/liboai/include",
-                "/usr/include/poppler/cpp"
+                "${workspaceFolder}/src/liboai/include",
+                "/usr/include/poppler/cpp",
+                "/usr/include/libreoffice",
+                "/usr/include/Poco"
             ],
             "defines": [],
             "compilerPath": "/usr/bin/gcc",

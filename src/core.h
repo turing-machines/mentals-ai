@@ -129,7 +129,7 @@ std::string gen_index();
 std::vector<std::string> split_text_by_sentences(const std::string& text, int sentences_per_chunk);
 bool is_valid_utf8(const std::string &str);
 std::string remove_invalid_utf8(const std::string &str);
-
+std::string get_filename_w_ext(const std::string& path);
 
 template <>
 struct fmt::formatter<std::vector<std::string>> {

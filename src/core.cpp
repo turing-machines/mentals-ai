@@ -599,3 +599,14 @@ std::string remove_invalid_utf8(const std::string &str) {
     }
     return result;
 }
+
+std::string get_filename_w_ext(const std::string& path) {
+    size_t last_slash_pos = path.find_last_of("/\\");
+    if (last_slash_pos == std::string::npos) {
+        last_slash_pos = 0;
+    } else {
+        last_slash_pos++;
+    }
+    std::string filename = path.substr(last_slash_pos);
+    return filename;
+}

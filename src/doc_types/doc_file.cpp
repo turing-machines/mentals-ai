@@ -1,4 +1,4 @@
-#include "docfile.h"
+#include "doc_file.h"
 
 expected<void, std::string> DocFile::open(const std::string& file_path) {
     guard("DocFile::open");

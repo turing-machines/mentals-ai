@@ -1,13 +1,12 @@
 #pragma once
 
-#include "file.h"
-#include <poppler-document.h>
-#include <poppler-page.h>
+#include "core.h"
+#include "file_interface.h"
 
-class PdfFile : public FileInterface {
+class TxtFile : public FileInterface {
 public:
-    PdfFile() = default;
-    ~PdfFile() override { close(); }
+    TxtFile() = default;
+    ~TxtFile() override { close(); }
 
     expected<void, std::string> open(const std::string& file_path) override;
     void close() override;
@@ -15,5 +14,6 @@ public:
     expected<std::string, std::string> read(const std::string& file_path) override;
 
 private:
-    std::unique_ptr<poppler::document> __document;
+    std::ifstream __file_stream;
+    bool is_open = false;
 };

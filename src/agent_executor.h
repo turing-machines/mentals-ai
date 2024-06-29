@@ -3,7 +3,7 @@
 #include "core.h"
 #include "logger.h"
 #include "llm.h"
-#include "genfile.h"
+#include "gen_file.h"
 #include "code_interpreter.h"
 
 class ToolRegistry;

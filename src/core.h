@@ -130,6 +130,7 @@ std::vector<std::string> split_text_by_sentences(const std::string& text, int se
 bool is_valid_utf8(const std::string &str);
 std::string remove_invalid_utf8(const std::string &str);
 std::string get_filename_w_ext(const std::string& path);
+std::string get_file_extension(const std::string &path);
 
 template <>
 struct fmt::formatter<std::vector<std::string>> {

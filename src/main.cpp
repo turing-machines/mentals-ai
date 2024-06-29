@@ -10,7 +10,7 @@
 #include "memory_controller.h"
 #include "agent_executor.h"
 
-#include "text_formats/pdffile.h"
+#include "doc_factory.h"
 
 bool debug{false};
 std::atomic<bool> spinner_active{false};

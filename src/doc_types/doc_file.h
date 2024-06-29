@@ -1,6 +1,6 @@
 #pragma once
 
-#include "file.h"
+#include "file_interface.h"
 #include <Poco/Process.h>
 
 class DocFile : public FileInterface {

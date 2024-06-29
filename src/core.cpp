@@ -610,3 +610,11 @@ std::string get_filename_w_ext(const std::string& path) {
     std::string filename = path.substr(last_slash_pos);
     return filename;
 }
+
+std::string get_file_extension(const std::string &path) {
+    size_t dot_pos = path.find_last_of('.');
+    if (dot_pos != std::string::npos) {
+        return path.substr(dot_pos + 1);
+    }
+    return "";
+}

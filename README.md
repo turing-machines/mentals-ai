@@ -4,6 +4,7 @@ Mentals AI is a tool designed for creating and operating agents that feature **`
 
 > [!NOTE] 
 > [work in progress] A local vector database to store your chats with the agents as well as your private information. See [vector-db](https://github.com/turing-machines/mentals-ai/tree/vector-db) branch.
+> [work in progress] Web UI with agents, tools and vector storage
 
 - [Getting Started](#-getting-started)
 - [Differences from Other Frameworks](#-differences-from-other-frameworks)
@@ -341,7 +342,7 @@ A complete example is contained in the [agents/tree_structure.gen](agents/tree_s
 
 ## 🗺️ Roadmap
 
-- [ ] Web UI
+- [ ] Web UI -- WIP
 - [ ] Vector database tools -- WIP
 - [ ] Agent's experience (experimental)
 - [ ] Tools: Image generation, Browser

@@ -3,7 +3,8 @@
 Mentals AI is a tool designed for creating and operating agents that feature **`loops`**, **`memory`**, and various **`tools`**, all through straightforward **`markdown`** file with a .gen extension. Think of an agent file as an executable file. You focus entirely on the logic of the agent, eliminating the necessity to write scaffolding code in Python or any other language. Essentially, it redefines the foundational frameworks for future AI applications.
 
 > [!NOTE] 
-> [work in progress] A local vector database to store your chats with the agents as well as your private information.
+> * [work in progress] A local vector database to store your chats with the agents as well as your private information. See [vector-db](https://github.com/turing-machines/mentals-ai/tree/vector-db) branch.
+> * [work in progress] Web UI with agents, tools and vector storage
 
 - [Getting Started](#-getting-started)
 - [Differences from Other Frameworks](#-differences-from-other-frameworks)
@@ -341,7 +342,7 @@ A complete example is contained in the [agents/tree_structure.gen](agents/tree_s
 
 ## 🗺️ Roadmap
 
-- [ ] Web UI
+- [ ] Web UI -- WIP
 - [ ] Vector database tools -- WIP
 - [ ] Agent's experience (experimental)
 - [ ] Tools: Image generation, Browser

@@ -57,7 +57,7 @@ int main(int argc, char *argv[]) {
         );
     }
 
-    WebServer mentals_chat("127.0.0.1", 9002, 8080);
+    WebServer mentals_chat(DEFAULT_ADDRESS, 9002, 8080);
     mentals_chat.start();
 
 /*

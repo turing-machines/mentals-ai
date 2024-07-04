@@ -23,6 +23,9 @@ namespace fs = boost::filesystem;
 using tcp = net::ip::tcp;
 
 #define ROOT_PAGE "web_ui/chat.html"
+#define DEFAULT_ADDRESS "127.0.0.1"
+#define DEFAULT_HTTP_PORT 8080
+#define DEFAULT_WS_PORT 9002
 
 class WebServer {
 private:
@@ -187,9 +190,9 @@ private:
     }
 
 public:
-    WebServer(const std::string& address = "127.0.0.1", 
-        unsigned short ws_port = 9002, 
-        unsigned short http_port = 8080)
+    WebServer(const std::string& address = DEFAULT_ADDRESS, 
+        unsigned short ws_port = DEFAULT_WS_PORT, 
+        unsigned short http_port = DEFAULT_HTTP_PORT)
         : __address(address), __ws_port(ws_port), __http_port(http_port) {}
 
     void start() {

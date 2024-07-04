@@ -21,6 +21,7 @@
 #include <algorithm>
 #include <functional>
 #include <optional>
+#include <set>
 #include <vector>
 #include <array>
 #include <map>
@@ -218,25 +219,25 @@ struct mem_chunk {
 };
 
 #define guard(method_name) \
-    std::string __method = method_name; \
+    std::string guard_method_name = method_name; \
     try {
 
 #define unguard() \
     } catch (const std::out_of_range& e) { \
-        log_exception(__method, fmt::format("Out of range: {}", e.what())); \
+        log_exception(guard_method_name, fmt::format("Out of range: {}", e.what())); \
         throw; \
     } catch (const std::regex_error& e) { \
-        log_exception(__method, fmt::format("RegEx error: {}", e.what())); \
+        log_exception(guard_method_name, fmt::format("RegEx error: {}", e.what())); \
         throw; \
     } catch (const json::parse_error& e) { \
-        log_exception(__method, fmt::format("JSON parse error: {}", e.what())); \
+        log_exception(guard_method_name, fmt::format("JSON parse error: {}", e.what())); \
     } catch (const std::runtime_error& e) { \
-        log_exception(__method, fmt::format("Runtime error: {}", e.what())); \
+        log_exception(guard_method_name, fmt::format("Runtime error: {}", e.what())); \
         throw; \
     } catch (const std::exception& e) { \
-        log_exception(__method, fmt::format("General exception: {}", e.what())); \
+        log_exception(guard_method_name, fmt::format("General exception: {}", e.what())); \
         throw; \
     } catch (...) { \
-        log_exception(__method, "Unknown exception"); \
+        log_exception(guard_method_name, "Unknown exception"); \
         throw; \
     }

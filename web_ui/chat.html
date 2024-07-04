@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mentals AI</title>
+    <style>
+        body { font-family: Arial, sans-serif; }
+        #messages { border: 1px solid #ccc; height: 300px; overflow-y: scroll; padding: 10px; }
+        #messageForm, #fileForm { margin-top: 10px; }
+    </style>
+</head>
+<body>
+    <h1>Chat</h1>
+    <div id="messages"></div>
+    <form id="messageForm">
+        <input type="text" id="messageInput" placeholder="Enter message" required>
+        <button type="submit">Send</button>
+    </form>
+    <form id="fileForm" enctype="multipart/form-data">
+        <input type="file" id="fileInput" multiple required>
+        <button type="submit">Upload Files</button>
+    </form>
+
+    <script>
+        const ws = new WebSocket('ws://localhost:9002');
+        const messagesDiv = document.getElementById('messages');
+        const messageForm = document.getElementById('messageForm');
+        const messageInput = document.getElementById('messageInput');
+        const fileForm = document.getElementById('fileForm');
+        const fileInput = document.getElementById('fileInput');
+
+        ws.onopen = () => {
+            console.log('Connected to the WebSocket server');
+        };
+
+        ws.onmessage = (event) => {
+            const message = document.createElement('div');
+            message.textContent = event.data;
+            messagesDiv.appendChild(message);
+        };
+
+        messageForm.onsubmit = (event) => {
+            event.preventDefault();
+            const message = messageInput.value;
+            ws.send(message);
+            messageInput.value = '';
+        };
+
+        fileForm.onsubmit = (event) => {
+            event.preventDefault();
+            const files = fileInput.files;
+            const formData = new FormData();
+            const filesArray = [];
+
+            for (const file of files) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    filesArray.push({ filename: file.name, content: e.target.result });
+                    if (filesArray.length === files.length) {
+                        const json = JSON.stringify({ files: filesArray });
+                        fetch('http://localhost:8080/upload', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: json
+                        })
+                        .then(response => response.text())
+                        .then(data => alert(data))
+                        .catch(error => console.error('Error:', error));
+                    }
+                };
+                reader.readAsDataURL(file);
+            }
+        };
+    </script>
+</body>
+</html>

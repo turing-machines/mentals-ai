@@ -72,7 +72,12 @@
         "span": "cpp",
         "variant": "cpp",
         "set": "cpp",
-        "cinttypes": "cpp"
+        "cinttypes": "cpp",
+        "csignal": "cpp",
+        "strstream": "cpp",
+        "complex": "cpp",
+        "cfenv": "cpp",
+        "typeindex": "cpp"
     },
     "cmake.sourceDirectory": "/home/costa-al/control_unit/liboai",
     "makefile.launchConfigurations": [

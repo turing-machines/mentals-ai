@@ -9,8 +9,9 @@
 #include "context.h"
 #include "memory_controller.h"
 #include "agent_executor.h"
-
 #include "doc_factory.h"
+#include "web_server.h"
+
 
 bool debug{false};
 std::atomic<bool> spinner_active{false};
@@ -56,6 +57,10 @@ int main(int argc, char *argv[]) {
         );
     }
 
+    WebServer mentals_chat("127.0.0.1", 9002, 8080);
+    mentals_chat.start();
+
+/*
     LLM llm;
     llm.set_provider(endpoint, api_key);
     llm.set_model(model);
@@ -126,7 +131,7 @@ int main(int argc, char *argv[]) {
             }
         }
     }
-
+*/
 /*
     vdb.delete_collection("tools");
     vdb.delete_collection("gens");

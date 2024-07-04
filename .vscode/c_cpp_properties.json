@@ -5,6 +5,7 @@
             "includePath": [
                 "${workspaceFolder}/**",
                 "${workspaceFolder}/src/liboai/include",
+                "/usr/include/boost",
                 "/usr/include/poppler/cpp",
                 "/usr/include/libreoffice",
                 "/usr/include/Poco"

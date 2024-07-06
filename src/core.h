@@ -42,7 +42,6 @@
 #include "nlohmann/json.hpp"
 #include "toml++/toml.hpp"
 
-
 #define MAX_INTEGER std::numeric_limits<int>::max()
 
 extern bool debug;
@@ -216,6 +215,17 @@ struct mem_chunk {
     vdb::vector embedding;
     std::optional<std::string> name;
     std::optional<std::string> meta;
+
+    json serialize_json() const {
+        json j;
+        j["content_id"] = content_id;
+        j["chunk_id"] = chunk_id;
+        j["content"] = content;
+        ///j["embedding"] = embedding;
+        if (name) { j["name"] = *name; } else { j["name"] = nullptr; }
+        if (meta) { j["meta"] = *meta; } else { j["meta"] = nullptr; }
+        return j;
+    }
 };
 
 #define guard(method_name) \

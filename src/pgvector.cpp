@@ -180,12 +180,54 @@ expected<void, std::string> PgVector::write_content(
         chunk.name, chunk.meta);
 }
 
-expected<json, std::string> PgVector::search_content(
-    const std::string& table_name, 
+expected<std::vector<mem_chunk>, std::string> PgVector::read_content(
+    const std::string& table_name,
+    const std::optional<std::string>& content_id,
+    const std::optional<int>& num_chunks
+) {
+    guard("PgVector::read_content")
+    if (!conn || !conn->is_open()) {
+        return unexpected<std::string>("Connection to vector db is not open");
+    }
+    std::vector<mem_chunk> chunks;
+    std::string sql = fmt::format("SELECT content_id, chunk_id, name, meta, content, embedding FROM {}", table_name);
+    std::string sql_order = " ORDER BY chunk_id";
+    if (num_chunks) {
+        sql_order += fmt::format(" LIMIT {}", *num_chunks);
+    }
+    if (content_id) {
+        sql += fmt::format(" WHERE content_id = $1") + sql_order;
+    } else {
+        sql += sql_order;
+    }
+    pqxx::work txn(*conn);
+    pqxx::result result;
+    if (content_id) {
+        result = txn.exec_params(sql, *content_id);
+    } else {
+        result = txn.exec(sql);
+    }
+    txn.commit();
+    for (auto row : result) {
+        mem_chunk chunk;
+        chunk.content_id = row["content_id"].c_str();
+        chunk.chunk_id = row["chunk_id"].as<int>();
+        chunk.name = row["name"].c_str();
+        chunk.meta = row["meta"].c_str();
+        chunk.content = row["content"].c_str();
+        chunks.push_back(chunk);
+    }
+    return chunks;
+    unguard()
+    return unexpected<std::string>("Nothing found");
+}
+
+expected<std::vector<mem_chunk>, std::string> PgVector::search_content(
+    const std::string& table_name,
     const vdb::vector& search_vector,
     int limit, vdb::query_type type
 ) {
-    guard("PgVector::search_content");
+    guard("PgVector::search_content")
     if (!conn || !conn->is_open()) {
         return unexpected<std::string>("Connection to vector db is not open");
     }
@@ -201,21 +243,17 @@ expected<json, std::string> PgVector::search_content(
     }));
     pqxx::result res = txn.exec_params(sql, (std::ostringstream() << search_vector).str());
     txn.commit();
-    json j_result = json::array();
+    std::vector<mem_chunk> chunks;
     for (auto row : res) {
-        json item;
-        item["content_id"]  = row["content_id"].c_str();
-        item["chunk_id"]    = row["chunk_id"].as<int>();
-        item["content"]     = row["content"].c_str();
-        item["name"]        = row["name"].c_str();
-        item["meta"]        = row["meta"].c_str();
-        item["created_at"]  = row["created_at"].c_str();
-        if (query_info.result_field) {
-            item[*query_info.result_field] = row[*query_info.result_field].as<double>();
-        }
-        j_result.push_back(item);
+        mem_chunk chunk;
+        chunk.content_id = row["content_id"].c_str();
+        chunk.chunk_id = row["chunk_id"].as<int>();
+        chunk.name = row["name"].c_str();
+        chunk.meta = row["meta"].c_str();
+        chunk.content = row["content"].c_str();
+        chunks.push_back(chunk);
     }
-    return j_result;
-    unguard();
+    return chunks;
+    unguard()
     return unexpected<std::string>("Nothing found");
 }

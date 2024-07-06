@@ -67,6 +67,13 @@ public:
         pqxx::work& txn,
         const std::string& table_name,
         const mem_chunk& chunk);
-    expected<json, std::string> search_content(const std::string& table_name, const vdb::vector& search_vector, 
-        int limit, vdb::query_type type = vdb::query_type::embedding);
+    expected<std::vector<mem_chunk>, std::string> read_content(
+        const std::string& table_name,
+        const std::optional<std::string>& content_id = std::nullopt,
+        const std::optional<int>& num_chunks = std::nullopt);
+    expected<std::vector<mem_chunk>, std::string> search_content(
+        const std::string& table_name, 
+        const vdb::vector& search_vector, 
+        int limit, 
+        vdb::query_type type = vdb::query_type::embedding);
 };

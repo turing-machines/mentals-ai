@@ -57,10 +57,10 @@ int main(int argc, char *argv[]) {
         );
     }
 
-    WebServer mentals_chat(DEFAULT_ADDRESS, 9002, 8080);
-    mentals_chat.start();
+    //WebServer mentals_chat(DEFAULT_ADDRESS, 9002, 8080);
+    //mentals_chat.start();
 
-/*
+
     LLM llm;
     llm.set_provider(endpoint, api_key);
     llm.set_model(model);
@@ -78,9 +78,9 @@ int main(int argc, char *argv[]) {
     memc.create_collection("books");
 
     std::vector<std::string> file_paths = {
-        "assets/thus_spoke_zarathustra.pdf",
-        "assets/15_the_spirit_in_man_art_and_literature.pdf",
-        "assets/psychology_and_religion.pdf"
+        "assets/thus_spoke_zarathustra.pdf"
+        //"assets/15_the_spirit_in_man_art_and_literature.pdf",
+        //"assets/psychology_and_religion.pdf"
     };
 
     std::unique_ptr<FileInterface> file = std::make_unique<PdfFile>();
@@ -99,15 +99,21 @@ int main(int argc, char *argv[]) {
 
     memc.write_chunks("books");
 
-    std::string query = input; /// "What does he thinks about life?";
+    std::string query = "What does he thinks about life?";
 
-    /// Read most relevant 20 chunks
-    auto chunks_res = memc.read_chunks("books", query, 20);
+    /// Read most relevant chunks
+    auto chunks_res = memc.read_chunks("books", query, 5);
 
     if (chunks_res) {
-        //std::cout << "Search results:\n" << (*chunks_res).dump(4) << "\n\n"; 
 
-        liboai::Conversation conv;
+        json j_chunks = json::array();
+        for (const auto& chunk : *chunks_res) {
+            j_chunks.push_back(chunk.serialize_json());
+        }
+
+        std::cout << "Search results:\n" << j_chunks.dump(4) << "\n\n"; 
+
+        /*liboai::Conversation conv;
         conv.SetSystemData(
             "You are a helpful assistant.\n"
             "Answer the user's question in no more than 300 words.\n"
@@ -129,9 +135,9 @@ int main(int argc, char *argv[]) {
                     }
                 }
             }
-        }
+        }*/
     }
-*/
+
 /*
     vdb.delete_collection("tools");
     vdb.delete_collection("gens");

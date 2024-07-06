@@ -126,7 +126,7 @@ public:
         return {};
     }
 
-    expected<json, std::string> read_chunks(
+    expected<std::vector<mem_chunk>, std::string> read_chunks(
         const std::string& collection, 
         const std::string& query,
         const int count

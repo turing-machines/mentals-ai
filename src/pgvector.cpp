@@ -11,7 +11,7 @@ expected<void, std::string> PgVector::connect() {
     guard("PgVector::connect");
     conn = std::make_unique<pqxx::connection>(conn_str);
     if (!conn->is_open()) {
-        logger->log("Failed to connect to database");
+        logger->log(fmt::format("Failed to connect to database: {}", conn->dbname()));
         return unexpected<std::string>("Failed to connect to database");
     }
     logger->log(fmt::format("Connected to database: {}", conn->dbname()));
@@ -26,6 +26,20 @@ std::unique_ptr<pqxx::work> PgVector::create_transaction() {
 
 void PgVector::commit_transaction(std::unique_ptr<pqxx::work>& txn) {
     txn->commit();
+}
+
+std::vector<mem_chunk> pqxx_result_to_mem_chunks(const pqxx::result& result) {
+    std::vector<mem_chunk> chunks;
+    for (auto row : result) {
+        mem_chunk chunk;
+        chunk.content_id = row["content_id"].c_str();
+        chunk.chunk_id = row["chunk_id"].as<int>();
+        chunk.name = row["name"].c_str();
+        chunk.meta = row["meta"].c_str();
+        chunk.content = row["content"].c_str();
+        chunks.push_back(chunk);
+    }
+    return chunks;
 }
 
 json pqxx_result_to_json(const pqxx::result& result) {
@@ -189,7 +203,6 @@ expected<std::vector<mem_chunk>, std::string> PgVector::read_content(
     if (!conn || !conn->is_open()) {
         return unexpected<std::string>("Connection to vector db is not open");
     }
-    std::vector<mem_chunk> chunks;
     std::string sql = fmt::format("SELECT content_id, chunk_id, name, meta, content, embedding FROM {}", table_name);
     std::string sql_order = " ORDER BY chunk_id";
     if (num_chunks) {
@@ -208,15 +221,7 @@ expected<std::vector<mem_chunk>, std::string> PgVector::read_content(
         result = txn.exec(sql);
     }
     txn.commit();
-    for (auto row : result) {
-        mem_chunk chunk;
-        chunk.content_id = row["content_id"].c_str();
-        chunk.chunk_id = row["chunk_id"].as<int>();
-        chunk.name = row["name"].c_str();
-        chunk.meta = row["meta"].c_str();
-        chunk.content = row["content"].c_str();
-        chunks.push_back(chunk);
-    }
+    std::vector<mem_chunk> chunks = pqxx_result_to_mem_chunks(result);
     return chunks;
     unguard()
     return unexpected<std::string>("Nothing found");
@@ -241,18 +246,9 @@ expected<std::vector<mem_chunk>, std::string> PgVector::search_content(
         { "distance_function"   , CosineDistance        },
         { "limit"               , to_string(limit)      }
     }));
-    pqxx::result res = txn.exec_params(sql, (std::ostringstream() << search_vector).str());
+    pqxx::result result = txn.exec_params(sql, (std::ostringstream() << search_vector).str());
     txn.commit();
-    std::vector<mem_chunk> chunks;
-    for (auto row : res) {
-        mem_chunk chunk;
-        chunk.content_id = row["content_id"].c_str();
-        chunk.chunk_id = row["chunk_id"].as<int>();
-        chunk.name = row["name"].c_str();
-        chunk.meta = row["meta"].c_str();
-        chunk.content = row["content"].c_str();
-        chunks.push_back(chunk);
-    }
+    std::vector<mem_chunk> chunks = pqxx_result_to_mem_chunks(result);
     return chunks;
     unguard()
     return unexpected<std::string>("Nothing found");

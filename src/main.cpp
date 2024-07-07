@@ -85,13 +85,13 @@ int main(int argc, char *argv[]) {
 
     std::unique_ptr<FileInterface> file = std::make_unique<PdfFile>();
     for (const auto& file_path : file_paths) {
-        fmt::print("\033[0mLoading file: {}\n", file_path);
+        fmt::print("{}Loading file: {}{}\n", YELLOW, file_path, RESET);
         auto file_res = file->read(file_path);
         if (!file_res) {
             std::cerr << file_res.error() << std::endl;
             continue;
         }
-        fmt::print("\033[0m{} chunking...\n", file_path);
+        fmt::print("{} chunking...\n", file_path);
         std::vector<std::string> chunks = split_text_by_sentences(file_res.value(), 20);
         std::string file_name = get_filename_w_ext(file_path);
         memc.process_chunks(chunks, file_name);
@@ -101,8 +101,8 @@ int main(int argc, char *argv[]) {
 
     std::string query = "What does he thinks about life?";
 
-    /// Read most relevant chunks
-    auto chunks_res = memc.read_chunks("books", query, 5);
+    /// Read chunks
+    auto chunks_res = memc.read_chunks("books", std::nullopt, 5); //query, 5);
 
     if (chunks_res) {
 

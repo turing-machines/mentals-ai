@@ -28,7 +28,7 @@ private:
         const std::optional<std::string>& meta = std::nullopt
     ) {
         guard("MemoryController::chunk_embedding")
-        fmt::print("mem_chunk #{}#{}: Embedding started.\n", content_id, chunk_id);
+        fmt::print("{}mem_chunk #{}#{}: Embedding started.\n", RESET, content_id, chunk_id);
         std::string cleaned_content = content;
         if (!is_valid_utf8(content)) {
             fmt::print("{}Warning: Invalid UTF-8 byte in content for chunk #{}#{}. Cleaning..{}\n", MAGENTA, content_id, chunk_id, RESET);
@@ -42,7 +42,7 @@ private:
         processed_tokens += response["usage"]["total_tokens"].get<int>();
         json jres = response["data"][0]["embedding"];
         vdb::vector embedding({ jres.begin(), jres.end() }, embed_model);
-        fmt::print("mem_chunk #{}#{}: Embedding completed.\n", content_id, chunk_id);
+        fmt::print("{}mem_chunk #{}#{}: Embedding completed.\n", RESET, content_id, chunk_id);
         ///std::lock_guard<std::mutex> lock(mem_chunks_mutex);
         mem_chunks.emplace_back(mem_chunk{
             content_id, chunk_id, cleaned_content, embedding, name, meta
@@ -79,7 +79,7 @@ public:
             else { content_id = gen_index(); }
         for (size_t chunk_id = 0; chunk_id < chunks.size(); ++chunk_id) {
             std::string chunk_content = chunks[chunk_id];
-            fmt::print("mem_chunk #{}#{}: Processing started.\n", content_id, chunk_id);
+            fmt::print("{}mem_chunk #{}#{}: Processing started.\n", RESET, content_id, chunk_id);
             futures.push_back(std::async(std::launch::async, 
                 &MemoryController::chunk_embedding, this, 
                 content_id, chunk_id, chunk_content, name, meta
@@ -100,7 +100,7 @@ public:
             }
             mem_chunk* chunk = res.value();
             __vdb.write_content(*txn, collection, *chunk);
-            fmt::print("mem_chunk #{}#{}: Data written to memory.\n", 
+            fmt::print("{}mem_chunk #{}#{}: Data written to memory.\n", RESET, 
                 chunk->content_id, chunk->chunk_id);
         }
         __vdb.commit_transaction(txn);
@@ -127,16 +127,28 @@ public:
     }
 
     expected<std::vector<mem_chunk>, std::string> read_chunks(
-        const std::string& collection, 
-        const std::string& query,
-        const int count
+        const std::string& collection,
+        const std::optional<std::string>& content_id = std::nullopt,
+        const std::optional<int>& num_chunks = std::nullopt
     ) {
         guard("MemoryController::read_chunks")
+        auto result = __vdb.read_content(collection, content_id, num_chunks);
+        return result;
+        unguard()
+        return unexpected("");
+    }
+
+    expected<std::vector<mem_chunk>, std::string> read_chunks(
+        const std::string& collection, 
+        const std::string& query,
+        const int& num_chunks
+    ) {
+        guard("MemoryController::read_chunks[query]")
         fmt::print("Fetch query: {}\n\n", query);
         liboai::Response response = __llm.embedding(query, embed_model);
         json jres = response["data"][0]["embedding"];
         vdb::vector query_vector = vdb::vector({ jres.begin(), jres.end() }, embed_model);
-        auto result = __vdb.search_content(collection, query_vector, count, 
+        auto result = __vdb.search_content(collection, query_vector, num_chunks, 
             vdb::query_type::cosine_similarity);
         return result;
         unguard()

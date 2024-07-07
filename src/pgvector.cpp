@@ -60,7 +60,13 @@ expected<json, std::string> PgVector::list_collections() {
         return unexpected<std::string>("Connection to vector db is not open");
     }
     pqxx::work txn(*conn);
-    pqxx::result result = txn.exec("SELECT tablename FROM pg_tables WHERE schemaname = 'public';");
+    SQLBuilder::Builder builder;
+    SQLBuilder query = builder
+        .select("tablename")
+        .from("pg_tables")
+        .where("schemaname = 'public'")
+        .build();
+    pqxx::result result = txn.exec(query.get_query());    
     json j_result = pqxx_result_to_json(result); /*json::array();
     for (const auto& row : result) {
         j_result.push_back(row[0].c_str());
@@ -76,35 +82,49 @@ expected<json, std::string> PgVector::create_collection(const std::string& table
         return unexpected<std::string>("Connection to vector db is not open");
     }
     pqxx::work txn(*conn);
-    pqxx::result result = txn.exec(fmt::format(
-        "SELECT EXISTS (SELECT FROM pg_tables WHERE tablename = '{}');",
-        table_name
-    ));
+    SQLBuilder::Builder builder;
+    SQLBuilder exists_query = builder
+        .select("*")
+        .from("pg_tables")
+        .where(fmt::format("tablename = '{}'", table_name))
+        .exists()
+        .build();
+    pqxx::result result = txn.exec(exists_query.get_query());
     if (result[0][0].as<bool>()) {
         return unexpected<std::string>(fmt::format("Table {} already exists", table_name));
     }
     txn.exec0("CREATE EXTENSION IF NOT EXISTS vector");
     int vector_dim = static_cast<int>(model);
-    std::string sql = fmt::format(
-        "CREATE TABLE IF NOT EXISTS {} ("
-        "id bigserial PRIMARY KEY, "
-        "content_id TEXT, "
-        "chunk_id INTEGER, "
-        "name TEXT, "
-        "meta TEXT, "
-        "content TEXT, "
-        "embedding vector({}), "
-        "created_at TIMESTAMP(3) DEFAULT CURRENT_TIMESTAMP(3))",
-        table_name, 
-        vector_dim
-    );
-    txn.exec0(sql);
-    txn.exec0("CREATE TABLE IF NOT EXISTS metadata (table_name TEXT PRIMARY KEY, model_name TEXT, dimensions INT)");
+    SQLBuilder create_table_query = builder
+        .create_table(table_name)
+        .add_column("id bigserial PRIMARY KEY")
+        .add_column("content_id TEXT")
+        .add_column("chunk_id INTEGER")
+        .add_column("name TEXT")
+        .add_column("meta TEXT")
+        .add_column("content TEXT")
+        .add_column(fmt::format("embedding vector({})", vector_dim))
+        .add_column("created_at TIMESTAMP(3) DEFAULT CURRENT_TIMESTAMP(3)")
+        .end_table()
+        .build();
+    txn.exec0(create_table_query.get_query());
+
+    SQLBuilder create_metadata_query = builder
+        .create_table("metadata")
+        .add_column("table_name TEXT PRIMARY KEY")
+        .add_column("model_name TEXT")
+        .add_column("dimensions INT")
+        .end_table()
+        .build();
+    txn.exec0(create_metadata_query.get_query());
+
     std::string model_name = fmt::format("{}", model);
-    txn.exec0(fmt::format(
-        "INSERT INTO metadata (table_name, model_name, dimensions) VALUES ('{}', '{}', {})",
-        table_name, model_name, vector_dim
-    ));
+    SQLBuilder insert_metadata_query = builder
+        .insert_into("metadata", "table_name, model_name, dimensions")
+        .values(fmt::format("'{}', '{}', {}", table_name, model_name, vector_dim))
+        .build();
+    txn.exec0(insert_metadata_query.get_query());
+
     json j_result = {
         { "table_name", table_name },
         { "model_name", model_name },
@@ -122,10 +142,16 @@ expected<std::string, std::string> PgVector::delete_collection(const std::string
         return unexpected<std::string>("Connection to vector db is not open");
     }
     pqxx::work txn(*conn);
-    std::string metadata_sql = fmt::format("DELETE FROM metadata WHERE table_name = '{}';", table_name);
-    txn.exec0(metadata_sql);
-    std::string drop_sql = fmt::format("DROP TABLE IF EXISTS {};", table_name);
-    txn.exec0(drop_sql);
+    SQLBuilder::Builder builder;
+    SQLBuilder delete_metadata_query = builder
+        .delete_from("metadata")
+        .where(fmt::format("table_name = '{}'", table_name))
+        .build();
+    txn.exec0(delete_metadata_query.get_query());
+    SQLBuilder drop_table_query = builder
+        .drop_table(table_name)
+        .build();
+    txn.exec0(drop_table_query.get_query());
     txn.commit();
     return fmt::format("Table {} and its metadata deleted successfully", table_name);
     unguard();
@@ -138,11 +164,23 @@ expected<json, std::string> PgVector::get_collection_info(const std::string& tab
         return unexpected<std::string>("Connection to vector db is not open");
     }
     pqxx::work txn(*conn);    
-    pqxx::result exists_result = txn.exec(fmt::format("SELECT EXISTS (SELECT FROM pg_tables WHERE tablename = '{}');", table_name));
+    SQLBuilder::Builder builder;
+    SQLBuilder exists_query = builder
+        .select("*")
+        .from("pg_tables")
+        .where(fmt::format("tablename = '{}'", table_name))
+        .exists()
+        .build();
+    pqxx::result exists_result = txn.exec(exists_query.get_query());
     if (!exists_result[0][0].as<bool>()) {
         return unexpected<std::string>(fmt::format("Table {} does not exist", table_name));
     }
-    pqxx::result metadata_result = txn.exec(fmt::format("SELECT model_name, dimensions FROM metadata WHERE table_name = '{}';", table_name));
+    SQLBuilder metadata_query = builder
+        .select("model_name, dimensions")
+        .from("metadata")
+        .where(fmt::format("table_name = '{}'", table_name))
+        .build();
+    pqxx::result metadata_result = txn.exec(metadata_query.get_query());
     if (metadata_result.empty()) {
         return unexpected<std::string>("No metadata found for the table");
     }
@@ -171,13 +209,14 @@ expected<void, std::string> PgVector::write_content(
     if (!conn || !conn->is_open()) {
         return unexpected<std::string>("Connection to vector db is not open");
     }
-    std::string sql = fmt::format(
-        "INSERT INTO {} (content_id, chunk_id, name, meta, content, embedding) VALUES ($1, $2, $3, $4, $5, $6)", 
-        table_name
-    );
+    SQLBuilder::Builder builder;
+    SQLBuilder insert_query = builder
+        .insert_into(table_name, "content_id, chunk_id, name, meta, content, embedding")
+        .values("$1, $2, $3, $4, $5, $6")
+        .build();
     std::string name_value = name ? *name : "";
     std::string desc_value = desc ? *desc : "";
-    txn.exec_params(sql, content_id, chunk_id, name_value, desc_value, content, 
+    txn.exec_params(insert_query.get_query(), content_id, chunk_id, name_value, desc_value, content, 
         (std::ostringstream() << embedding).str());
     unguard();
     return {};
@@ -203,22 +242,22 @@ expected<std::vector<mem_chunk>, std::string> PgVector::read_content(
     if (!conn || !conn->is_open()) {
         return unexpected<std::string>("Connection to vector db is not open");
     }
-    std::string sql = fmt::format("SELECT content_id, chunk_id, name, meta, content, embedding FROM {}", table_name);
-    std::string sql_order = " ORDER BY chunk_id";
-    if (num_chunks) {
-        sql_order += fmt::format(" LIMIT {}", *num_chunks);
-    }
+    SQLBuilder::Builder builder;
+    builder.select("content_id, chunk_id, name, meta, content, embedding").from(table_name);
     if (content_id) {
-        sql += fmt::format(" WHERE content_id = $1") + sql_order;
-    } else {
-        sql += sql_order;
+        builder.where(fmt::format("content_id = '{}'", *content_id));
     }
+    builder.order_by("chunk_id");
+    if (num_chunks) {
+        builder.limit(*num_chunks);
+    }
+    SQLBuilder select_query = builder.build();
     pqxx::work txn(*conn);
     pqxx::result result;
     if (content_id) {
-        result = txn.exec_params(sql, *content_id);
+        result = txn.exec_params(select_query.get_query(), *content_id);
     } else {
-        result = txn.exec(sql);
+        result = txn.exec(select_query.get_query());
     }
     txn.commit();
     std::vector<mem_chunk> chunks = pqxx_result_to_mem_chunks(result);
@@ -236,17 +275,29 @@ expected<std::vector<mem_chunk>, std::string> PgVector::search_content(
     if (!conn || !conn->is_open()) {
         return unexpected<std::string>("Connection to vector db is not open");
     }
+    std::string distance_function = CosineDistance;
     pqxx::work txn(*conn);
-    const auto& query_info = query_options[type];
-    std::string sql = render_template(query_info.sql_clause, json::object({
-        { "table_name"          , table_name            },
-        //{ "distance_function"   , L1Distance            }, /// v0.7.0
-        //{ "distance_function"   , L2Distance            },
-        //{ "distance_function"   , NegativeInnerProduct  },
-        { "distance_function"   , CosineDistance        },
-        { "limit"               , to_string(limit)      }
-    }));
-    pqxx::result result = txn.exec_params(sql, (std::ostringstream() << search_vector).str());
+    SQLBuilder::Builder builder;
+    if (type == vdb::query_type::embedding) {
+        builder.select("*")
+            .from(table_name)
+            .order_by(fmt::format("embedding {} $1", distance_function))
+            .limit(limit);
+    } else if (type == vdb::query_type::distance) {
+        builder.select(fmt::format("*, embedding {} $1 AS distance", distance_function))
+            .from(table_name)
+            .order_by("distance")
+            .limit(limit);
+    } else if (type == vdb::query_type::cosine_similarity) {
+        builder.select(fmt::format("*, 1 - (embedding {} $1) AS cosine_similarity", distance_function))
+            .from(table_name)
+            .order_by("cosine_similarity", "DESC")
+            .limit(limit);
+    } else {
+        return unexpected<std::string>("Invalid query type");
+    }
+    SQLBuilder query = builder.build();
+    pqxx::result result = txn.exec_params(query.get_query(), (std::ostringstream() << search_vector).str());
     txn.commit();
     std::vector<mem_chunk> chunks = pqxx_result_to_mem_chunks(result);
     return chunks;

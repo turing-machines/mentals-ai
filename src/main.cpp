@@ -102,7 +102,7 @@ int main(int argc, char *argv[]) {
     std::string query = "What does he thinks about life?";
 
     /// Read chunks
-    auto chunks_res = memc.read_chunks("books", std::nullopt, 5); //query, 5);
+    auto chunks_res = memc.read_chunks("books", query, 5);
 
     if (chunks_res) {
 

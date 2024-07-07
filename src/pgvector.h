@@ -3,6 +3,8 @@
 #include "core.h"
 #include "logger.h"
 
+#include "sql_builder.h"
+
 #include <pqxx/pqxx>
 
 /*
@@ -11,17 +13,6 @@
 <=> - cosine distance
 <+> - L1 distance (added in 0.7.0)
 */
-
-#define QUERY_EMBEDDING \
-    "SELECT * FROM {{table_name}} ORDER BY embedding {{distance_function}} $1 LIMIT {{limit}}"
-
-#define QUERY_DISTANCE \
-    "SELECT *, embedding {{distance_function}} $1 AS distance " \
-    "FROM {{table_name}} ORDER BY distance LIMIT {{limit}}"
-
-#define QUERY_COSINE_SIMILARITY \
-    "SELECT *, 1 - (embedding {{distance_function}} $1) AS cosine_similarity " \
-    "FROM {{table_name}} ORDER BY cosine_similarity DESC LIMIT {{limit}}"
 
 const std::string L1Distance = "<+>";
 const std::string L2Distance = "<->";
@@ -35,13 +26,13 @@ private:
 
     Logger* logger;
 
-private:
+/*private:
     std::map<vdb::query_type, vdb::query_info> query_options = {
         { vdb::query_type::embedding         , { QUERY_EMBEDDING         , std::nullopt          }},
         { vdb::query_type::distance          , { QUERY_DISTANCE          , "distance"            }},
         { vdb::query_type::cosine_similarity , { QUERY_COSINE_SIMILARITY , "cosine_similarity"   }}
      };
-
+*/
 public:
     PgVector(const std::string& conn_info);
     ~PgVector();

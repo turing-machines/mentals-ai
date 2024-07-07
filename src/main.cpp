@@ -4,6 +4,8 @@
 /// Author: https://x.com/CostaAl4
 ///
 
+#include "cli/cli11.hpp"
+
 #include "platform.h"
 #include "pgvector.h"
 #include "context.h"
@@ -12,20 +14,25 @@
 #include "doc_factory.h"
 #include "web_server.h"
 
-
 bool debug{false};
 std::atomic<bool> spinner_active{false};
 std::thread spinner_thread;
 std::string completion_text;
-
-int mem_total_tokens{0};
 
 
 int main(int argc, char *argv[]) {
 
     guard("Mentals")
 
-    std::string input, filename = parse_input(argc, argv, input);
+    CLI::App app{"Mentals - Central Executive Unit for LLM"};
+
+    std::string input, filename, toolfile;
+    app.add_option("-f,--file", filename, "Agent file name to run");
+    app.add_option("-i,--input", input, "Input string");
+    app.add_option("-t,--tools-update", toolfile, "Tool file in TOML format");
+    app.add_flag("-d,--debug", debug, "Enable debug mode");
+
+    CLI11_PARSE(app, argc, argv);
 
     Logger* logger = Logger::get_instance();
     logger->log("Mentals started");
@@ -60,7 +67,6 @@ int main(int argc, char *argv[]) {
     //WebServer mentals_chat(DEFAULT_ADDRESS, 9002, 8080);
     //mentals_chat.start();
 
-
     LLM llm;
     llm.set_provider(endpoint, api_key);
     llm.set_model(model);
@@ -74,7 +80,7 @@ int main(int argc, char *argv[]) {
     MemoryController memc(llm, vdb);
     memc.set_model(embedding_model::oai_3small);
 
-    memc.delete_collection("books");
+ /*   memc.delete_collection("books");
     memc.create_collection("books");
 
     std::vector<std::string> file_paths = {
@@ -113,7 +119,7 @@ int main(int argc, char *argv[]) {
 
         std::cout << "Search results:\n" << j_chunks.dump(4) << "\n\n"; 
 
-        /*liboai::Conversation conv;
+        liboai::Conversation conv;
         conv.SetSystemData(
             "You are a helpful assistant.\n"
             "Answer the user's question in no more than 300 words.\n"
@@ -135,66 +141,73 @@ int main(int argc, char *argv[]) {
                     }
                 }
             }
-        }*/
-    }
-
-/*
-    vdb.delete_collection("tools");
-    vdb.delete_collection("gens");
-    vdb.create_collection("tools", embedding_model::oai_3small);
-    ///vdb.create_collection("gens", embedding_model::oai_ada002);
-    //vdb.create_collection("tools", embedding_model::oai_3large);
-
-    auto res = vdb.list_collections();
-
-    if (res) {
-        std::cout << "Collections: " << *res << "\n\n";
-    }
-
-    auto native_instructions_toml = toml::parse_file("native_tools.toml");
-    auto tools = native_instructions_toml["instruction"].as_array();
-
-    std::stringstream ss;
-    ss << toml::json_formatter{ *tools };
-    json native_instructions = json::parse(ss.str());
-
-    for (auto& item : native_instructions) {
-        std::string tool_text;
-        //tool_text = item.dump(4);
-        //tool_text = std::string(item["name"]);
-        tool_text = std::string(item["name"]) + "\n" + std::string(item["description"]);
-        if (item.contains("parameters")) {
-            for (auto& param : item["parameters"]) {
-                tool_text += "\n" 
-                    + std::string(param["name"]) + " : " 
-                    + std::string(param["description"]);
-            }
         }
-        //tool_text = std::string(item["description"]);
-        std::cout << tool_text << "\n-------\n";
-        vdb::vector vec = llm.embedding(tool_text); //, embedding_model::oai_3large);
-        
-        std::string idx = gen_index();
-
-        vdb.write_content("tools", idx, item["name"], vec, item["name"]);
-    }
-
-    GenFile gen;
-    auto [variables, instructions] = gen.load_from_file(filename);
-    std::string search_text = instructions["root"].prompt;
-    fmt::print("Search text:\n{}\n\n", search_text);
-    fmt::print("Tools: {}\n\n", instructions["root"].use);
-    vdb::vector search_vec = llm.embedding(search_text); //, embedding_model::oai_3large);
-    auto search_res = vdb.search_content("tools", search_vec, 5, vdb::query_type::cosine_similarity);
-    if (search_res) {
-        std::cout << "Search results:\n" << (*search_res).dump(4) << "\n\n";
-    }
-
-    auto info = vdb.get_collection_info("tools");
-    if (info) {
-        std::cout << "tools info: " << (*info).dump(4) << "\n\n";
     }
 */
+
+    if (!toolfile.empty()) {
+
+        memc.delete_collection("tools");
+        memc.create_collection("tools");
+
+        auto res = vdb.list_collections();
+
+        if (res) {
+            std::cout << "Collections: " << *res << "\n\n";
+        }
+
+        auto native_instructions_toml = toml::parse_file("native_tools.toml");
+        auto tools = native_instructions_toml["instruction"].as_array();
+
+        std::stringstream ss;
+        ss << toml::json_formatter{ *tools };
+        json native_instructions = json::parse(ss.str());
+
+        for (auto& item : native_instructions) {
+            std::string tool_text;
+            //tool_text = item.dump(4);
+            //tool_text = std::string(item["name"]);
+            tool_text = std::string(item["name"]) + "\n" + std::string(item["description"]);
+            if (item.contains("parameters")) {
+                for (auto& param : item["parameters"]) {
+                    tool_text += "\n" 
+                        + std::string(param["name"]) + " : " 
+                        + std::string(param["description"]);
+                }
+            }
+            //tool_text = std::string(item["description"]);
+            std::cout << tool_text << "\n-------\n";
+
+            std::vector<std::string> chunks = { tool_text };
+            memc.process_chunks(chunks, item["name"]);
+        }
+
+        memc.write_chunks("tools");
+
+    } else if (!filename.empty()) {
+
+        GenFile gen;
+        auto [variables, instructions] = gen.load_from_file(filename);
+        std::string search_text = instructions["root"].prompt;
+        fmt::print("Search text:\n{}\n\n", search_text);
+        fmt::print("Tools: {}\n\n", instructions["root"].use);
+
+        auto search_res = memc.read_chunks("tools", search_text, 5);
+        if (search_res) {
+            json j_chunks = json::array();
+            for (const auto& chunk : *search_res) {
+                j_chunks.push_back(chunk.serialize_json());
+            }
+            std::cout << "Search results:\n" << j_chunks.dump(4) << "\n\n"; 
+        }
+
+    }
+
+    /*auto info = vdb.get_collection_info("tools");
+    if (info) {
+        std::cout << "tools info: " << (*info).dump(4) << "\n\n";
+    }*/
+
 
 /*
     /// Init central executive

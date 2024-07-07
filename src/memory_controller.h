@@ -141,15 +141,15 @@ public:
     expected<std::vector<mem_chunk>, std::string> read_chunks(
         const std::string& collection, 
         const std::string& query,
-        const int& num_chunks
+        const int& num_chunks,
+        vdb::query_type query_type = vdb::query_type::cosine_similarity
     ) {
         guard("MemoryController::read_chunks[query]")
         fmt::print("Fetch query: {}\n\n", query);
         liboai::Response response = __llm.embedding(query, embed_model);
         json jres = response["data"][0]["embedding"];
         vdb::vector query_vector = vdb::vector({ jres.begin(), jres.end() }, embed_model);
-        auto result = __vdb.search_content(collection, query_vector, num_chunks, 
-            vdb::query_type::cosine_similarity);
+        auto result = __vdb.search_content(collection, query_vector, num_chunks, query_type);
         return result;
         unguard()
         return unexpected("");

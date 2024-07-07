@@ -77,7 +77,8 @@
         "strstream": "cpp",
         "complex": "cpp",
         "cfenv": "cpp",
-        "typeindex": "cpp"
+        "typeindex": "cpp",
+        "*.ipp": "cpp"
     },
     "cmake.sourceDirectory": "/home/costa-al/control_unit/liboai",
     "makefile.launchConfigurations": [

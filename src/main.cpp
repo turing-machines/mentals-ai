@@ -156,7 +156,7 @@ int main(int argc, char *argv[]) {
             std::cout << "Collections: " << *res << "\n\n";
         }
 
-        auto native_instructions_toml = toml::parse_file("native_tools.toml");
+        auto native_instructions_toml = toml::parse_file(toolfile);
         auto tools = native_instructions_toml["instruction"].as_array();
 
         std::stringstream ss;

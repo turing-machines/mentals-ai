@@ -63,4 +63,20 @@ public:
     ControlUnit(ControlUnit&&) = default;
     ControlUnit& operator=(ControlUnit&&) = default;
 
+    void process_message(const std::string& content) {
+
+        /// Add message to context
+        /// Calculate vector for content
+        /// Store message into vdb memory_stream collection
+        /// Fetch tools by vector
+        /// Update system prompt in context with fetched tools
+        /// Call LLM with context
+        /// Parse response
+        /// Execute tools if needed
+        /// Add assistant message to context
+
+        Message& msg = ctx->add_message("user", "user", content);
+
+    }
+
 };

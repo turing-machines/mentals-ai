@@ -74,15 +74,16 @@ public:
         return result;
     }
 
-    void add_message(const Message& message) {
+    Message& add_message(const Message& message) {
         push_back(message);
+        return back();
     }
 
-    void add_message(const std::string& name, const std::string& role, const std::string& content) {
+    Message& add_message(const std::string& name, const std::string& role, const std::string& content) {
         std::string created_at = to_string(get_timestamp());
         std::string random = to_string(get_random_number(1, MAX_INTEGER));
         std::string content_id = gen_index(created_at + random);
-        add_message({ content_id, created_at, name, role, content });
+        return add_message({ content_id, created_at, name, role, content });
     }
 
     void delete_message(const std::string& content_id) {

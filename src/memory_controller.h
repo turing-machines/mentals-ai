@@ -10,8 +10,8 @@ private:
     PgVector& __vdb; /// TODO: MemoryInterface
 
     std::vector<std::future<expected<mem_chunk*, std::string>>> futures;
-    std::deque<mem_chunk> mem_chunks;
-    std::mutex mem_chunks_mutex;
+    std::deque<mem_chunk> chunk_buffer;
+    std::mutex chunk_buffer_mutex;
 
     embedding_model embed_model;
 
@@ -43,13 +43,56 @@ private:
         json jres = response["data"][0]["embedding"];
         vdb::vector embedding({ jres.begin(), jres.end() }, embed_model);
         fmt::print("{}mem_chunk #{}#{}: Embedding completed.\n", RESET, content_id, chunk_id);
-        ///std::lock_guard<std::mutex> lock(mem_chunks_mutex);
-        mem_chunks.emplace_back(mem_chunk{
+        std::lock_guard<std::mutex> lock(chunk_buffer_mutex);
+        chunk_buffer.emplace_back(mem_chunk{
             content_id, chunk_id, cleaned_content, embedding, name, meta
         });
-        return &mem_chunks.back();
+        return &chunk_buffer.back();
         unguard()
         return {};
+    }
+
+public:
+    expected<mem_chunk*, std::string> buf_get_chunk(const std::string& content) {
+        guard("MemoryController::buf_get_chunk")
+        std::lock_guard<std::mutex> lock(chunk_buffer_mutex);
+        for (auto& chunk : chunk_buffer) {
+            if (chunk.content == content) {
+                return &chunk;
+            }
+        }
+        unguard()
+        return unexpected("mem_chunk not found");
+    }
+
+    expected<void, std::string> buf_remove_chunk(const std::string& content) {
+        guard("MemoryController::buf_remove_chunk")
+        std::lock_guard<std::mutex> lock(chunk_buffer_mutex);
+        auto it = std::find_if(chunk_buffer.begin(), chunk_buffer.end(),
+            [&content](const mem_chunk& chunk) {
+                return chunk.content == content;
+            });
+        if (it != chunk_buffer.end()) {
+            chunk_buffer.erase(it);
+            return {};
+        }
+        unguard()
+        return unexpected("mem_chunk not found");
+    }
+
+    void buf_clear() {
+        std::lock_guard<std::mutex> lock(chunk_buffer_mutex);
+        chunk_buffer.clear();
+    }
+
+    size_t buf_get_chunks_count() {
+        std::lock_guard<std::mutex> lock(chunk_buffer_mutex);
+        return chunk_buffer.size();
+    }
+
+    std::vector<mem_chunk> buf_get_all_chunks() {
+        std::lock_guard<std::mutex> lock(chunk_buffer_mutex);
+        return std::vector<mem_chunk>(chunk_buffer.begin(), chunk_buffer.end());
     }
 
 public:
@@ -87,7 +130,7 @@ public:
         }
     }
 
-    expected<void, std::vector<int>> write_chunks(const std::string& collection) {
+    expected<void, std::vector<int>> write_chunks(const std::string& collection, const bool& clear_buffer = true) {
         std::vector<int> failed_chunks;
         guard("MemoryController::write_chunks")
         auto txn = __vdb.create_transaction();
@@ -110,11 +153,10 @@ public:
             "{} failed chunks\n"
             "{} processed tokens\n"
             "{:.2f} MB of data processed\n",
-            mem_chunks.size(), failed_chunks.size(), processed_tokens, processed_kb / 1024.0);
+            chunk_buffer.size(), failed_chunks.size(), processed_tokens, processed_kb / 1024.0);
         futures.clear();
-        {
-            ///std::lock_guard<std::mutex> lock(mem_chunks_mutex);
-            mem_chunks.clear();
+        if (clear_buffer) {
+            buf_clear();
         }
         processed_kb = 0;
         processed_tokens = 0;
@@ -146,9 +188,17 @@ public:
     ) {
         guard("MemoryController::read_chunks[query]")
         fmt::print("Fetch query: {}\n\n", query);
-        liboai::Response response = __llm.embedding(query, embed_model);
-        json jres = response["data"][0]["embedding"];
-        vdb::vector query_vector = vdb::vector({ jres.begin(), jres.end() }, embed_model);
+        vdb::vector query_vector;
+        auto buffer_result = buf_get_chunk(query);
+        if (buffer_result.has_value()) {
+            fmt::print("Embedding vector found in buffer.\n");
+            query_vector = buffer_result.value()->embedding;
+        } else {
+            /// TODO: Add response validator
+            liboai::Response response = __llm.embedding(query, embed_model);
+            json jres = response["data"][0]["embedding"];
+            query_vector = vdb::vector({ jres.begin(), jres.end() }, embed_model);
+        }
         auto result = __vdb.search_content(collection, query_vector, num_chunks, query_type);
         return result;
         unguard()

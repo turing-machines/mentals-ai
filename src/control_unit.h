@@ -12,6 +12,10 @@
 
 /// Refactoring from AgentExecutor to ControlUnit
 
+#define MAX_TOOLS 5
+#define TOOLS_COLLECTION "tools"
+#define MESSAGES_COLLECTION "messages"
+
 class ControlUnit {
 private:
     Logger* logger;
@@ -23,6 +27,8 @@ private:
 
     std::string control_unit_instructions;
     std::unique_ptr<ToolRegistry> tools;
+
+    json control_unit_state;
 
     void init() {
         guard("ControlUnit::init")
@@ -75,7 +81,30 @@ public:
         /// Execute tools if needed
         /// Add assistant message to context
 
-        Message& msg = ctx->add_message("user", "user", content);
+        std::string name = "user";
+        Message& msg = ctx->add_message(name, name, content);
+        std::vector<std::string> chunk = { content };
+        __memc->process_chunks(chunk, name);
+        __memc->write_chunks(MESSAGES_COLLECTION, false);
+        auto tools_result = __memc->read_chunks(TOOLS_COLLECTION, content, MAX_TOOLS);
+        __memc->buf_clear();
+        if (tools_result.has_value()) {
+            std::vector<mem_chunk> tools_chunks = tools_result.value();
+            json fetched_tools = json::array();
+            for (auto& tool_chunk : tools_chunks) {
+                fetched_tools.push_back(tool_chunk.content);
+            }
+            control_unit_state["tools"] = fetched_tools.dump(4);
+        }
+        std::string system_content = render_template(control_unit_instructions, control_unit_state);
+        std::vector<Message> system_messages = ctx->select_messages_by_role("system");
+        if(!system_messages.empty()) {
+            ctx->update_message(system_messages[0], system_content);
+        } else {
+            /// Insert message
+        }
+
+        /// Call llm
 
     }
 

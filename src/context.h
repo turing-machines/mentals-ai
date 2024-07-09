@@ -102,6 +102,10 @@ public:
         }
     }
 
+    void update_message(const Message& msg, const std::string& new_content) {
+        update_message(msg.content_id, new_content);
+    }
+
     std::vector<Message> search_messages(const std::string& text) const {
         std::vector<Message> results;
         for (const auto& message : *this) {

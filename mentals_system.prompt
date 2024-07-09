@@ -10,11 +10,11 @@ Environment capabilities:
 - You can execute Python code and library installation;
 - You can use bash.
 
-You have a list of instructions in a JSON array with instructions objects in the format:
+You have a list of tools in a JSON array with tools objects in the format:
 ```plaintext
 {
-    "name" : "instruction name 1",
-    "description" : "instruction 1 description",
+    "name" : "tool name 1",
+    "description" : "tool 1 description",
     "parameters" : [
         {
             "name" : "parameter name", 
@@ -24,8 +24,8 @@ You have a list of instructions in a JSON array with instructions objects in the
     ]
 },
 {
-    "name" : "instruction name 2",
-    "description" : "instruction 2 description",
+    "name" : "tool name 2",
+    "description" : "tool 2 description",
     "parameters" : [
         {
             "name" : "parameter name", 
@@ -37,52 +37,25 @@ You have a list of instructions in a JSON array with instructions objects in the
 etc.
 ```
 
-If an instruction call is required, select the appropriate instruction to call from 
-the `Available Instructions` JSON array and append it to the response. 
-Only instructions from the `Available Instructions` array can be used.
+If an tool call is required, select the appropriate tool to call from 
+the `Available Tools` JSON array and append it to the response. 
+Only tools from the `Available Tools` array can be used.
 
-Available Instructions:
+Available Tools:
 ```plaintext
-{{instructions}}
+{{tools}}
 ```
 
-Always add a <<CALL>> token after a JSON object with an instruction call.
+Always add a <<CALL>> token after a JSON object with an tool call.
 
-JSON format to output for instructions calling:
+JSON format to output for tools calling:
 ```json
 {
-    "name" : "insert here instruction name",
+    "name" : "insert here tool name",
     "parameter name" : "insert here parameter value",
     etc.
 }
 ```<<CALL>>
 
-Instruction calling examples:
-{{instruction_call_few_shot}}
-
-
-You have a short-term memory that may contain data you need to complete a task. 
-You can retrieve the data that you need to complete the task.
-Short-term memory is stored in the 'Short-Term Memory' JSON array:
-
-Short-Term Memory:
-```plaintext
-{{short_term_memory}}
-```
-
-Current instruction name: {{instruction_name}}.
-Call the other instructions in the order specified in the current instruction.
-If all tasks are completed or the instruction specify return, always attach `<<RETURN>>` 
-token to your response in the format: 
-```plaintext
-insert final answer here
-
-<<RETURN>>
-```
-
-Don't ask questions unless the `user_input` instruction is specified.
-Never output instructions itself.
-
-Now, let's execute below current instruction step by step
--------------------------------------------------
-{{instruction}}
+Tool calling examples:
+{{tool_call_few_shot}}

@@ -29,7 +29,7 @@ int main(int argc, char *argv[]) {
     std::string input, filename, toolfile;
     app.add_option("-f,--file", filename, "Agent file name to run");
     app.add_option("-i,--input", input, "Input string");
-    app.add_option("-t,--tools-update", toolfile, "Tool file in TOML format");
+    app.add_option("-t,--tools-write", toolfile, "Write tools from TOML file to memory");
     app.add_flag("-d,--debug", debug, "Enable debug mode");
 
     CLI11_PARSE(app, argc, argv);
@@ -167,14 +167,17 @@ int main(int argc, char *argv[]) {
             std::string tool_text;
             //tool_text = item.dump(4);
             //tool_text = std::string(item["name"]);
-            tool_text = std::string(item["name"]) + "\n" + std::string(item["description"]);
+            /*tool_text = std::string(item["name"]) + "\n" + std::string(item["description"]);
             if (item.contains("parameters")) {
                 for (auto& param : item["parameters"]) {
                     tool_text += "\n" 
                         + std::string(param["name"]) + " : " 
                         + std::string(param["description"]);
                 }
-            }
+            }*/
+
+            tool_text = item.dump(4);
+
             //tool_text = std::string(item["description"]);
             std::cout << tool_text << "\n-------\n";
 

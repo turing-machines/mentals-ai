@@ -10,8 +10,9 @@
 #include "pgvector.h"
 #include "context.h"
 #include "memory_controller.h"
-#include "agent_executor.h"
+#include "control_unit.h"
 #include "doc_factory.h"
+#include "gen_file.h"
 #include "web_server.h"
 
 bool debug{false};
@@ -67,9 +68,9 @@ int main(int argc, char *argv[]) {
     //WebServer mentals_chat(DEFAULT_ADDRESS, 9002, 8080);
     //mentals_chat.start();
 
-    LLM llm;
-    llm.set_provider(endpoint, api_key);
-    llm.set_model(model);
+    auto llm = std::make_unique<LLM>();
+    llm->set_provider(endpoint, api_key);
+    llm->set_model(model);
 
     std::string conn_info = fmt::format("dbname={} user={} password={} hostaddr={} port={}", 
         dbname, user, password, hostaddr, port);
@@ -77,8 +78,8 @@ int main(int argc, char *argv[]) {
     PgVector vdb(conn_info);
     vdb.connect();
 
-    MemoryController memc(llm, vdb);
-    memc.set_model(embedding_model::oai_3small);
+    auto memc = std::make_unique<MemoryController>(*llm, vdb);
+    memc->set_model(embedding_model::oai_3small);
 
  /*   memc.delete_collection("books");
     memc.create_collection("books");
@@ -147,8 +148,8 @@ int main(int argc, char *argv[]) {
 
     if (!toolfile.empty()) {
 
-        memc.delete_collection("tools");
-        memc.create_collection("tools");
+        memc->delete_collection("tools");
+        memc->create_collection("tools");
 
         auto res = vdb.list_collections();
 
@@ -182,27 +183,36 @@ int main(int argc, char *argv[]) {
             std::cout << tool_text << "\n-------\n";
 
             std::vector<std::string> chunks = { tool_text };
-            memc.process_chunks(chunks, item["name"]);
+            memc->process_chunks(chunks, item["name"]);
         }
 
-        memc.write_chunks("tools");
+        memc->write_chunks("tools");
 
     } else if (!filename.empty()) {
 
+        memc->create_collection("messages");
+
         GenFile gen;
         auto [variables, instructions] = gen.load_from_file(filename);
-        std::string search_text = instructions["root"].prompt;
-        fmt::print("Search text:\n{}\n\n", search_text);
+        std::string user_prompt = instructions["root"].prompt;
+
+        ControlUnit ctrlu(std::move(llm), std::move(memc));
+        ctrlu.init();
+
+        ctrlu.process_message(user_prompt);
+
+
+        /*fmt::print("Search text:\n{}\n\n", user_prompt);
         fmt::print("Tools: {}\n\n", instructions["root"].use);
 
-        auto search_res = memc.read_chunks("tools", search_text, 5);
+        auto search_res = memc->read_chunks("tools", user_prompt, 5);
         if (search_res) {
             json j_chunks = json::array();
             for (const auto& chunk : *search_res) {
                 j_chunks.push_back(chunk.serialize_json());
             }
             std::cout << "Search results:\n" << j_chunks.dump(4) << "\n\n"; 
-        }
+        }*/
 
     }
 

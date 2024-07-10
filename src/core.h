@@ -41,6 +41,7 @@
 #include "treehh/tree.hh"
 #include "nlohmann/json.hpp"
 #include "toml++/toml.hpp"
+#include "inja/inja.hpp"
 
 #define MAX_INTEGER std::numeric_limits<int>::max()
 

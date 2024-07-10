@@ -2,9 +2,9 @@
 
 #include "core.h"
 
-class AgentExecutor;
+class ControlUnit;
 
-using function_t = std::function<std::string(std::shared_ptr<AgentExecutor>, const json&)>;
+using function_t = std::function<std::string(std::shared_ptr<ControlUnit>, const json&)>;
 
 ///
 /// @brief Native tools registry
@@ -12,12 +12,12 @@ using function_t = std::function<std::string(std::shared_ptr<AgentExecutor>, con
 class ToolRegistry {
 private:
     ///
-    std::shared_ptr<AgentExecutor> ce_ref;
+    std::shared_ptr<ControlUnit> ce_ref;
     std::unordered_map<std::string, function_t> tools;
 
 public:
 
-    explicit ToolRegistry(std::shared_ptr<AgentExecutor> ce) : ce_ref(ce) {}
+    explicit ToolRegistry(std::shared_ptr<ControlUnit> ce) : ce_ref(ce) {}
 
     void register_tool(const std::string& name, function_t func);
     std::optional<std::string> call_tool(const std::string& name, const json& args);

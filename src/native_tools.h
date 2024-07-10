@@ -2,7 +2,8 @@
 
 #include "core.h"
 
-std::string tool_memory(std::shared_ptr<AgentExecutor> ce_ref, json args) {
+std::string tool_memory(std::shared_ptr<ControlUnit> ce_ref, json args) {
+    (void)ce_ref;
     std::string answer;
     assert(args.contains("keyword") && "tool_memory must contain the 'keyword' key.");
     assert(args.contains("content") && "tool_memory must contain the 'content' key.");
@@ -10,12 +11,12 @@ std::string tool_memory(std::shared_ptr<AgentExecutor> ce_ref, json args) {
     std::string keyword = args["keyword"].get<std::string>(),
                 description = args["description"].get<std::string>(),
                 content = args["content"].get<std::string>();
-    ce_ref->short_term_memory = remove_element_by_name(ce_ref->short_term_memory, "keyword", keyword);
+    /*ce_ref->short_term_memory = remove_element_by_name(ce_ref->short_term_memory, "keyword", keyword);
     ce_ref->short_term_memory.push_back({
         { "keyword", keyword },
         { "description", description },
         { "content", content }
-    });
+    });*/
     if (debug) {
         print_in_line(CYAN, "[memory_data]\t", content);
         print_in_line(CYAN, "[memory_result]\t", "Content has been memorised");
@@ -24,14 +25,15 @@ std::string tool_memory(std::shared_ptr<AgentExecutor> ce_ref, json args) {
     return answer;
 }
 
-std::string tool_send_message(std::shared_ptr<AgentExecutor> ce_ref, json args) {
+std::string tool_send_message(std::shared_ptr<ControlUnit> ce_ref, json args) {
+    (void)ce_ref;
     std::string answer;
     if (args.contains("message")) {
         if (!debug) {
-            std::string completion = ce_ref->agent_executor_state["output"];
+            /*std::string completion = ce_ref->agent_executor_state["output"];
             completion = string_in_line(completion);
             completion += "\n";
-            stop_spinner(completion);
+            stop_spinner(completion);*/
         }
         std::string message = args["message"];
         std::cout << GREEN << "[message] " << RESET << message << "\n";
@@ -43,14 +45,15 @@ std::string tool_send_message(std::shared_ptr<AgentExecutor> ce_ref, json args) 
     return answer;
 }
 
-std::string tool_user_input(std::shared_ptr<AgentExecutor> ce_ref, json args) {
+std::string tool_user_input(std::shared_ptr<ControlUnit> ce_ref, json args) {
+    (void)ce_ref;
     std::string answer;
     if (args.contains("prompt")) {
         if (!debug) {
-            std::string completion = ce_ref->agent_executor_state["output"].get<std::string>();
+            /*std::string completion = ce_ref->agent_executor_state["output"].get<std::string>();
             completion = string_in_line(completion);
             completion += "\n";
-            stop_spinner(completion);
+            stop_spinner(completion);*/
         }
         std::string prompt = args["prompt"];
         std::cout << CYAN << "[question] " << RESET << prompt << "\n> ";
@@ -63,7 +66,7 @@ std::string tool_user_input(std::shared_ptr<AgentExecutor> ce_ref, json args) {
     return answer;
 }
 
-std::string tool_read_file(std::shared_ptr<AgentExecutor> ce_ref, json args) {
+std::string tool_read_file(std::shared_ptr<ControlUnit> ce_ref, json args) {
     (void)ce_ref;
     std::string answer;
     if (args.contains("file_path")) {
@@ -83,7 +86,7 @@ std::string tool_read_file(std::shared_ptr<AgentExecutor> ce_ref, json args) {
     return answer;
 }
 
-std::string tool_write_file(std::shared_ptr<AgentExecutor> ce_ref, json args) {
+std::string tool_write_file(std::shared_ptr<ControlUnit> ce_ref, json args) {
     (void)ce_ref;
     std::string answer;
     if (args.contains("file_path")) {
@@ -104,7 +107,7 @@ std::string tool_write_file(std::shared_ptr<AgentExecutor> ce_ref, json args) {
     return answer;
 }
 
-std::string tool_append_file(std::shared_ptr<AgentExecutor> ce_ref, json args) {
+std::string tool_append_file(std::shared_ptr<ControlUnit> ce_ref, json args) {
     (void)ce_ref;
     std::string answer;
     if (args.contains("file_path")) {
@@ -125,7 +128,7 @@ std::string tool_append_file(std::shared_ptr<AgentExecutor> ce_ref, json args) {
     return answer;
 }
 
-std::string tool_execute_bash_command(std::shared_ptr<AgentExecutor> ce_ref, json args) {
+std::string tool_execute_bash_command(std::shared_ptr<ControlUnit> ce_ref, json args) {
     (void)ce_ref;
     std::string answer;
     if (args.contains("command")) {
@@ -148,7 +151,8 @@ std::string tool_execute_bash_command(std::shared_ptr<AgentExecutor> ce_ref, jso
     return answer;
 }
 
-std::string tool_execute_python_script(std::shared_ptr<AgentExecutor> ce_ref, json args) {
+std::string tool_execute_python_script(std::shared_ptr<ControlUnit> ce_ref, json args) {
+    (void)ce_ref;
     std::string answer;
     if (args.contains("script")) {
         std::string script = std::string(args["script"]);
@@ -156,7 +160,7 @@ std::string tool_execute_python_script(std::shared_ptr<AgentExecutor> ce_ref, js
         if (args.contains("dependencies")) {
             dependencies = std::string(args["dependencies"]);
         }
-        std::string result = ce_ref->code_interpreter.run_python_code(script, dependencies);
+        /*std::string result = ce_ref->code_interpreter.run_python_code(script, dependencies);
         if (debug) {
             print_in_line(CYAN, "[python_script]\t", script);
             std::cout << CYAN << "[python_result]\t" << RESET << result << "\n";
@@ -167,7 +171,7 @@ std::string tool_execute_python_script(std::shared_ptr<AgentExecutor> ce_ref, js
             "was executed with result: '{}'", 
             script,
             result
-        );
+        );*/
     }
     return answer;
 }

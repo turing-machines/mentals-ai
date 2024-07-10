@@ -191,7 +191,7 @@ public:
         vdb::vector query_vector;
         auto buffer_result = buf_get_chunk(query);
         if (buffer_result.has_value()) {
-            fmt::print("Embedding vector found in buffer.\n");
+            ///fmt::print("Embedding vector found in buffer.\n");
             query_vector = buffer_result.value()->embedding;
         } else {
             /// TODO: Add response validator

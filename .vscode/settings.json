@@ -78,7 +78,8 @@
         "complex": "cpp",
         "cfenv": "cpp",
         "typeindex": "cpp",
-        "*.ipp": "cpp"
+        "*.ipp": "cpp",
+        "*.header": "c"
     },
     "cmake.sourceDirectory": "/home/costa-al/control_unit/liboai",
     "makefile.launchConfigurations": [

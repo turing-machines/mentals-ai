@@ -4,7 +4,7 @@ demos/
 python_env/
 tests/
 
-pgvector/
+deprecated/
 snake_game/
 pacman_game/
 ai_videos.csv

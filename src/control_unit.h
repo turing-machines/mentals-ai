@@ -20,7 +20,7 @@ class ControlUnit : public std::enable_shared_from_this<ControlUnit>{
 private:
     Logger* logger;
 
-    std::unique_ptr<LLM> __llm;
+    std::unique_ptr<LLMClient> __llm;
     std::unique_ptr<MemoryController> __memc;
 
     std::unique_ptr<Context> ctx;
@@ -53,11 +53,13 @@ public:
         tools->register_tool("execute_bash_command"  , tool_execute_bash_command    );
         tools->register_tool("execute_python_script" , tool_execute_python_script   );*/
 
+        control_unit_state["platform_info"] = "";
+
         unguard()
     }
 
 public:
-    ControlUnit(std::unique_ptr<LLM> llm, std::unique_ptr<MemoryController> memc) 
+    ControlUnit(std::unique_ptr<LLMClient> llm, std::unique_ptr<MemoryController> memc) 
         : __llm(std::move(llm)), __memc(std::move(memc)) {
         logger = Logger::get_instance();
     }
@@ -77,13 +79,12 @@ public:
         /// Store message into vdb memory_stream collection
         /// Fetch tools by vector
         /// Update system prompt in context with fetched tools
-        /// Call LLM with context
+        /// Call LLMClient with context
         /// Parse response
         /// Execute tools if needed
         /// Add assistant message to context
 
         control_unit_state["current_date"] = get_current_date();
-        control_unit_state["platform_info"] = "";
 
         std::string name = "user";
         ctx->add_message(name, name, content);
@@ -108,6 +109,9 @@ public:
             }
             control_unit_state["tools"] = fetched_tools.dump(4);
             control_unit_state["tool_call_few_shot"] = few_shot;
+        } else {
+            control_unit_state["tools"] = "nothing";
+            control_unit_state["tool_call_few_shot"] = "nothing";
         }
 
         ///std::string system_prompt = render_template(control_unit_instructions, control_unit_state);

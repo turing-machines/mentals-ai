@@ -6,7 +6,7 @@
 
 class MemoryController {
 private:
-    LLM& __llm;
+    LLMClient& __llm;
     PgVector& __vdb; /// TODO: MemoryInterface
 
     std::vector<std::future<expected<mem_chunk*, std::string>>> futures;
@@ -96,7 +96,7 @@ public:
     }
 
 public:
-    MemoryController(LLM& llm, PgVector& vdb) : __llm(llm), __vdb(vdb) {
+    MemoryController(LLMClient& llm, PgVector& vdb) : __llm(llm), __vdb(vdb) {
         embed_model = embedding_model::oai_3small;
         processed_kb = 0;
         processed_tokens = 0;

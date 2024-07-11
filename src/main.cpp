@@ -1,5 +1,5 @@
 ///
-/// Experimental implementation of a central executive unit for LLM
+/// Experimental implementation of a central executive unit for LLMClient
 /// Turing Machines, Inc.
 /// Author: https://x.com/CostaAl4
 ///
@@ -25,7 +25,7 @@ int main(int argc, char *argv[]) {
 
     guard("Mentals")
 
-    CLI::App app{"Mentals - Central Executive Unit for LLM"};
+    CLI::App app{"Mentals - Central Executive Unit for LLMClient"};
 
     std::string input, filename, toolfile;
     app.add_option("-f,--file", filename, "Agent file name to run");
@@ -68,7 +68,7 @@ int main(int argc, char *argv[]) {
     //WebServer mentals_chat(DEFAULT_ADDRESS, 9002, 8080);
     //mentals_chat.start();
 
-    auto llm = std::make_unique<LLM>();
+    auto llm = std::make_unique<LLMClient>();
     llm->set_provider(endpoint, api_key);
     llm->set_model(model);
 
@@ -194,18 +194,18 @@ int main(int argc, char *argv[]) {
 
         GenFile gen;
         auto [variables, instructions] = gen.load_from_file(filename);
-        std::string user_prompt = instructions["root"].prompt;
+        std::string user_input = instructions["root"].prompt;
 
         ControlUnit ctrlu(std::move(llm), std::move(memc));
         ctrlu.init();
 
-        ctrlu.process_message(user_prompt);
+        ctrlu.process_message(user_input);
 
 
-        /*fmt::print("Search text:\n{}\n\n", user_prompt);
+        /*fmt::print("Search text:\n{}\n\n", user_input);
         fmt::print("Tools: {}\n\n", instructions["root"].use);
 
-        auto search_res = memc->read_chunks("tools", user_prompt, 5);
+        auto search_res = memc->read_chunks("tools", user_input, 5);
         if (search_res) {
             json j_chunks = json::array();
             for (const auto& chunk : *search_res) {

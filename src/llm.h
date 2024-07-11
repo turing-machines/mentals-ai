@@ -3,22 +3,27 @@
 #include "core.h"
 #include "logger.h"
 #include "liboai.h"
+#include "context.h"
 
 ///
-/// @brief LLM client
+/// @brief LLMClient
 ///
-class LLM {
-
+class LLMClient final : private liboai::Network {
     liboai::OpenAI oai;
     std::string llm_model;
+    liboai::Authorization& auth = liboai::Authorization::Authorizer();
 
-    Logger* logger;
+    Logger* logger = Logger::get_instance();
 
 public:
 
-    LLM() {
-        logger = Logger::get_instance();
-    }
+	LLMClient() = default;
+    ~LLMClient() = default;
+    LLMClient(const LLMClient&) = delete;
+    LLMClient(LLMClient&&) = delete;
+
+    LLMClient& operator=(const LLMClient&) = delete;
+    LLMClient& operator=(LLMClient&&) = delete;
 
     void set_model(std::string model) {
         llm_model = model;
@@ -26,14 +31,62 @@ public:
 
     void set_provider(std::string endpoint, std::string key) {
         bool result = oai.auth.SetKey(key);
+        auth.SetKey(key);
         if (!result) {
             throw std::runtime_error("Failed to set API key");
         }
         oai.ChatCompletion->SetEndpoint(endpoint);
+        this->endpoint_root_ = endpoint;
+    }
+
+    liboai::Response chat_completion_new(
+        const Context& ctx, 
+        std::optional<float> temperature, 
+        std::optional<float> top_p, 
+        std::optional<uint16_t> n, 
+        std::optional<std::function<bool(std::string, intptr_t)>> stream, 
+        std::optional<std::vector<std::string>> stop, 
+        std::optional<uint16_t> max_tokens, 
+        std::optional<float> presence_penalty, 
+        std::optional<float> frequency_penalty, 
+        std::optional<std::unordered_map<std::string, int8_t>> logit_bias, 
+        std::optional<std::string> user
+    ) const& noexcept(false) {
+        liboai::JsonConstructor jcon;
+        jcon.push_back("model", llm_model);
+        jcon.push_back("temperature", std::move(temperature));
+        jcon.push_back("top_p", std::move(top_p));
+        jcon.push_back("n", std::move(n));
+        jcon.push_back("stream", stream);
+        jcon.push_back("stop", std::move(stop));
+        jcon.push_back("max_tokens", std::move(max_tokens));
+        jcon.push_back("presence_penalty", std::move(presence_penalty));
+        jcon.push_back("frequency_penalty", std::move(frequency_penalty));
+        jcon.push_back("logit_bias", std::move(logit_bias));
+        jcon.push_back("user", std::move(user));
+        if (!ctx.empty()) {
+            jcon.push_back("messages", ctx);
+        }
+        auth.SetMaxTimeout(120000); /// ms
+        liboai::Response res;
+        res = this->Request(
+            Method::HTTP_POST, this->endpoint_root_, "/chat/completions", "application/json",
+            this->auth.GetAuthorizationHeaders(),
+            liboai::netimpl::components::Body {
+                jcon.dump()
+            },
+            stream ? liboai::netimpl::components::WriteCallback{std::move(stream.value())} : liboai::netimpl::components::WriteCallback{},
+            this->auth.GetProxies(),
+            this->auth.GetProxyAuth(),
+            this->auth.GetMaxTimeout()
+        );
+        logger->log("Response");
+        logger->log(json::parse(res.content).dump(4));
+        return res;
     }
 
     liboai::Response chat_completion(liboai::Conversation& conversation, float temperature) {
-        guard("LLM::chat_completion")
+        guard("LLMClient::chat_completion")
         logger->log("Call chat_completion");
         logger->log(conversation.GetJSON().dump(4));
         oai.auth.SetMaxTimeout(120000); /// ms
@@ -60,7 +113,7 @@ public:
     }
 
     liboai::Response embedding(const std::string& text, embedding_model model = embedding_model::oai_3small) {
-        guard("LLM::embedding")
+        guard("LLMClient::embedding")
         liboai::Response response = oai.Embedding->create(
             fmt::format("{}", model),
             text
@@ -73,7 +126,7 @@ public:
     }
 
     std::future<liboai::Response> embedding_async(const std::string& text, embedding_model model = embedding_model::oai_3small) {
-        return std::async(std::launch::async, &LLM::embedding, this, text, model);
+        return std::async(std::launch::async, &LLMClient::embedding, this, text, model);
     }
 
     /// TODO: Refine

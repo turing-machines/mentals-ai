@@ -47,16 +47,17 @@ struct ToolCall {
 class ToolExecutor {
 private:
     ///
-    std::shared_ptr<ControlUnit> ce_ref;
+    std::shared_ptr<ControlUnit> __ctrl;
     std::unordered_map<std::string, function_t> tools;
     std::vector<std::future<ToolCall>> futures;
 
 public:
-    explicit ToolExecutor(std::shared_ptr<ControlUnit> ce) : ce_ref(ce) {}
+    explicit ToolExecutor(std::shared_ptr<ControlUnit> cu) : __ctrl(std::move(cu)) {}
+
     void register_tool(const std::string& name, function_t func);
     /// Sync call
-    std::optional<std::string> call(const ToolCall& tool_call);
+    std::optional<std::string> invoke_tool(const ToolCall& tool_call);
     /// Async call
-    void async_batch_call(const std::vector<ToolCall>& batch_tool_call);
-    std::vector<ToolCall> async_results();
+    void execute_async_batch(const std::vector<ToolCall>& batch_tool_call);
+    std::vector<ToolCall> fetch_async_results();
 };

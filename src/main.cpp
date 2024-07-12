@@ -68,7 +68,7 @@ int main(int argc, char *argv[]) {
     //WebServer mentals_chat(DEFAULT_ADDRESS, 9002, 8080);
     //mentals_chat.start();
 
-    auto llm = std::make_unique<LLMClient>();
+    auto llm = std::make_shared<LLMClient>();
     llm->set_provider(endpoint, api_key);
     llm->set_model(model);
 
@@ -78,8 +78,9 @@ int main(int argc, char *argv[]) {
     PgVector vdb(conn_info);
     vdb.connect();
 
-    auto memc = std::make_unique<MemoryController>(*llm, vdb);
+    auto memc = std::make_shared<MemoryController>(*llm, vdb);
     memc->set_model(embedding_model::oai_3small);
+
 
  /*   memc.delete_collection("books");
     memc.create_collection("books");
@@ -192,9 +193,10 @@ int main(int argc, char *argv[]) {
 
         memc->create_collection("messages");
 
-        ControlUnit ctrlu(std::move(llm), std::move(memc));
-        ctrlu.init();
-        ctrlu.process_message(input);
+        auto ctrl = std::make_shared<ControlUnit>(llm, memc);
+        ctrl->init();
+
+        ctrl->process_message(input);
 
     } else if (!filename.empty()) {
 

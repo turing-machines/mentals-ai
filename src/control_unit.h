@@ -20,8 +20,8 @@ class ControlUnit : public std::enable_shared_from_this<ControlUnit>{
 private:
     Logger* logger;
 
-    std::unique_ptr<LLMClient> __llm;
-    std::unique_ptr<MemoryController> __memc;
+    std::shared_ptr<LLMClient> __llm;
+    std::shared_ptr<MemoryController> __memc;
 
     std::unique_ptr<Context> ctx;
 
@@ -33,7 +33,7 @@ private:
 public:
     void init() {
         guard("ControlUnit::init")
-    
+
         control_unit_instructions = read_file("mentals_system.prompt");
         if (control_unit_instructions.empty()) {
             throw "Failed to load control unit instructions";
@@ -42,7 +42,7 @@ public:
         ctx = std::make_unique<Context>();
         ctx->add_message("system", "system", control_unit_instructions);
 
-        /*tools = std::make_unique<ToolExecutor>(shared_from_this());
+        tools = std::make_unique<ToolExecutor>(shared_from_this());
 
         tools->register_tool("memory"                , tool_memory                  );
         tools->register_tool("read_file"             , tool_read_file               );
@@ -51,7 +51,7 @@ public:
         tools->register_tool("send_message"          , tool_send_message            );
         tools->register_tool("user_input"            , tool_user_input              );
         tools->register_tool("execute_bash_command"  , tool_execute_bash_command    );
-        tools->register_tool("execute_python_script" , tool_execute_python_script   );*/
+        tools->register_tool("execute_python_script" , tool_execute_python_script   );
 
         control_unit_state["platform_info"] = "";
 
@@ -59,7 +59,7 @@ public:
     }
 
 public:
-    ControlUnit(std::unique_ptr<LLMClient> llm, std::unique_ptr<MemoryController> memc) 
+    ControlUnit(std::shared_ptr<LLMClient> llm, std::shared_ptr<MemoryController> memc) 
         : __llm(std::move(llm)), __memc(std::move(memc)) {
         logger = Logger::get_instance();
     }

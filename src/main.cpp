@@ -188,6 +188,14 @@ int main(int argc, char *argv[]) {
 
         memc->write_chunks("tools");
 
+    } else if (filename.empty() && !input.empty()) {
+
+        memc->create_collection("messages");
+
+        ControlUnit ctrlu(std::move(llm), std::move(memc));
+        ctrlu.init();
+        ctrlu.process_message(input);
+
     } else if (!filename.empty()) {
 
         memc->create_collection("messages");

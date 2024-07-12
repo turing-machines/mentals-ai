@@ -304,3 +304,31 @@ expected<std::vector<mem_chunk>, std::string> PgVector::search_content(
     unguard()
     return unexpected<std::string>("Nothing found");
 }
+
+expected<std::vector<mem_chunk>, std::string> PgVector::bm25_search_content(
+    const std::string& table_name,
+    const std::string& search_query,
+    int limit
+) {
+    guard("PgVector::bm25_search_content")
+    if (!conn || !conn->is_open()) {
+        return unexpected<std::string>("Connection to vector db is not open");
+    }
+    pqxx::work txn(*conn);
+    SQLBuilder::Builder builder;    
+    builder.select(
+        fmt::format(
+            "content_id, chunk_id, name, meta, content, embedding, "
+            "ts_rank_cd(to_tsvector(content), plainto_tsquery('{}')) AS rank", search_query))
+        .from(table_name)
+        .where(fmt::format("to_tsvector(content) @@ plainto_tsquery('{}')", search_query))
+        .order_by("rank", "DESC")
+        .limit(limit);
+    SQLBuilder query = builder.build();
+    pqxx::result result = txn.exec(query.get_query());
+    txn.commit();
+    std::vector<mem_chunk> chunks = pqxx_result_to_mem_chunks(result);
+    return chunks;
+    unguard()
+    return unexpected<std::string>("Nothing found");
+}

@@ -67,4 +67,8 @@ public:
         const vdb::vector& search_vector, 
         int limit, 
         vdb::query_type type = vdb::query_type::embedding);
+    expected<std::vector<mem_chunk>, std::string> bm25_search_content(
+        const std::string& table_name,
+        const std::string& search_query,
+        int limit);
 };

@@ -72,10 +72,10 @@ public:
     ControlUnit(ControlUnit&&) = default;
     ControlUnit& operator=(ControlUnit&&) = default;
 
-    void process_message(const std::string& content) {
+    void process_message(const std::string& message) {
 
         /// Add message to context
-        /// Calculate vector for content
+        /// Calculate vector for message
         /// Store message into vdb memory_stream collection
         /// Fetch tools by vector
         /// Update system prompt in context with fetched tools
@@ -87,10 +87,10 @@ public:
         control_unit_state["current_date"] = get_current_date();
 
         std::string name = "user";
-        ctx->add_message(name, name, content);
-        __memc->process_chunks({ content } , name);
+        ctx->add_message(name, name, message);
+        __memc->process_chunks({ message } , name);
         __memc->write_chunks(MEMORY_MESSAGES, false);
-        auto tools_result = __memc->read_chunks(MEMORY_TOOLS, content, MAX_TOOLS);
+        auto tools_result = __memc->read_chunks(MEMORY_TOOLS, message, MAX_TOOLS);
         __memc->buf_clear();
         if (tools_result.has_value()) {
             std::vector<mem_chunk> tools_chunks = tools_result.value();
@@ -117,13 +117,26 @@ public:
         ///std::string system_prompt = render_template(control_unit_instructions, control_unit_state);
         std::string system_prompt = inja::render(control_unit_instructions, control_unit_state);
         std::vector<Message> system_messages = ctx->select_messages_by_role("system");
-        if(!system_messages.empty()) {
+        if (!system_messages.empty()) {
             ctx->update_message(system_messages[0], system_prompt);
         }
         json j_ctx = *ctx;
         std::cout << j_ctx.dump(4) << "\n\n";
 
         /// Call llm
+        Response response = __llm->chat_completion(*ctx, 0.5);
+        json content = json::parse(std::string(response.content));
+        if (content.contains("choices")) {
+            for (auto& choice : content["choices"].items()) {
+                if (choice.value().contains("message")) {
+                    json message = choice.value()["message"];
+                    std::string content = std::string(message["content"]);
+                    if (!content.empty()) {
+                        fmt::print("\n-----\n{}\n\n", content);
+                    }
+                }
+            }
+        }
 
     }
 

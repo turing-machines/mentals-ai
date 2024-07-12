@@ -199,7 +199,8 @@ public:
             json jres = response["data"][0]["embedding"];
             query_vector = vdb::vector({ jres.begin(), jres.end() }, embed_model);
         }
-        auto result = __vdb.search_content(collection, query_vector, num_chunks, query_type);
+        auto result = __vdb.bm25_search_content(collection, query_vector, num_chunks, query_type);
+        ///auto result = __vdb.bm25_search_content(collection, query, num_chunks);
         return result;
         unguard()
         return unexpected("");

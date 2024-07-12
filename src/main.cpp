@@ -25,7 +25,7 @@ int main(int argc, char *argv[]) {
 
     guard("Mentals")
 
-    CLI::App app{"Mentals - Central Executive Unit for LLMClient"};
+    CLI::App app{"Mentals - Central Executive Unit for LLM"};
 
     std::string input, filename, toolfile;
     app.add_option("-f,--file", filename, "Agent file name to run");

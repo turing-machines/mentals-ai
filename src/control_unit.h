@@ -5,7 +5,7 @@
 #include "llm.h"
 #include "context.h"
 #include "memory_controller.h"
-#include "tool_registry.h"
+#include "tool_executor.h"
 #include "native_tools.h"
 
 ///#include "code_interpreter.h"
@@ -26,7 +26,7 @@ private:
     std::unique_ptr<Context> ctx;
 
     std::string control_unit_instructions;
-    std::unique_ptr<ToolRegistry> tools;
+    std::unique_ptr<ToolExecutor> tools;
 
     json control_unit_state;
 
@@ -42,7 +42,7 @@ public:
         ctx = std::make_unique<Context>();
         ctx->add_message("system", "system", control_unit_instructions);
 
-        /*tools = std::make_unique<ToolRegistry>(shared_from_this());
+        /*tools = std::make_unique<ToolExecutor>(shared_from_this());
 
         tools->register_tool("memory"                , tool_memory                  );
         tools->register_tool("read_file"             , tool_read_file               );
@@ -103,15 +103,17 @@ public:
                     one_shot += ",\n\t\"" + std::string(param["name"]) + 
                     "\" : \"" + std::string(param["description"]) + "\",";
                 }
-                one_shot += "\n}\n```<<CALL>>";
+                one_shot += "\n}\n```";
                 few_shot += one_shot + "\n\n";
                 fetched_tools.push_back(j_tool);
             }
             control_unit_state["tools"] = fetched_tools.dump(4);
             control_unit_state["tool_call_few_shot"] = few_shot;
+            fmt::print("Fetched tools:\n{}\n\n", fetched_tools.dump(4));
         } else {
             control_unit_state["tools"] = "nothing";
             control_unit_state["tool_call_few_shot"] = "nothing";
+            fmt::print("Fetched tools:\n{}\n\n", "nothing found");
         }
 
         ///std::string system_prompt = render_template(control_unit_instructions, control_unit_state);
@@ -120,8 +122,8 @@ public:
         if (!system_messages.empty()) {
             ctx->update_message(system_messages[0], system_prompt);
         }
-        json j_ctx = *ctx;
-        std::cout << j_ctx.dump(4) << "\n\n";
+        //json j_ctx = *ctx;
+        //std::cout << j_ctx.dump(4) << "\n\n";
 
         /// Call llm
         Response response = __llm->chat_completion(*ctx, 0.5);

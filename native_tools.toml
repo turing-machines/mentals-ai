@@ -138,3 +138,16 @@ description = """Delete collection"""
 [[instruction.parameters]]
 name = "name"
 description = """Collection name"""
+
+#####################################
+### Find in collection
+#####################################
+[[instruction]]
+name = "find_in_collection"
+description = "Find in the collection"
+[[instruction.parameters]]
+name = "collection_name"
+description = "Collection name"
+[[instruction.parameters]]
+name = "search_text"
+description = "Search text"

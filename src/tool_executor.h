@@ -7,12 +7,21 @@ class ControlUnit;
 using function_t = std::function<std::string(std::shared_ptr<ControlUnit>, const json&)>;
 
 struct ToolCall {
+    static std::atomic<int> id_counter;
+    int id;
     std::string name;
     json params;
     std::optional<std::string> result;
 
+    ToolCall() : id(id_counter++) {}
+    ToolCall(std::string name, json params, std::optional<std::string> result = std::nullopt)
+        : id(id_counter++), name(std::move(name)), params(std::move(params)), result(std::move(result)) {}
+    ToolCall(int id, std::string name, json params, std::optional<std::string> result = std::nullopt)
+        : id(id), name(std::move(name)), params(std::move(params)), result(std::move(result)) {}
+
     friend void to_json(json& j, const ToolCall& t) {
         j = json{
+            {"id", t.id},
             {"name", t.name},
             {"params", t.params},
             {"result", t.result.has_value() ? json(t.result.value()) : json(nullptr)}
@@ -20,6 +29,7 @@ struct ToolCall {
     }
 
     friend void from_json(const json& j, ToolCall& t) {
+        ///j.at("id").get_to(t.id);
         j.at("name").get_to(t.name);
         j.at("params").get_to(t.params);
         if (j.contains("result") && !j.at("result").is_null()) {

@@ -1,5 +1,7 @@
 #include "tool_executor.h"
 
+std::atomic<int> ToolCall::id_counter(0);
+
 void ToolExecutor::register_tool(const std::string& name, function_t func) {
     tools.emplace(name, std::move(func));
 }
@@ -16,7 +18,7 @@ void ToolExecutor::async_batch_call(const std::vector<ToolCall>& batch_tool_call
     for (const auto& tool_call : batch_tool_call) {
         futures.emplace_back(std::async(std::launch::async, [this, tool_call]() -> ToolCall {
             auto result = this->call(tool_call);
-            return ToolCall{tool_call.name, tool_call.params, result};
+            return ToolCall{tool_call.id, tool_call.name, tool_call.params, result};
         }));
     }
 }

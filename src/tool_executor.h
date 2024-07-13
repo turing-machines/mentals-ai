@@ -10,20 +10,20 @@ struct ToolCall {
     static std::atomic<int> id_counter;
     int id;
     std::string name;
-    json params;
+    json args;
     std::optional<std::string> result;
 
     ToolCall() : id(id_counter++) {}
-    ToolCall(std::string name, json params, std::optional<std::string> result = std::nullopt)
-        : id(id_counter++), name(std::move(name)), params(std::move(params)), result(std::move(result)) {}
-    ToolCall(int id, std::string name, json params, std::optional<std::string> result = std::nullopt)
-        : id(id), name(std::move(name)), params(std::move(params)), result(std::move(result)) {}
+    ToolCall(std::string name, json args, std::optional<std::string> result = std::nullopt)
+        : id(id_counter++), name(std::move(name)), args(std::move(args)), result(std::move(result)) {}
+    ToolCall(int id, std::string name, json args, std::optional<std::string> result = std::nullopt)
+        : id(id), name(std::move(name)), args(std::move(args)), result(std::move(result)) {}
 
     friend void to_json(json& j, const ToolCall& t) {
         j = json{
             {"id", t.id},
             {"name", t.name},
-            {"params", t.params},
+            {"args", t.args},
             {"result", t.result.has_value() ? json(t.result.value()) : json(nullptr)}
         };
     }
@@ -31,7 +31,7 @@ struct ToolCall {
     friend void from_json(const json& j, ToolCall& t) {
         ///j.at("id").get_to(t.id);
         j.at("name").get_to(t.name);
-        j.at("params").get_to(t.params);
+        j.at("args").get_to(t.args);
         if (j.contains("result") && !j.at("result").is_null()) {
             t.result = j.at("result").get<std::string>();
         } else {

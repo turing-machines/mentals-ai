@@ -54,6 +54,82 @@ name = "command"
 description = "insert bash command here as a plain text"
 
 #####################################
+### Create Directory
+#####################################
+[[instruction]]
+name = "create_directory"
+description = """Create a new directory"""
+[[instruction.parameters]]
+name = "path"
+description = """Path of the directory to be created"""
+
+#####################################
+### List Directory
+#####################################
+[[instruction]]
+name = "list_directory"
+description = """List all files and directories within a specified directory"""
+[[instruction.parameters]]
+name = "path"
+description = """Path of the directory to list contents"""
+
+#####################################
+### Remove
+#####################################
+[[instruction]]
+name = "remove"
+description = """Remove a file or directory"""
+[[instruction.parameters]]
+name = "path"
+description = """Path of the file or directory to be removed"""
+
+#####################################
+### Remove All
+#####################################
+[[instruction]]
+name = "remove_all"
+description = """Remove a directory and all its contents"""
+[[instruction.parameters]]
+name = "path"
+description = """Path of the directory to be removed along with its contents"""
+
+#####################################
+### Exists
+#####################################
+[[instruction]]
+name = "exists"
+description = """Check if a file or directory exists"""
+[[instruction.parameters]]
+name = "path"
+description = """Path of the file or directory to check existence"""
+
+#####################################
+### Copy
+#####################################
+[[instruction]]
+name = "copy"
+description = """Copy a file or directory to another location"""
+[[instruction.parameters]]
+name = "source"
+description = """Path of the source file or directory to be copied"""
+[[instruction.parameters]]
+name = "destination"
+description = """Path of the destination where the file or directory will be copied"""
+
+#####################################
+### Rename
+#####################################
+[[instruction]]
+name = "rename"
+description = """Rename or move a file or directory"""
+[[instruction.parameters]]
+name = "old_path"
+description = """Current path of the file or directory to be renamed"""
+[[instruction.parameters]]
+name = "new_path"
+description = """New path of the file or directory after renaming"""
+
+#####################################
 ### Read file
 #####################################
 [[instruction]]

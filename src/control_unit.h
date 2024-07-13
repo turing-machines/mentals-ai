@@ -72,8 +72,8 @@ public:
     ControlUnit(ControlUnit&&) = default;
     ControlUnit& operator=(ControlUnit&&) = default;
 
-    void process_message(const std::string& message) {
-
+    void process_request(const std::string& message) {
+        guard("ControlUnit::process_request")
         /// Add message to context
         /// Calculate vector for message
         /// Store message into vdb memory_stream collection
@@ -83,9 +83,7 @@ public:
         /// Parse response
         /// Execute tools if needed
         /// Add assistant message to context
-
         control_unit_state["current_date"] = get_current_date();
-
         std::string name = "user";
         ctx->add_message(name, name, message);
         __memc->process_chunks({ message } , name);
@@ -108,14 +106,13 @@ public:
                 fetched_tools.push_back(j_tool);
             }
             control_unit_state["tools"] = fetched_tools.dump(4);
-            control_unit_state["tool_call_few_shot"] = few_shot;
-            fmt::print("Fetched tools:\n{}\n\n", fetched_tools.dump(4));
+            control_unit_state["tool_call_few_shot"] = ""; //few_shot;
+            //fmt::print("Fetched tools:\n{}\n\n", fetched_tools.dump(4));
         } else {
             control_unit_state["tools"] = "nothing";
             control_unit_state["tool_call_few_shot"] = "nothing";
             fmt::print("Fetched tools:\n{}\n\n", "nothing found");
         }
-
         ///std::string system_prompt = render_template(control_unit_instructions, control_unit_state);
         std::string system_prompt = inja::render(control_unit_instructions, control_unit_state);
         std::vector<Message> system_messages = ctx->select_messages_by_role("system");
@@ -124,7 +121,6 @@ public:
         }
         //json j_ctx = *ctx;
         //std::cout << j_ctx.dump(4) << "\n\n";
-
         /// Call llm
         Response response = __llm->chat_completion(*ctx, 0.5);
         json content = json::parse(std::string(response.content));
@@ -134,12 +130,35 @@ public:
                     json message = choice.value()["message"];
                     std::string content = std::string(message["content"]);
                     if (!content.empty()) {
-                        fmt::print("\n-----\n{}\n\n", content);
+                        ///fmt::print("\n-----\n{}\n\n", content);
+                        process_response(content);
                     }
                 }
             }
         }
+        unguard()
+    }
 
+    void process_response(const std::string& content) {
+        guard("ControlUnit::process_response")
+        std::vector<json> j_objects = parse_json_objects(content);
+        std::vector<ToolCall> tool_calls;
+        for (const auto& j : j_objects) {
+            if (j.contains("name")) {
+                ToolCall tool_call;
+                from_json(j, tool_call);
+                tool_calls.push_back(tool_call);
+            }
+        }
+        if (!tool_calls.empty()) {
+            tools->execute_async_batch(tool_calls);
+            std::vector<ToolCall> tools_results = tools->fetch_async_results();
+            json j = tools_results;
+            fmt::print("{}\n", j.dump(4));
+        } else {
+            fmt::print("{}\n\n", content);
+        }
+        unguard()
     }
 
 };

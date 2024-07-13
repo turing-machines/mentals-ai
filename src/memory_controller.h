@@ -2,11 +2,11 @@
 
 #include "core.h"
 #include "pgvector.h"
-#include "embedding.h"
+#include "embeddings.h"
 
 class MemoryController {
 private:
-    std::unique_ptr<EmbeddingInterface> __emb;
+    std::unique_ptr<EmbeddingsInterface> __emb;
     std::unique_ptr<PgVector> __vdb;  /// TODO: MemoryInterface
 
     std::vector<std::future<expected<mem_chunk*, std::string>>> futures;
@@ -18,14 +18,14 @@ private:
     int processed_tokens;
 
 private:
-    expected<mem_chunk*, std::string> chunk_embedding(
+    expected<mem_chunk*, std::string> chunk_embeddings(
         const std::string& content_id,
         const int chunk_id,
         const std::string& content,
         const std::optional<std::string>& name = std::nullopt,
         const std::optional<std::string>& meta = std::nullopt
     ) {
-        guard("MemoryController::chunk_embedding")
+        guard("MemoryController::chunk_embeddings")
         fmt::print("{}mem_chunk #{}#{}: Embedding started.\n", RESET, content_id, chunk_id);
         std::string cleaned_content = content;
         if (!is_valid_utf8(content)) {
@@ -35,7 +35,7 @@ private:
         size_t size_in_bytes = cleaned_content.size();
         double size_in_kb = static_cast<double>(size_in_bytes) / 1024.0;
         processed_kb += size_in_kb;
-        std::future<liboai::Response> future_res = __emb->embedding_async(cleaned_content);
+        std::future<liboai::Response> future_res = __emb->embeddings_async(cleaned_content);
         liboai::Response response = future_res.get();
         processed_tokens += response["usage"]["total_tokens"].get<int>();
         json jres = response["data"][0]["embedding"];
@@ -95,7 +95,7 @@ public:
 
 public:
 
-    MemoryController(std::unique_ptr<EmbeddingInterface> emb, std::unique_ptr<PgVector> vdb)
+    MemoryController(std::unique_ptr<EmbeddingsInterface> emb, std::unique_ptr<PgVector> vdb)
         : __emb(std::move(emb)), __vdb(std::move(vdb)), processed_kb(0), processed_tokens(0) {}
 
     ~MemoryController() = default;
@@ -122,7 +122,7 @@ public:
             std::string chunk_content = chunks[chunk_id];
             fmt::print("{}mem_chunk #{}#{}: Processing started.\n", RESET, content_id, chunk_id);
             futures.push_back(std::async(std::launch::async, 
-                &MemoryController::chunk_embedding, this, 
+                &MemoryController::chunk_embeddings, this, 
                 content_id, chunk_id, chunk_content, name, meta
             ));
         }
@@ -193,7 +193,7 @@ public:
             query_vector = buffer_result.value()->embedding;
         } else {
             /// TODO: Add response validator
-            liboai::Response response = __emb->embedding(query);
+            liboai::Response response = __emb->embeddings(query);
             json jres = response["data"][0]["embedding"];
             query_vector = vdb::vector({ jres.begin(), jres.end() }, __emb->get_model());
         }

@@ -10,9 +10,9 @@ std::optional<std::string> ToolExecutor::invoke_tool(const ToolCall& tool_call) 
     guard("ToolExecutor::invoke_tool")
     auto it = tools.find(tool_call.name);
     if (it != tools.end()) {
-        return it->second(__ctrl, tool_call.params);
+        return it->second(__ctrl, tool_call.args);
     }
-    return std::nullopt;
+    return fmt::format("Tool with name {} not found\n", tool_call.name);
     unguard()
     return std::nullopt;
 }
@@ -22,7 +22,7 @@ void ToolExecutor::execute_async_batch(const std::vector<ToolCall>& batch_tool_c
     for (const auto& tool_call : batch_tool_call) {
         futures.emplace_back(std::async(std::launch::async, [this, tool_call]() -> ToolCall {
             auto result = this->invoke_tool(tool_call);
-            return ToolCall{tool_call.id, tool_call.name, tool_call.params, result};
+            return ToolCall{tool_call.id, tool_call.name, tool_call.args, result};
         }));
     }
     unguard()

@@ -6,12 +6,12 @@
 
 using namespace liboai;
 
-class EmbeddingInterface {
+class EmbeddingsInterface {
 protected:
     embedding_model embed_model;
 
 public:
-    virtual ~EmbeddingInterface() = default;
+    virtual ~EmbeddingsInterface() = default;
 
     virtual void set_model(embedding_model model) {
         embed_model = model;
@@ -23,31 +23,31 @@ public:
 
     virtual void set_provider(std::string endpoint, std::string api_key) = 0;
 
-    virtual Response embedding(
+    virtual Response embeddings(
         const std::string& text,
         std::optional<std::string> user = std::nullopt
     ) const& noexcept(false) = 0;
 
-    virtual std::future<Response> embedding_async(
+    virtual std::future<Response> embeddings_async(
         const std::string& text,
         std::optional<std::string> user = std::nullopt
     ) = 0;
 };
 
 
-class EmbeddingProvider final : public EmbeddingInterface, private Network {
+class EmbeddingsProvider final : public EmbeddingsInterface, private Network {
     Authorization& auth = Authorization::Authorizer();
     Logger* logger = Logger::get_instance();
 
 public:
 
-    EmbeddingProvider() = default;
-    ~EmbeddingProvider() = default;
-    EmbeddingProvider(const EmbeddingProvider&) = delete;
-    EmbeddingProvider(EmbeddingProvider&&) = delete;
+    EmbeddingsProvider() = default;
+    ~EmbeddingsProvider() = default;
+    EmbeddingsProvider(const EmbeddingsProvider&) = delete;
+    EmbeddingsProvider(EmbeddingsProvider&&) = delete;
 
-    EmbeddingProvider& operator=(const EmbeddingProvider&) = delete;
-    EmbeddingProvider& operator=(EmbeddingProvider&&) = delete;
+    EmbeddingsProvider& operator=(const EmbeddingsProvider&) = delete;
+    EmbeddingsProvider& operator=(EmbeddingsProvider&&) = delete;
 
     void set_provider(std::string endpoint, std::string api_key) {
         bool result = auth.SetKey(api_key);
@@ -57,15 +57,15 @@ public:
         this->endpoint_root_ = endpoint;
     }
 
-    Response embedding(
+    Response embeddings(
         const std::string& text,
         std::optional<std::string> user = std::nullopt
     ) const& noexcept(false) {
-	    guard("EmbeddingProvider::embedding")
+	    guard("EmbeddingsProvider::embeddings")
         JsonConstructor jcon;
-	    jcon.push_back("model", fmt::format("{}", embed_model));
-	    jcon.push_back("input", std::move(text));
-	    jcon.push_back("user", std::move(user));
+        jcon.push_back("model", fmt::format("{}", embed_model));
+        jcon.push_back("input", std::move(text));
+        jcon.push_back("user", std::move(user));
         Response response;
         response = this->Request(
             Method::HTTP_POST, this->endpoint_root_, "/embeddings", "application/json",
@@ -82,11 +82,11 @@ public:
         return Response();
     }
 
-    std::future<Response> embedding_async(
+    std::future<Response> embeddings_async(
         const std::string& text,
         std::optional<std::string> user = std::nullopt
     ) {
-        return std::async(std::launch::async, &EmbeddingProvider::embedding, this, text, user);
+        return std::async(std::launch::async, &EmbeddingsProvider::embeddings, this, text, user);
     }
 
 };

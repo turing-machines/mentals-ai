@@ -262,6 +262,24 @@ std::vector<std::string> extract_json_blocks(const std::string& text) {
     return result;
 }
 
+std::vector<json> parse_json_objects(const std::string& text) {
+    std::vector<json> json_objects;
+    std::regex backticks_regex(R"(```json\s*([\s\S]*?)\s*```)");
+    auto begin = std::sregex_iterator(text.begin(), text.end(), backticks_regex);
+    auto end = std::sregex_iterator();
+    for (std::sregex_iterator i = begin; i != end; ++i) {
+        std::smatch match = *i;
+        std::string json_string = match.str(1);
+        try {
+            json json_object = json::parse(json_string);
+            json_objects.push_back(json_object);
+        } catch (json::parse_error& e) {
+            std::cerr << "JSON parse error: " << e.what() << '\n';
+        }
+    }
+    return json_objects;
+}
+
 std::string extract_json_from_markdown(const std::string& text) {
     guard("extract_json_from_markdown")
     std::regex json_regex(R"(```json\n(\{[\s\S]*?\})\n```)");

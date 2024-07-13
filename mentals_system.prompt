@@ -50,8 +50,11 @@ JSON format to output for tools calling:
 ```json
 {
     "name" : "insert here tool name",
-    "parameter name" : "insert here parameter value",
-    etc.
+    "args" : {
+        "parameter name" : "insert here value for parameter name",
+        "parameter name 2" : "insert here value for parameter name 2",
+        etc.
+    }
 }
 ```
 

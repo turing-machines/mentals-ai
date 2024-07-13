@@ -72,7 +72,7 @@ int main(int argc, char *argv[]) {
     llm->set_provider(endpoint, api_key);
     llm->set_model(model);
 
-    std::unique_ptr<EmbeddingInterface> emb = std::make_unique<EmbeddingProvider>();
+    std::unique_ptr<EmbeddingsInterface> emb = std::make_unique<EmbeddingsProvider>();
     emb->set_provider(endpoint, api_key);
     emb->set_model(embedding_model::oai_3small);
 
@@ -198,7 +198,7 @@ int main(int argc, char *argv[]) {
         auto ctrl = std::make_shared<ControlUnit>(llm, memc);
         ctrl->init();
 
-        ctrl->process_message(input);
+        ctrl->process_request(input);
 
     } else if (!filename.empty()) {
 
@@ -211,7 +211,7 @@ int main(int argc, char *argv[]) {
         ControlUnit ctrlu(std::move(llm), std::move(memc));
         ctrlu.init();
 
-        ctrlu.process_message(user_input);
+        ctrlu.process_request(user_input);
 
 
         /*fmt::print("Search text:\n{}\n\n", user_input);

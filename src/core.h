@@ -100,6 +100,7 @@ std::string erase_text_after_specified_substring(const std::string& text, const 
 std::string replace_new_lines(const std::string& input);
 std::string convert_to_single_line(const std::string& multiline_text);
 std::vector<std::string> extract_json_blocks(const std::string& text);
+std::vector<json> parse_json_objects(const std::string& text);
 std::string extract_json_from_markdown(const std::string& text);
 std::string get_first_instruction(const std::vector<std::string>& array);
 json find_object_by_field_value(const json& json_array, const std::string& field_name, const json& value);

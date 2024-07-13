@@ -91,40 +91,6 @@ public:
         return Response();
     }
 
-    Response embedding(
-        const std::string& text,
-        embedding_model model = embedding_model::oai_3small,
-        std::optional<std::string> user = std::nullopt
-    ) const& noexcept(false) {
-	    guard("LLMClient::embedding")
-        JsonConstructor jcon;
-	    jcon.push_back("model", fmt::format("{}", model));
-	    jcon.push_back("input", std::move(text));
-	    jcon.push_back("user", std::move(user));
-        Response response;
-        response = this->Request(
-            Method::HTTP_POST, this->endpoint_root_, "/embeddings", "application/json",
-            this->auth.GetAuthorizationHeaders(),
-            netimpl::components::Body {
-                jcon.dump()
-            },
-            this->auth.GetProxies(),
-            this->auth.GetProxyAuth(),
-            this->auth.GetMaxTimeout()
-        );
-        return response; //vdb::vector({ jres.begin(), jres.end() }, model);
-        unguard()
-        return Response();
-    }
-
-    std::future<Response> embedding_async(
-        const std::string& text,
-        embedding_model model = embedding_model::oai_3small,
-        std::optional<std::string> user = std::nullopt
-    ) {
-        return std::async(std::launch::async, &LLMClient::embedding, this, text, model, user);
-    }
-
     /// TODO: Refine
     /*std::string rag(std::string input, std::string data) {
         std::string result;

@@ -72,15 +72,17 @@ int main(int argc, char *argv[]) {
     llm->set_provider(endpoint, api_key);
     llm->set_model(model);
 
+    std::unique_ptr<EmbeddingInterface> emb = std::make_unique<EmbeddingProvider>();
+    emb->set_provider(endpoint, api_key);
+    emb->set_model(embedding_model::oai_3small);
+
     std::string conn_info = fmt::format("dbname={} user={} password={} hostaddr={} port={}", 
         dbname, user, password, hostaddr, port);
 
-    PgVector vdb(conn_info);
-    vdb.connect();
+    std::unique_ptr<PgVector> vdb = std::make_unique<PgVector>(conn_info);
+    vdb->connect();
 
-    auto memc = std::make_shared<MemoryController>(*llm, vdb);
-    memc->set_model(embedding_model::oai_3small);
-
+    auto memc = std::make_shared<MemoryController>(std::move(emb), std::move(vdb));
 
  /*   memc.delete_collection("books");
     memc.create_collection("books");
@@ -152,7 +154,7 @@ int main(int argc, char *argv[]) {
         memc->delete_collection("tools");
         memc->create_collection("tools");
 
-        auto res = vdb.list_collections();
+        auto res = vdb->list_collections();
 
         if (res) {
             std::cout << "Collections: " << *res << "\n\n";
@@ -226,7 +228,7 @@ int main(int argc, char *argv[]) {
 
     }
 
-    /*auto info = vdb.get_collection_info("tools");
+    /*auto info = vdb->get_collection_info("tools");
     if (info) {
         std::cout << "tools info: " << (*info).dump(4) << "\n\n";
     }*/

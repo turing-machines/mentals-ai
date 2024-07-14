@@ -124,6 +124,7 @@ void print_tree(const tree<std::string>& tr);
 tree<std::string>::pre_order_iterator find_node(const tree<std::string>& tr, const std::string& node_value);
 bool append_child(tree<std::string>& tr, const std::string& node_value, const std::string& child_value);
 long long get_timestamp();
+std::string get_current_time();
 std::mt19937& get_random_engine();
 int get_random_number(int min, int max);
 std::string gen_index(const std::string& data);
@@ -217,6 +218,26 @@ struct mem_chunk {
     vdb::vector embedding;
     std::optional<std::string> name;
     std::optional<std::string> meta;
+    std::optional<std::string> created_at;
+
+    mem_chunk() = default;
+    mem_chunk(const std::string& content_id, int chunk_id, const std::string& content, 
+        const vdb::vector& embedding)
+        : content_id(content_id), chunk_id(chunk_id), content(content), embedding(embedding) {}
+    mem_chunk(const std::string& content_id, int chunk_id, const std::string& content, 
+        const vdb::vector& embedding, const std::optional<std::string>& name)
+        : content_id(content_id), chunk_id(chunk_id), content(content), embedding(embedding), 
+        name(name) {}
+    mem_chunk(const std::string& content_id, int chunk_id, const std::string& content, 
+        const vdb::vector& embedding, const std::optional<std::string>& name, 
+        const std::optional<std::string>& meta)
+        : content_id(content_id), chunk_id(chunk_id), content(content), embedding(embedding), 
+        name(name), meta(meta) {}
+    mem_chunk(const std::string& content_id, int chunk_id, const std::string& content, 
+        const vdb::vector& embedding, const std::optional<std::string>& name, 
+        const std::optional<std::string>& meta, const std::optional<std::string>& created_at)
+        : content_id(content_id), chunk_id(chunk_id), content(content), embedding(embedding), 
+        name(name), meta(meta), created_at(created_at) {}
 
     json serialize_json() const {
         json j;
@@ -224,8 +245,9 @@ struct mem_chunk {
         j["chunk_id"] = chunk_id;
         j["content"] = content;
         ///j["embedding"] = embedding;
-        if (name) { j["name"] = *name; } else { j["name"] = nullptr; }
-        if (meta) { j["meta"] = *meta; } else { j["meta"] = nullptr; }
+        j["name"] = name.value_or(nullptr);
+        j["meta"] = meta.value_or(nullptr);
+        j["created_at"] = created_at.value_or(nullptr);
         return j;
     }
 };

@@ -538,6 +538,16 @@ long long get_timestamp() {
     return milliseconds_since_epoch;
 }
 
+std::string get_current_time() {
+    auto timestamp = get_timestamp();
+    std::time_t t = timestamp / 1000;
+    char buffer[100];
+    if (std::strftime(buffer, sizeof(buffer), "%Y-%m-%d %H:%M:%S", std::localtime(&t))) {
+        return std::string(buffer);
+    }
+    return "";
+}
+
 std::mt19937& get_random_engine() {
     static std::random_device rd;
     static std::mt19937 gen(rd());

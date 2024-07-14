@@ -179,6 +179,20 @@ public:
     }
 
     expected<std::vector<mem_chunk>, std::string> read_chunks(
+        const std::string& collection,
+        const std::optional<std::string>& content_id = std::nullopt,
+        const std::optional<int>& num_chunks = std::nullopt,
+        const std::optional<std::string>& start_time = std::nullopt,
+        const std::optional<bool>& before = std::nullopt
+    ) {
+        guard("MemoryController::read_chunks")
+        auto result = __vdb->read_content(collection, content_id, num_chunks, start_time, before);
+        return result;
+        unguard()
+        return unexpected("");
+    }
+
+    expected<std::vector<mem_chunk>, std::string> read_chunks(
         const std::string& collection, 
         const std::string& query,
         const int& num_chunks,

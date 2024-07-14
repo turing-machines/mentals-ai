@@ -10,3 +10,5 @@ pacman_game/
 ai_videos.csv
 
 config.toml
+
+terminal_chat.h

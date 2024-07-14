@@ -37,7 +37,7 @@ std::string tool_send_message(std::shared_ptr<ControlUnit> ce_ref, json args) {
         }
         std::string message = args["message"];
         std::cout << GREEN << "[message] " << RESET << message << "\n";
-        std::string answer = fmt::format(
+        answer = fmt::format(
             "The message: '{}' was successfully displayed",
             message
         );

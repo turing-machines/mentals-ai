@@ -36,15 +36,15 @@ INC_FLAGS += $(POCO_INCLUDE)
 OS := $(shell uname -s)
 ifeq ($(OS),Linux)
     CPPFLAGS += -DLINUX
-    LDFLAGS := -lrt -lpthread -lcurl -lfmt -lpqxx -lpq $(shell pkg-config --libs poppler-cpp) -lPocoFoundation -lboost_system -lboost_thread -lboost_filesystem
+    LDFLAGS := -lrt -lpthread -lcurl -lfmt -lpqxx -lpq $(shell pkg-config --libs poppler-cpp) -lPocoFoundation -lboost_system -lboost_thread -lboost_filesystem -lncurses
 endif
 ifeq ($(OS),Darwin)
     CPPFLAGS += -DMACOS
-    LDFLAGS := -lpthread -lcurl -lfmt -lpqxx -lpq $(shell pkg-config --libs poppler-cpp) -lPocoFoundation -lboost_system -lboost_thread -lboost_filesystem
+    LDFLAGS := -lpthread -lcurl -lfmt -lpqxx -lpq $(shell pkg-config --libs poppler-cpp) -lPocoFoundation -lboost_system -lboost_thread -lboost_filesystem -lncurses
 endif
 ifeq ($(OS),Windows_NT)
     CPPFLAGS += -DWIN32
-    LDFLAGS := -lws2_32 -lcurl -lfmt -lpqxx -lpq -lboost_system -lboost_thread -lboost_filesystem
+    LDFLAGS := -lws2_32 -lcurl -lfmt -lpqxx -lpq -lboost_system -lboost_thread -lboost_filesystem -lncurses
 endif
 
 ifeq ($(VERBOSE),1)

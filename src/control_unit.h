@@ -58,6 +58,33 @@ public:
         unguard()
     }
 
+    void load_latest_messages(int num_latest_messages) {
+        std::string current_time = get_current_time();
+        auto chunks_result = __memc->read_chunks(
+            MEMORY_MESSAGES, 
+            std::nullopt, 
+            num_latest_messages,
+            current_time,
+            true
+        );
+        if (chunks_result.has_value()) {
+            std::vector<mem_chunk> chunks = chunks_result.value();
+            for (const auto& chunk : chunks) {
+                Message msg;
+                msg.content_id = chunk.content_id;
+                if (chunk.created_at.has_value()) {
+                    msg.created_at = chunk.created_at.value();
+                } else {
+                    msg.created_at = "";
+                }
+                msg.name = chunk.name.value_or("");
+                msg.role = chunk.meta.value_or("");
+                msg.content = chunk.content;
+                ctx->add_message(msg);
+            }
+        }
+    }
+
 public:
     ControlUnit(std::shared_ptr<LLMClient> llm, std::shared_ptr<MemoryController> memc) 
         : __llm(std::move(llm)), __memc(std::move(memc)) {

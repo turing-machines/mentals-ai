@@ -62,6 +62,12 @@ public:
         const std::string& table_name,
         const std::optional<std::string>& content_id = std::nullopt,
         const std::optional<int>& num_chunks = std::nullopt);
+    expected<std::vector<mem_chunk>, std::string> read_content(
+        const std::string& table_name,
+        const std::optional<std::string>& content_id,
+        const std::optional<int>& num_chunks,
+        const std::optional<std::string>& start_time,
+        const std::optional<bool>& before = false);
     expected<std::vector<mem_chunk>, std::string> search_content(
         const std::string& table_name, 
         const vdb::vector& search_vector, 

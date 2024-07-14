@@ -14,6 +14,8 @@
 #include "doc_factory.h"
 #include "gen_file.h"
 #include "web_server.h"
+///#include "terminal_chat.h"
+
 
 bool debug{false};
 std::atomic<bool> spinner_active{false};
@@ -197,8 +199,12 @@ int main(int argc, char *argv[]) {
 
         auto ctrl = std::make_shared<ControlUnit>(llm, memc);
         ctrl->init();
+        ctrl->load_latest_messages(5);
 
         ctrl->process_request(input);
+
+        ///TerminalChat chat_app;
+        ///chat_app.run();
 
     } else if (!filename.empty()) {
 

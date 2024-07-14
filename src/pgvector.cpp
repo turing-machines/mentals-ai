@@ -266,6 +266,54 @@ expected<std::vector<mem_chunk>, std::string> PgVector::read_content(
     return unexpected<std::string>("Nothing found");
 }
 
+expected<std::vector<mem_chunk>, std::string> PgVector::read_content(
+    const std::string& table_name,
+    const std::optional<std::string>& content_id,
+    const std::optional<int>& num_chunks,
+    const std::optional<std::string>& start_time,
+    const std::optional<bool>& before
+) {
+    guard("PgVector::read_content");
+    if (!conn || !conn->is_open()) {
+        return unexpected<std::string>("Connection to vector db is not open");
+    }
+    SQLBuilder::Builder builder;
+    builder.select("content_id, chunk_id, name, meta, content, embedding, created_at").from(table_name);
+    if (content_id) {
+        builder.where(fmt::format("content_id = '{}'", *content_id));
+    }
+    if (start_time) {
+        if (before && *before) {
+            builder.where(fmt::format("created_at < TIMESTAMP '{}'", *start_time));
+            builder.order_by("created_at", "DESC");
+        } else {
+            builder.where(fmt::format("created_at >= TIMESTAMP '{}'", *start_time));
+            builder.order_by("created_at", "ASC");
+        }
+    } else {
+        builder.order_by("created_at", "DESC");
+    }
+    if (num_chunks) {
+        builder.limit(*num_chunks);
+    }
+    SQLBuilder select_query = builder.build();
+    pqxx::work txn(*conn);
+    pqxx::result result;
+    if (content_id) {
+        result = txn.exec_params(select_query.get_query(), *content_id);
+    } else {
+        result = txn.exec(select_query.get_query());
+    }
+    txn.commit();
+    std::vector<mem_chunk> chunks = pqxx_result_to_mem_chunks(result);
+    if (chunks.empty()) {
+        return unexpected<std::string>("Nothing found");
+    }
+    return chunks;
+    unguard();
+    return unexpected<std::string>("");
+}
+
 expected<std::vector<mem_chunk>, std::string> PgVector::search_content(
     const std::string& table_name,
     const vdb::vector& search_vector,

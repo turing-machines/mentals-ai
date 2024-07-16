@@ -15,6 +15,7 @@
 #include "gen_file.h"
 #include "web_server.h"
 ///#include "terminal_chat.h"
+#include "tui/progress_bar.h"
 
 
 bool debug{false};
@@ -156,11 +157,18 @@ int main(int argc, char *argv[]) {
         memc->delete_collection("tools");
         memc->create_collection("tools");
 
-        auto res = vdb->list_collections();
+        ProgressBar progress_bar("Updating tools:", "Complete");
+        auto progress_callback = [&progress_bar](double progress) {
+            progress_bar.update(static_cast<float>(progress));
+        };
+
+        memc->set_progress_callback(progress_callback);
+
+        /*auto res = vdb->list_collections();
 
         if (res) {
             std::cout << "Collections: " << *res << "\n\n";
-        }
+        }*/
 
         auto native_instructions_toml = toml::parse_file(toolfile);
         auto tools = native_instructions_toml["instruction"].as_array();
@@ -173,20 +181,9 @@ int main(int argc, char *argv[]) {
             std::string tool_text;
             //tool_text = item.dump(4);
             //tool_text = std::string(item["name"]);
-            /*tool_text = std::string(item["name"]) + "\n" + std::string(item["description"]);
-            if (item.contains("parameters")) {
-                for (auto& param : item["parameters"]) {
-                    tool_text += "\n" 
-                        + std::string(param["name"]) + " : " 
-                        + std::string(param["description"]);
-                }
-            }*/
-
             tool_text = item.dump(4);
-
             //tool_text = std::string(item["description"]);
-            std::cout << tool_text << "\n-------\n";
-
+            //std::cout << tool_text << "\n-------\n";
             std::vector<std::string> chunks = { tool_text };
             memc->process_chunks(chunks, item["name"]);
         }

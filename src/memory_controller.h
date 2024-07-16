@@ -16,8 +16,23 @@ private:
     /// Stats
     double processed_kb;
     int processed_tokens;
+    size_t total_chunks;
+    size_t processed_chunks;
+    size_t written_chunks;
+
+public:
+    using ProgressCallback = std::function<void(double)>;
 
 private:
+    ProgressCallback progress_callback;
+
+    void update_progress() {
+        if (progress_callback && total_chunks > 0) {
+            double progress = static_cast<double>(processed_chunks + written_chunks) / (2 * total_chunks) * 100.0;
+            progress_callback(progress);
+        }
+    }
+
     expected<mem_chunk*, std::string> chunk_embeddings(
         const std::string& content_id,
         const int chunk_id,
@@ -26,25 +41,27 @@ private:
         const std::optional<std::string>& meta = std::nullopt
     ) {
         guard("MemoryController::chunk_embeddings")
-        fmt::print("{}mem_chunk #{}#{}: Embedding started.\n", RESET, content_id, chunk_id);
+        ///fmt::print("{}mem_chunk #{}#{}: Embedding started.\n", RESET, content_id, chunk_id);
         std::string cleaned_content = content;
         if (!is_valid_utf8(content)) {
             fmt::print("{}Warning: Invalid UTF-8 byte in content for chunk #{}#{}. Cleaning..{}\n", MAGENTA, content_id, chunk_id, RESET);
             cleaned_content = remove_invalid_utf8(content);
         }
-        size_t size_in_bytes = cleaned_content.size();
-        double size_in_kb = static_cast<double>(size_in_bytes) / 1024.0;
-        processed_kb += size_in_kb;
         std::future<liboai::Response> future_res = __emb->embeddings_async(cleaned_content);
         liboai::Response response = future_res.get();
         processed_tokens += response["usage"]["total_tokens"].get<int>();
         json jres = response["data"][0]["embedding"];
         vdb::vector embedding({ jres.begin(), jres.end() }, __emb->get_model());
-        fmt::print("{}mem_chunk #{}#{}: Embedding completed.\n", RESET, content_id, chunk_id);
+        ///fmt::print("{}mem_chunk #{}#{}: Embedding completed.\n", RESET, content_id, chunk_id);
         std::lock_guard<std::mutex> lock(chunk_buffer_mutex);
         chunk_buffer.emplace_back(mem_chunk{
             content_id, chunk_id, cleaned_content, embedding, name, meta
         });
+        size_t size_in_bytes = cleaned_content.size();
+        double size_in_kb = static_cast<double>(size_in_bytes) / 1024.0;
+        processed_kb += size_in_kb;
+        processed_chunks++;
+        update_progress();
         return &chunk_buffer.back();
         unguard()
         return {};
@@ -96,12 +113,15 @@ public:
 public:
 
     MemoryController(std::unique_ptr<EmbeddingsInterface> emb, std::unique_ptr<PgVector> vdb)
-        : __emb(std::move(emb)), __vdb(std::move(vdb)), processed_kb(0), processed_tokens(0) {}
+        : __emb(std::move(emb)), __vdb(std::move(vdb)), processed_kb(0), processed_tokens(0)
+        , total_chunks(0), processed_chunks(0), written_chunks(0) {}
 
     ~MemoryController() = default;
 
     embedding_model get_model() const { return __emb->get_model(); }
     void set_model(embedding_model new_embed_model) { __emb->set_model(new_embed_model); }
+
+    void set_progress_callback(ProgressCallback callback) { progress_callback = callback; }
 
     void create_collection(const std::string& collection) {
         __vdb->create_collection(collection, __emb->get_model());
@@ -115,12 +135,14 @@ public:
         const std::optional<std::string>& name = std::nullopt,
         const std::optional<std::string>& meta = std::nullopt
     ) {
+        total_chunks += chunks.size();
+        update_progress();
         std::string content_id;
         if (name && !name->empty()) { content_id = gen_index(*name); }
             else { content_id = gen_index(); }
         for (size_t chunk_id = 0; chunk_id < chunks.size(); ++chunk_id) {
             std::string chunk_content = chunks[chunk_id];
-            fmt::print("{}mem_chunk #{}#{}: Processing started.\n", RESET, content_id, chunk_id);
+            ///fmt::print("{}mem_chunk #{}#{}: Processing started.\n", RESET, content_id, chunk_id);
             futures.push_back(std::async(std::launch::async, 
                 &MemoryController::chunk_embeddings, this, 
                 content_id, chunk_id, chunk_content, name, meta
@@ -135,16 +157,19 @@ public:
         for (auto& fut : futures) {
             auto res = fut.get();
             if (!res.has_value()) {
-                fmt::print("{}Error processing chunk {}.{}\n", RED, res.error(), RESET);
+                ///fmt::print("{}Error processing chunk {}.{}\n", RED, res.error(), RESET);
                 failed_chunks.push_back(fut.get().value()->chunk_id);
                 continue;
             }
             mem_chunk* chunk = res.value();
             __vdb->write_content(*txn, collection, *chunk);
-            fmt::print("{}mem_chunk #{}#{}: Data written to memory.\n", RESET, 
-                chunk->content_id, chunk->chunk_id);
+            ///fmt::print("{}mem_chunk #{}#{}: Data written to memory.\n", RESET, 
+            ///    chunk->content_id, chunk->chunk_id);
+            written_chunks++;
+            update_progress();
         }
         __vdb->commit_transaction(txn);
+        if (progress_callback) { progress_callback(100.0); }
         fmt::print(
             "\n----------------\n"
             "{} chunks have been processed\n"
@@ -153,11 +178,12 @@ public:
             "{:.2f} MB of data processed\n",
             chunk_buffer.size(), failed_chunks.size(), processed_tokens, processed_kb / 1024.0);
         futures.clear();
-        if (clear_buffer) {
-            buf_clear();
-        }
+        if (clear_buffer) { buf_clear(); }
         processed_kb = 0;
         processed_tokens = 0;
+        total_chunks = 0;
+        processed_chunks = 0;
+        written_chunks = 0;
         if (!failed_chunks.empty()) {
             /// TODO: Unroll transaction or try to write in the next call
             return unexpected(failed_chunks);

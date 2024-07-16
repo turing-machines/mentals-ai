@@ -88,5 +88,7 @@
             "binaryPath": "/home/costa-al/control_unit/build/mentals",
             "binaryArgs": []
         }
-    ]
+    ],
+    "editor.formatOnSave": true,
+    "clang-format.style": "file"
 }

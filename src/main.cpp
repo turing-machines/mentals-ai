@@ -11,7 +11,7 @@
 #include "context.h"
 #include "memory_controller.h"
 #include "control_unit.h"
-#include "doc_factory.h"
+#include "file_manager.h"
 #include "gen_file.h"
 #include "web_server.h"
 ///#include "terminal_chat.h"
@@ -152,6 +152,10 @@ int main(int argc, char *argv[]) {
     }
 */
 
+    ///FileManager  fmgn;
+    ///json ls = fmgn.list_directory("src");
+    ///fmt::print("{}\n\n", ls.dump(4)); 
+
     if (!toolfile.empty()) {
 
         memc->delete_collection("tools");
@@ -163,12 +167,6 @@ int main(int argc, char *argv[]) {
         };
 
         memc->set_progress_callback(progress_callback);
-
-        /*auto res = vdb->list_collections();
-
-        if (res) {
-            std::cout << "Collections: " << *res << "\n\n";
-        }*/
 
         auto native_instructions_toml = toml::parse_file(toolfile);
         auto tools = native_instructions_toml["instruction"].as_array();
@@ -215,7 +213,6 @@ int main(int argc, char *argv[]) {
         ctrlu.init();
 
         ctrlu.process_request(user_input);
-
 
         /*fmt::print("Search text:\n{}\n\n", user_input);
         fmt::print("Tools: {}\n\n", instructions["root"].use);

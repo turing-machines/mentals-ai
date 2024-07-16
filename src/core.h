@@ -53,6 +53,7 @@ extern std::string completion_text;
 using std::to_string;
 using tl::expected, tl::unexpected;
 using json = nlohmann::json;
+namespace fs = std::filesystem;
 
 /// ANSI escape codes for coloring text
 const std::string RED       = "\033[31m";
@@ -253,25 +254,31 @@ struct mem_chunk {
 };
 
 #define guard(method_name) \
-    std::string guard_method_name = method_name; \
+    std::string __method_name = method_name; \
     try {
 
 #define unguard() \
     } catch (const std::out_of_range& e) { \
-        log_exception(guard_method_name, fmt::format("Out of range: {}", e.what())); \
+        log_exception(__method_name, fmt::format("Out of range: {}", e.what())); \
         throw; \
     } catch (const std::regex_error& e) { \
-        log_exception(guard_method_name, fmt::format("RegEx error: {}", e.what())); \
+        log_exception(__method_name, fmt::format("RegEx error: {}", e.what())); \
         throw; \
     } catch (const json::parse_error& e) { \
-        log_exception(guard_method_name, fmt::format("JSON parse error: {}", e.what())); \
+        log_exception(__method_name, fmt::format("JSON parse error: {}", e.what())); \
     } catch (const std::runtime_error& e) { \
-        log_exception(guard_method_name, fmt::format("Runtime error: {}", e.what())); \
+        log_exception(__method_name, fmt::format("Runtime error: {}", e.what())); \
         throw; \
     } catch (const std::exception& e) { \
-        log_exception(guard_method_name, fmt::format("General exception: {}", e.what())); \
+        log_exception(__method_name, fmt::format("General exception: {}", e.what())); \
         throw; \
     } catch (...) { \
-        log_exception(guard_method_name, "Unknown exception"); \
+        log_exception(__method_name, "Unknown exception"); \
+        throw; \
+    }
+
+#define unguard_fs() \
+    } catch (const fs::filesystem_error& e) { \
+        log_exception(__method_name, fmt::format("File system error: {}", e.what())); \
         throw; \
     }

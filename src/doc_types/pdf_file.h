@@ -6,14 +6,15 @@
 
 class PdfFile : public FileInterface {
 public:
-    PdfFile() = default;
+    explicit PdfFile(const std::string& file_path) : FileInterface(file_path) {}
     ~PdfFile() override { close(); }
 
-    expected<void, std::string> open(const std::string& file_path) override;
+    expected<void, std::string> open() override;
     void close() override;
     expected<std::string, std::string> read() override;
     expected<std::string, std::string> read(const std::string& file_path) override;
 
 private:
     std::unique_ptr<poppler::document> __document;
+
 };

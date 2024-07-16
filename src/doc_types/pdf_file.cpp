@@ -1,10 +1,10 @@
 #include "pdf_file.h"
 
-expected<void, std::string> PdfFile::open(const std::string &file_path) {
+expected<void, std::string> PdfFile::open() {
     guard("PdfFile::open");
-    __document.reset(poppler::document::load_from_file(file_path));
+    __document.reset(poppler::document::load_from_file(this->__file_path));
     if (!__document) {
-        return unexpected<std::string>("Error: Unable to open PDF document: " + file_path);
+        return unexpected<std::string>("Error: Unable to open PDF document: " + this->__file_path);
     }
     unguard();
     return {};
@@ -35,7 +35,8 @@ expected<std::string, std::string> PdfFile::read() {
 }
 
 expected<std::string, std::string> PdfFile::read(const std::string& file_path) {
-    auto file_res = open(file_path);
+    this->__file_path = file_path;
+    auto file_res = open();
     if (!file_res) {
         unexpected(file_res.error());
     }

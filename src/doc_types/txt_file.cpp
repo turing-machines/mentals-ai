@@ -1,10 +1,10 @@
 #include "txt_file.h"
 
-expected<void, std::string> TxtFile::open(const std::string& file_path) {
+expected<void, std::string> TxtFile::open() {
     guard("TxtFile::open");
-    __file_stream.open(file_path);
+    __file_stream.open(this->__file_path);
     if (!__file_stream.is_open()) {
-        return unexpected<std::string>("Error: Unable to open text file: " + file_path);
+        return unexpected<std::string>("Error: Unable to open text file: " + this->__file_path);
     }
     is_open = true;
     unguard();
@@ -34,7 +34,8 @@ expected<std::string, std::string> TxtFile::read() {
 }
 
 expected<std::string, std::string> TxtFile::read(const std::string& file_path) {
-    auto file_res = open(file_path);
+    this->__file_path = file_path;
+    auto file_res = open();
     if (!file_res) {
         unexpected(file_res.error());
     }

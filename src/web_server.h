@@ -19,7 +19,6 @@ namespace beast = boost::beast;
 namespace http = beast::http;
 namespace websocket = beast::websocket;
 namespace net = boost::asio;
-namespace fs = boost::filesystem;
 using tcp = net::ip::tcp;
 
 #define ROOT_PAGE "web_ui/chat.html"

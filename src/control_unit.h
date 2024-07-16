@@ -78,6 +78,7 @@ public:
                     msg.created_at = "";
                 }
                 msg.name = chunk.name.value_or("");
+                /// TODO: Valid roles
                 msg.role = chunk.meta.value_or("");
                 msg.content = chunk.content;
                 ctx->add_message(msg);
@@ -168,13 +169,12 @@ public:
 
     void process_response(const std::string& content) {
         guard("ControlUnit::process_response")
+        std::string name = "assistant";
         std::vector<json> j_objects = parse_json_objects(content);
         std::vector<ToolCall> tool_calls;
         for (const auto& j : j_objects) {
             if (j.contains("name")) {
-                ToolCall tool_call;
-                from_json(j, tool_call);
-                tool_calls.push_back(tool_call);
+                tool_calls.push_back(j);
             }
         }
         if (!tool_calls.empty()) {
@@ -184,8 +184,12 @@ public:
             fmt::print("{}\n", j.dump(4));
         } else {
             fmt::print("{}\n\n", content);
+            ctx->add_message(name, name, content);
+            __memc->process_chunks({ content } , name);
+            __memc->write_chunks(MEMORY_MESSAGES, true);
         }
         unguard()
     }
 
 };
+

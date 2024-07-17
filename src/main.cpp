@@ -12,6 +12,7 @@
 #include "memory_controller.h"
 #include "control_unit.h"
 #include "file_manager.h"
+#include "data_transfer.h"
 #include "gen_file.h"
 #include "web_server.h"
 ///#include "terminal_chat.h"
@@ -30,10 +31,13 @@ int main(int argc, char *argv[]) {
 
     CLI::App app{"Mentals - Central Executive Unit for LLM"};
 
-    std::string input, filename, toolfile;
-    app.add_option("-f,--file", filename, "Agent file name to run");
+    bool list_collections = false;
+    std::string input, collection, filename, toolfile;
+    app.add_option("-f,--file", filename, "File name");
+    app.add_option("-c,--collection", collection, "Collection name");
     app.add_option("-i,--input", input, "Input string");
     app.add_option("-t,--tools-write", toolfile, "Write tools from TOML file to memory");
+    app.add_flag("-l,--list-collections", list_collections, "List collections");
     app.add_flag("-d,--debug", debug, "Enable debug mode");
 
     CLI11_PARSE(app, argc, argv);
@@ -71,7 +75,7 @@ int main(int argc, char *argv[]) {
     //WebServer mentals_chat(DEFAULT_ADDRESS, 9002, 8080);
     //mentals_chat.start();
 
- /*   auto llm = std::make_shared<LLMClient>();
+    auto llm = std::make_shared<LLMClient>();
     llm->set_provider(endpoint, api_key);
     llm->set_model(model);
 
@@ -151,10 +155,19 @@ int main(int argc, char *argv[]) {
         }
     }
 */
+    if (list_collections) {
 
-    FileManager fmgr;
-    //json ls = fmgr.list_directory(input);
-    //fmt::print("{}\n\n", ls.dump(4));
+    } else if (!filename.empty() && !collection.empty()) {
+
+        auto fmgr = std::make_shared<FileManager>();
+        DataTransfer dt(fmgr, memc);
+
+        dt.transfer_file(filename, collection);
+
+    }
+
+    ///json ls = fmgr->list_directory(input);
+    ///fmt::print("{}\n\n", ls.dump(4));
     //std::string file_content = fmgr.read_file(input);
     //fmt::print("{}\n\n", file_content);
     /*for (auto it = fmgr.begin(input); it != fmgr.end(); ++it) {

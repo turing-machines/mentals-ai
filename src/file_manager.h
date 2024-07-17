@@ -86,6 +86,7 @@ public:
                 json item_info;
                 item_info["path"] = entry.path().string();
                 item_info["name"] = entry.path().filename().string();
+                item_info["extension"] = FileHelpers::get_file_extension(entry.path().filename());
                 item_info["size"] = entry.is_regular_file() ? fs::file_size(entry.path()) : 0;
                 item_info["created"] = FileHelpers::get_formatted_time(entry.last_write_time());
                 item_info["is_directory"] = entry.is_directory();

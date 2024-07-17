@@ -79,17 +79,17 @@ int main(int argc, char *argv[]) {
     llm->set_provider(endpoint, api_key);
     llm->set_model(model);
 
-    std::unique_ptr<EmbeddingsInterface> emb = std::make_unique<EmbeddingsProvider>();
+    std::shared_ptr<EmbeddingsInterface> emb = std::make_shared<EmbeddingsProvider>();
     emb->set_provider(endpoint, api_key);
     emb->set_model(embedding_model::oai_3small);
 
     std::string conn_info = fmt::format("dbname={} user={} password={} hostaddr={} port={}", 
         dbname, user, password, hostaddr, port);
 
-    std::unique_ptr<PgVector> vdb = std::make_unique<PgVector>(conn_info);
+    std::shared_ptr<PgVector> vdb = std::make_shared<PgVector>(conn_info);
     vdb->connect();
 
-    auto memc = std::make_shared<MemoryController>(std::move(emb), std::move(vdb));
+    auto memc = std::make_shared<MemoryController>(emb, vdb);
 
  /*   memc.delete_collection("books");
     memc.create_collection("books");
@@ -100,7 +100,7 @@ int main(int argc, char *argv[]) {
         //"assets/psychology_and_religion.pdf"
     };
 
-    std::unique_ptr<FileInterface> file = std::make_unique<PdfFile>();
+    std::shared_ptr<FileInterface> file = std::make_shared<PdfFile>();
     for (const auto& file_path : file_paths) {
         fmt::print("{}Loading file: {}{}\n", YELLOW, file_path, RESET);
         auto file_res = file->read(file_path);
@@ -157,12 +157,27 @@ int main(int argc, char *argv[]) {
 */
     if (list_collections) {
 
+        auto lc = vdb->list_collections();
+        if (lc.has_value()) {
+            fmt::print("Collections list\n{}", (*lc).dump(4));
+        }
+
     } else if (!filename.empty() && !collection.empty()) {
+
+        ProgressBar progress_bar("Transfer", "Complete");
+        auto progress_callback = [&progress_bar](double progress) {
+            progress_bar.update(static_cast<float>(progress));
+        };
+        memc->set_progress_callback(progress_callback);
 
         auto fmgr = std::make_shared<FileManager>();
         DataTransfer dt(fmgr, memc);
 
-        dt.transfer_file(filename, collection);
+        if (FileHelpers::is_file(filename)) {
+            dt.transfer_file(filename, collection);
+        } else if (FileHelpers::is_directory(filename)) {
+            dt.transfer_directory_async(filename, collection);
+        }
 
     }
 

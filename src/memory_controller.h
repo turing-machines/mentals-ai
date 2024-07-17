@@ -6,8 +6,8 @@
 
 class MemoryController {
 private:
-    std::unique_ptr<EmbeddingsInterface> __emb;
-    std::unique_ptr<PgVector> __vdb;  /// TODO: MemoryInterface
+    std::shared_ptr<EmbeddingsInterface> __emb;
+    std::shared_ptr<PgVector> __vdb;  /// TODO: MemoryInterface
 
     std::vector<std::future<expected<mem_chunk*, std::string>>> futures;
     std::deque<mem_chunk> chunk_buffer;
@@ -112,7 +112,7 @@ public:
 
 public:
 
-    MemoryController(std::unique_ptr<EmbeddingsInterface> emb, std::unique_ptr<PgVector> vdb)
+    MemoryController(std::shared_ptr<EmbeddingsInterface> emb, std::shared_ptr<PgVector> vdb)
         : __emb(std::move(emb)), __vdb(std::move(vdb)), processed_kb(0), processed_tokens(0)
         , total_chunks(0), processed_chunks(0), written_chunks(0) {}
 

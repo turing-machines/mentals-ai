@@ -5,8 +5,16 @@
 
 class FileHelpers {
 public:
-    static bool file_exists(const std::string& file_path) {
-        return fs::exists(file_path);
+    static bool exists(const std::string& path) {
+        return fs::exists(path);
+    }
+
+    static bool is_directory(const std::string& path) {
+        return fs::is_directory(path);
+    }
+
+    static bool is_file(const std::string& path) {
+        return fs::is_regular_file(path);
     }
 
     static std::string get_file_extension(const std::string &path) {

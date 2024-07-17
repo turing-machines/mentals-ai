@@ -110,25 +110,22 @@ public:
         return false;
     }
 
-    std::string read_file(const std::string& file_path) {
+    expected<std::string, std::string> read_file(const std::string& file_path) {
         guard("FileManager::read_file")
-        if (FileHelpers::file_exists(file_path)) {
+        if (FileHelpers::exists(file_path)) {
             auto file_instance = DocFactory::get_instance(file_path);
             auto open_res = file_instance->open();
             if (open_res.has_value()) {
                 auto result = file_instance->read();
-                if (result.has_value()) { return result.value(); }
-                else {
-                    /// Read error
-                }
+                return result;
             } else {
                 /// Open error
             }
         } else {
-            return fmt::format("File '{}' not exist", file_path);
+            return unexpected(fmt::format("File '{}' not exist", file_path));
         }
         unguard()
-        return "Exception";
+        return unexpected("");
 
     }
 

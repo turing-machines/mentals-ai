@@ -7,8 +7,9 @@ expected<void, std::string> TxtFile::open() {
         return unexpected<std::string>("Error: Unable to open text file: " + this->__file_path);
     }
     is_open = true;
-    unguard();
     return {};
+    unguard();
+    return unexpected<std::string>("Error: Unknown error for file: " + this->__file_path);
 }
 
 void TxtFile::close() {

@@ -1,6 +1,7 @@
 #pragma once
 
 #include "core.h"
+#include "file_helpers.h"
 #include "doc_factory.h"
 
 class FileManager {
@@ -28,7 +29,7 @@ public:
                 item_info["path"] = entry.path().string();
                 item_info["name"] = entry.path().filename().string();
                 item_info["size"] = entry.is_regular_file() ? fs::file_size(entry.path()) : 0;
-                item_info["created"] = get_formatted_time(entry.last_write_time());
+                item_info["created"] = FileHelpers::get_formatted_time(entry.last_write_time());
                 item_info["is_directory"] = entry.is_directory();
                 items.push_back(item_info);
             }
@@ -50,19 +51,26 @@ public:
         return false;
     }
 
-    bool file_exists(const std::string& file_path) {
-        return fs::exists(file_path);
-    }
-
     std::string read_file(const std::string& file_path) {
         guard("FileManager::read_file")
-        DocFactory doc_factory;
-        auto file_instance = doc_factory.get_instance(file_path);
-        auto result = file_instance->read();
-        if (result) { return result.value(); }
-        return "";
+        if (FileHelpers::file_exists(file_path)) {
+            DocFactory doc_factory;
+            auto file_instance = doc_factory.get_instance(file_path);
+            auto open_res = file_instance->open();
+            if (open_res.has_value()) {
+                auto result = file_instance->read();
+                if (result.has_value()) { return result.value(); }
+                else {
+                    /// Read error
+                }
+            } else {
+                /// Open error
+            }
+        } else {
+            return fmt::format("File {} not exist", file_path);
+        }
         unguard()
-        return "Error";
+        return "Exception";
 
     }
 
@@ -75,18 +83,6 @@ public:
         } else { 
             return false; 
         }
-    }
-
-private:
-    std::string get_formatted_time(std::filesystem::file_time_type file_time) {
-        auto sctp = std::chrono::time_point_cast<std::chrono::system_clock::duration>(
-            file_time - std::filesystem::file_time_type::clock::now()
-            + std::chrono::system_clock::now());
-        std::time_t time = std::chrono::system_clock::to_time_t(sctp);
-        std::tm tm = *std::localtime(&time);
-        std::stringstream ss;
-        ss << std::put_time(&tm, "%Y-%m-%d %H:%M:%S");
-        return ss.str();
     }
 
 };

@@ -282,3 +282,4 @@ struct mem_chunk {
         log_exception(__method_name, fmt::format("File system error: {}", e.what())); \
         throw; \
     }
+

@@ -71,7 +71,7 @@ int main(int argc, char *argv[]) {
     //WebServer mentals_chat(DEFAULT_ADDRESS, 9002, 8080);
     //mentals_chat.start();
 
-    auto llm = std::make_shared<LLMClient>();
+ /*   auto llm = std::make_shared<LLMClient>();
     llm->set_provider(endpoint, api_key);
     llm->set_model(model);
 
@@ -152,10 +152,13 @@ int main(int argc, char *argv[]) {
     }
 */
 
-    ///FileManager  fmgn;
+    FileManager  fmgn;
     ///json ls = fmgn.list_directory("src");
-    ///fmt::print("{}\n\n", ls.dump(4)); 
+    ///fmt::print("{}\n\n", ls.dump(4));
+    std::string file_content = fmgn.read_file(input);
+    fmt::print("{}\n\n", file_content);
 
+/*  
     if (!toolfile.empty()) {
 
         memc->delete_collection("tools");
@@ -213,26 +216,7 @@ int main(int argc, char *argv[]) {
         ctrlu.init();
 
         ctrlu.process_request(user_input);
-
-        /*fmt::print("Search text:\n{}\n\n", user_input);
-        fmt::print("Tools: {}\n\n", instructions["root"].use);
-
-        auto search_res = memc->read_chunks("tools", user_input, 5);
-        if (search_res) {
-            json j_chunks = json::array();
-            for (const auto& chunk : *search_res) {
-                j_chunks.push_back(chunk.serialize_json());
-            }
-            std::cout << "Search results:\n" << j_chunks.dump(4) << "\n\n"; 
-        }*/
-
     }
-
-    /*auto info = vdb->get_collection_info("tools");
-    if (info) {
-        std::cout << "tools info: " << (*info).dump(4) << "\n\n";
-    }*/
-
 
 /*
     /// Init central executive

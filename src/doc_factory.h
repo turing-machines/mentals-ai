@@ -4,11 +4,12 @@
 #include "doc_types/txt_file.h"
 #include "doc_types/pdf_file.h"
 #include "doc_types/doc_file.h"
+#include "file_helpers.h"
 
 class DocFactory {
 public:
     std::unique_ptr<FileInterface> get_instance(const std::string &file_path) {
-        std::string extension = get_file_extension(file_path);
+        std::string extension = FileHelpers::get_file_extension(file_path);
         if (is_plain_text_file(file_path)) {
             return std::make_unique<TxtFile>(file_path);
         } else if (extension == "pdf") {

@@ -152,11 +152,15 @@ int main(int argc, char *argv[]) {
     }
 */
 
-    FileManager  fmgn;
-    ///json ls = fmgn.list_directory("src");
-    ///fmt::print("{}\n\n", ls.dump(4));
-    std::string file_content = fmgn.read_file(input);
-    fmt::print("{}\n\n", file_content);
+    FileManager fmgr;
+    //json ls = fmgr.list_directory(input);
+    //fmt::print("{}\n\n", ls.dump(4));
+    //std::string file_content = fmgr.read_file(input);
+    //fmt::print("{}\n\n", file_content);
+    /*for (auto it = fmgr.begin(input); it != fmgr.end(); ++it) {
+        const auto& entry = *it;
+        std::cout << entry.path() << std::endl;
+    }*/
 
 /*  
     if (!toolfile.empty()) {

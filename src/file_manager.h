@@ -6,6 +6,63 @@
 
 class FileManager {
 public:
+    class DirectoryIterator {
+    public:
+        using iterator_category = std::input_iterator_tag;
+        using value_type = fs::directory_entry;
+        using difference_type = std::ptrdiff_t;
+        using pointer = const fs::directory_entry*;
+        using reference = const fs::directory_entry&;
+
+        DirectoryIterator() : __it(), __is_end(true) {}
+        DirectoryIterator(const std::string& dir_path) : __it(fs::directory_iterator(dir_path)), __is_end(false) {
+            if (__it == fs::end(__it)) __is_end = true;
+        }
+        DirectoryIterator(const fs::directory_iterator& it, bool is_end = false) : __it(it), __is_end(is_end) {}
+
+        reference operator*() const { return *__it; }
+        pointer operator->() const { return &(*__it); }
+
+        DirectoryIterator& operator++() {
+            if (!__is_end) {
+                ++__it;
+                if (__it == fs::end(__it)) __is_end = true;
+            }
+            return *this;
+        }
+
+        DirectoryIterator operator++(int) {
+            DirectoryIterator tmp = *this;
+            ++(*this);
+            return tmp;
+        }
+
+        friend bool operator==(const DirectoryIterator& a, const DirectoryIterator& b) {
+            return a.__it == b.__it && a.__is_end == b.__is_end;
+        }
+
+        friend bool operator!=(const DirectoryIterator& a, const DirectoryIterator& b) {
+            return !(a == b);
+        }
+
+    private:
+        fs::directory_iterator __it;
+        bool __is_end;
+    };
+
+    DirectoryIterator begin(const std::string& dir_path) {
+        guard("DirectoryIterator::begin")
+        if (fs::exists(dir_path) && fs::is_directory(dir_path)) {
+            return DirectoryIterator(dir_path);
+        }
+        unguard_fs()
+        return DirectoryIterator();
+    }
+
+    DirectoryIterator end() {
+        return DirectoryIterator(fs::directory_iterator(), true);
+    }
+
     bool create_directory(const std::string& dir_path) {
         guard("FileManager::create_directory")
         return fs::create_directory(dir_path);
@@ -24,7 +81,8 @@ public:
         guard("FileManager::list_directory")
         json items = json::array();
         if (fs::exists(dir_path) && fs::is_directory(dir_path)) {
-            for (const auto& entry : fs::directory_iterator(dir_path)) {
+            for (auto it = begin(dir_path); it != end(); ++it) {
+                const auto& entry = *it;
                 json item_info;
                 item_info["path"] = entry.path().string();
                 item_info["name"] = entry.path().filename().string();
@@ -54,8 +112,7 @@ public:
     std::string read_file(const std::string& file_path) {
         guard("FileManager::read_file")
         if (FileHelpers::file_exists(file_path)) {
-            DocFactory doc_factory;
-            auto file_instance = doc_factory.get_instance(file_path);
+            auto file_instance = DocFactory::get_instance(file_path);
             auto open_res = file_instance->open();
             if (open_res.has_value()) {
                 auto result = file_instance->read();
@@ -67,7 +124,7 @@ public:
                 /// Open error
             }
         } else {
-            return fmt::format("File {} not exist", file_path);
+            return fmt::format("File '{}' not exist", file_path);
         }
         unguard()
         return "Exception";

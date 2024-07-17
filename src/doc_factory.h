@@ -8,7 +8,7 @@
 
 class DocFactory {
 public:
-    std::unique_ptr<FileInterface> get_instance(const std::string &file_path) {
+    static std::unique_ptr<FileInterface> get_instance(const std::string &file_path) {
         std::string extension = FileHelpers::get_file_extension(file_path);
         if (is_plain_text_file(file_path)) {
             return std::make_unique<TxtFile>(file_path);
@@ -22,7 +22,7 @@ public:
     }
 
 private:
-    bool is_plain_text_file(const std::string& file_path) {
+    static bool is_plain_text_file(const std::string& file_path) {
         std::ifstream file(file_path, std::ios::binary);
         if (!file) { return false; }
         char c;

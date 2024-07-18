@@ -8,9 +8,9 @@ class FileManager {
 public:
     class DirectoryIterator {
     public:
-        using iterator_category = std::input_iterator_tag;
-        using value_type = fs::directory_entry;
-        using difference_type = std::ptrdiff_t;
+        ///using iterator_category = std::input_iterator_tag;
+        ///using value_type = fs::directory_entry;
+        ///using difference_type = std::ptrdiff_t;
         using pointer = const fs::directory_entry*;
         using reference = const fs::directory_entry&;
 

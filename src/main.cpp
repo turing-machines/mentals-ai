@@ -172,13 +172,12 @@ int main(int argc, char *argv[]) {
     
         auto fmgr = std::make_shared<FileManager>();
 
-        ///DataTransfer<FileManager, MemoryController> dt(fmgr, memc);
-        DataTransfer dt(fmgr, memc);
-
+        /// FileManager -> MemoryController
+        DataTransfer<FileManager, MemoryController> fs2memory(fmgr, memc);
         if (FileHelpers::is_file(path)) {
-            dt.transfer_file(path, collection);
+            fs2memory.transfer(path, collection);
         } else if (FileHelpers::is_directory(path)) {
-            dt.transfer_files_async(path, collection);
+            fs2memory.bulk_transfer(path, collection);
         }
 
     }

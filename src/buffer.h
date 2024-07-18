@@ -2,6 +2,7 @@
 
 #include "core.h"
 
+
 template <typename T>
 class Buffer {
 public:
@@ -9,10 +10,10 @@ public:
 
     virtual void set_data(const T& data) = 0;
     virtual T get_data() const = 0;
-    virtual void append(const typename T::value_type& data) = 0;
+    virtual void append(const T& data) = 0;
+    virtual void push_back(const typename T::value_type& data) = 0;
     virtual void clear() = 0;
     virtual size_t size() const = 0;
-
 };
 
 
@@ -22,7 +23,8 @@ public:
 
     void set_data(const std::string& str) override { buffer = str; }
     std::string get_data() const override { return buffer; }
-    void append(const char& c) override { buffer += c; }
+    void append(const std::string& str) override { buffer += str; }
+    void push_back(const char& c) override { buffer += c; }
     void clear() override { buffer.clear(); }
     size_t size() const override { return buffer.size(); }
 
@@ -47,7 +49,12 @@ public:
         return chunk_buffer;
     }
 
-    void append(const T& chunk) override {
+    void append(const std::deque<T>& chunks) override {
+        std::lock_guard<std::mutex> lock(chunk_buffer_mutex);
+        chunk_buffer.insert(chunk_buffer.end(), chunks.begin(), chunks.end());
+    }
+
+    void push_back(const typename std::deque<T>::value_type& chunk) override {
         std::lock_guard<std::mutex> lock(chunk_buffer_mutex);
         chunk_buffer.emplace_back(chunk);
     }

@@ -33,29 +33,21 @@ private:
         }
     }
 
-    expected<mem_chunk*, std::string> chunk_embeddings(
-        const std::string& content_id,
-        const int chunk_id,
-        const std::string& content,
-        const std::optional<std::string>& name = std::nullopt,
-        const std::optional<std::string>& meta = std::nullopt
-    ) {
+    expected<mem_chunk*, std::string> chunk_embeddings(mem_chunk& chunk) {
         guard("MemoryController::chunk_embeddings")
-        ///fmt::print("{}mem_chunk #{}#{}: Embedding started.\n", RESET, content_id, chunk_id);
-        std::string cleaned_content = content;
-        if (!is_valid_utf8(content)) {
-            fmt::print("{}Warning: Invalid UTF-8 byte in content for chunk #{}#{}. Cleaning..{}\n", MAGENTA, content_id, chunk_id, RESET);
-            cleaned_content = remove_invalid_utf8(content);
+        std::string cleaned_content = chunk.content;
+        if (!is_valid_utf8(chunk.content)) {
+            fmt::print("{}Warning: Invalid UTF-8 byte in content for chunk #{}#{}. Cleaning..{}\n", MAGENTA, chunk.content_id, chunk.chunk_id, RESET);
+            cleaned_content = remove_invalid_utf8(chunk.content);
         }
         std::future<liboai::Response> future_res = __emb->embeddings_async(cleaned_content);
         liboai::Response response = future_res.get();
         processed_tokens += response["usage"]["total_tokens"].get<int>();
         json jres = response["data"][0]["embedding"];
         vdb::vector embedding({ jres.begin(), jres.end() }, __emb->get_model());
-        ///fmt::print("{}mem_chunk #{}#{}: Embedding completed.\n", RESET, content_id, chunk_id);
-        chunk_buffer.append(mem_chunk{
-            content_id, chunk_id, cleaned_content, embedding, name, meta
-        });
+        chunk.embedding = embedding;
+        chunk.content = cleaned_content;
+        chunk_buffer.push_back(chunk);
         size_t size_in_bytes = cleaned_content.size();
         double size_in_kb = static_cast<double>(size_in_bytes) / 1024.0;
         processed_kb += size_in_kb;
@@ -94,12 +86,14 @@ public:
 
     void set_progress_callback(ProgressCallback callback) { progress_callback = callback; }
 
+    /// TODO: Deprecate from this class
     void create_collection(const std::string& collection) {
         __vdb->create_collection(collection, __emb->get_model());
     }
     void delete_collection(const std::string& collection) {
         __vdb->delete_collection(collection);
     }
+    ///
 
     void process_chunks( 
         const std::vector<std::string>& chunks,
@@ -113,10 +107,10 @@ public:
             else { content_id = gen_index(); }
         for (size_t chunk_id = 0; chunk_id < chunks.size(); ++chunk_id) {
             std::string chunk_content = chunks[chunk_id];
+            mem_chunk chunk { content_id, static_cast<int>(chunk_id), chunk_content, name, meta };
             ///fmt::print("{}mem_chunk #{}#{}: Processing started.\n", RESET, content_id, chunk_id);
             futures.push_back(std::async(std::launch::async, 
-                &MemoryController::chunk_embeddings, this, 
-                content_id, chunk_id, chunk_content, name, meta
+                &MemoryController::chunk_embeddings, this, std::ref(chunk)
             ));
         }
     }

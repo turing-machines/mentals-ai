@@ -230,6 +230,9 @@ struct mem_chunk {
         : content_id(content_id), chunk_id(chunk_id), content(content), embedding(embedding), 
         name(name) {}
     mem_chunk(const std::string& content_id, int chunk_id, const std::string& content, 
+        const std::optional<std::string>& name, const std::optional<std::string>& meta)
+        : content_id(content_id), chunk_id(chunk_id), content(content), name(name), meta(meta) {}
+    mem_chunk(const std::string& content_id, int chunk_id, const std::string& content, 
         const vdb::vector& embedding, const std::optional<std::string>& name, 
         const std::optional<std::string>& meta)
         : content_id(content_id), chunk_id(chunk_id), content(content), embedding(embedding), 

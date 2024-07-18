@@ -79,7 +79,8 @@
         "cfenv": "cpp",
         "typeindex": "cpp",
         "*.ipp": "cpp",
-        "*.header": "c"
+        "*.header": "c",
+        "unordered_set": "cpp"
     },
     "cmake.sourceDirectory": "/home/costa-al/control_unit/liboai",
     "makefile.launchConfigurations": [

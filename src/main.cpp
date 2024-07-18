@@ -32,8 +32,8 @@ int main(int argc, char *argv[]) {
     CLI::App app{"Mentals - Central Executive Unit for LLM"};
 
     bool list_collections = false;
-    std::string input, collection, filename, toolfile;
-    app.add_option("-f,--file", filename, "File name");
+    std::string input, collection, path, toolfile;
+    app.add_option("-p,--path", path, "File or directory path");
     app.add_option("-c,--collection", collection, "Collection name");
     app.add_option("-i,--input", input, "Input string");
     app.add_option("-t,--tools-write", toolfile, "Write tools from TOML file to memory");
@@ -162,21 +162,23 @@ int main(int argc, char *argv[]) {
             fmt::print("Collections list\n{}", (*lc).dump(4));
         }
 
-    } else if (!filename.empty() && !collection.empty()) {
+    } else if (!path.empty() && !collection.empty()) {
 
         ProgressBar progress_bar("Transfer", "Complete");
         auto progress_callback = [&progress_bar](double progress) {
             progress_bar.update(static_cast<float>(progress));
         };
         memc->set_progress_callback(progress_callback);
-
+    
         auto fmgr = std::make_shared<FileManager>();
+
+        ///DataTransfer<FileManager, MemoryController> dt(fmgr, memc);
         DataTransfer dt(fmgr, memc);
 
-        if (FileHelpers::is_file(filename)) {
-            dt.transfer_file(filename, collection);
-        } else if (FileHelpers::is_directory(filename)) {
-            dt.transfer_directory_async(filename, collection);
+        if (FileHelpers::is_file(path)) {
+            dt.transfer_file(path, collection);
+        } else if (FileHelpers::is_directory(path)) {
+            dt.transfer_files_async(path, collection);
         }
 
     }
@@ -223,7 +225,7 @@ int main(int argc, char *argv[]) {
 
         memc->write_chunks("tools");
 
-    } else if (filename.empty() && !input.empty()) {
+    } else if (path.empty() && !input.empty()) {
 
         memc->create_collection("messages");
 
@@ -236,12 +238,12 @@ int main(int argc, char *argv[]) {
         ///TerminalChat chat_app;
         ///chat_app.run();
 
-    } else if (!filename.empty()) {
+    } else if (!path.empty()) {
 
         memc->create_collection("messages");
 
         GenFile gen;
-        auto [variables, instructions] = gen.load_from_file(filename);
+        auto [variables, instructions] = gen.load_from_file(path);
         std::string user_input = instructions["root"].prompt;
 
         ControlUnit ctrlu(std::move(llm), std::move(memc));
@@ -268,7 +270,7 @@ int main(int argc, char *argv[]) {
 
     /// Load agent file
     GenFile gen;
-    auto [variables, instructions] = gen.load_from_file(filename);
+    auto [variables, instructions] = gen.load_from_file(path);
 
     /// Render variables
     /// TODO: Move into GenFile class

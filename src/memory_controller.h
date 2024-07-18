@@ -1,6 +1,7 @@
 #pragma once
 
 #include "core.h"
+#include "buffer.h"
 #include "pgvector.h"
 #include "embeddings.h"
 
@@ -10,8 +11,7 @@ private:
     std::shared_ptr<PgVector> __vdb;  /// TODO: MemoryInterface
 
     std::vector<std::future<expected<mem_chunk*, std::string>>> futures;
-    std::deque<mem_chunk> chunk_buffer;
-    std::mutex chunk_buffer_mutex;
+    SafeChunkBuffer<mem_chunk> chunk_buffer;
 
     /// Stats
     double processed_kb;
@@ -53,8 +53,7 @@ private:
         json jres = response["data"][0]["embedding"];
         vdb::vector embedding({ jres.begin(), jres.end() }, __emb->get_model());
         ///fmt::print("{}mem_chunk #{}#{}: Embedding completed.\n", RESET, content_id, chunk_id);
-        std::lock_guard<std::mutex> lock(chunk_buffer_mutex);
-        chunk_buffer.emplace_back(mem_chunk{
+        chunk_buffer.append(mem_chunk{
             content_id, chunk_id, cleaned_content, embedding, name, meta
         });
         size_t size_in_bytes = cleaned_content.size();
@@ -70,45 +69,17 @@ private:
 public:
     expected<mem_chunk*, std::string> buf_get_chunk(const std::string& content) {
         guard("MemoryController::buf_get_chunk")
-        std::lock_guard<std::mutex> lock(chunk_buffer_mutex);
-        for (auto& chunk : chunk_buffer) {
-            if (chunk.content == content) {
-                return &chunk;
-            }
+        auto chunk_result = chunk_buffer.get_chunk([&content](const mem_chunk& chunk) {
+            return chunk.content == content;
+        });
+        if (chunk_result.has_value()) {
+            return *chunk_result;
         }
         unguard()
         return unexpected("mem_chunk not found");
     }
 
-    expected<void, std::string> buf_remove_chunk(const std::string& content) {
-        guard("MemoryController::buf_remove_chunk")
-        std::lock_guard<std::mutex> lock(chunk_buffer_mutex);
-        auto it = std::find_if(chunk_buffer.begin(), chunk_buffer.end(),
-            [&content](const mem_chunk& chunk) {
-                return chunk.content == content;
-            });
-        if (it != chunk_buffer.end()) {
-            chunk_buffer.erase(it);
-            return {};
-        }
-        unguard()
-        return unexpected("mem_chunk not found");
-    }
-
-    void buf_clear() {
-        std::lock_guard<std::mutex> lock(chunk_buffer_mutex);
-        chunk_buffer.clear();
-    }
-
-    size_t buf_get_chunks_count() {
-        std::lock_guard<std::mutex> lock(chunk_buffer_mutex);
-        return chunk_buffer.size();
-    }
-
-    std::vector<mem_chunk> buf_get_all_chunks() {
-        std::lock_guard<std::mutex> lock(chunk_buffer_mutex);
-        return std::vector<mem_chunk>(chunk_buffer.begin(), chunk_buffer.end());
-    }
+    void buf_clear() { chunk_buffer.clear(); }
 
 public:
 
@@ -178,7 +149,7 @@ public:
             "{:.2f} MB of data processed\n",
             chunk_buffer.size(), failed_chunks.size(), processed_tokens, processed_kb / 1024.0);
         futures.clear();
-        if (clear_buffer) { buf_clear(); }
+        if (clear_buffer) { chunk_buffer.clear(); }
         processed_kb = 0;
         processed_tokens = 0;
         total_chunks = 0;

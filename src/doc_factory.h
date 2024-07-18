@@ -26,8 +26,8 @@ public:
     static std::optional<std::string> is_supported(const std::string &file_path) {
         std::string extension = FileHelpers::get_file_extension(file_path);
         if (is_plain_text_file(file_path)) { return "plain_text"; }
-        static const std::unordered_set<std::string> supported_extensions = { "pdf", "doc", "docx" };
-        if (supported_extensions.find(extension) != supported_extensions.end()) { return extension; }
+        static const std::unordered_set<std::string> supported_formats = { "pdf", "doc", "docx" };
+        if (supported_formats.find(extension) != supported_formats.end()) { return extension; }
         return std::nullopt;
     }
 

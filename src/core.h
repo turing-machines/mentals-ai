@@ -45,6 +45,8 @@
 
 #define MAX_INTEGER std::numeric_limits<int>::max()
 
+#define SENTENCES_PER_CHUNK 20
+
 extern bool debug;
 extern std::atomic<bool> spinner_active;
 extern std::thread spinner_thread;

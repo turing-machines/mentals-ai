@@ -15,6 +15,8 @@ private:
 public:
     NaiveChunker(int sentences_per_chunk) : __sentences_per_chunk(sentences_per_chunk) {}
 
+    /// TODO: Overload StringBuffer->SafeChunkBuffer
+
     expected<std::vector<std::string>, std::string> process(const std::string& text) const override {
         guard("NaiveChunker::process")
         std::vector<std::string> chunks;
@@ -41,6 +43,23 @@ public:
             chunks.push_back(chunk);
         }
         return chunks;
+        unguard()
+        return unexpected("Error during chunking");
+    }
+
+    expected<std::shared_ptr<SafeChunkBuffer<std::string>>, std::string> 
+    process(const StringBuffer& input_buffer) const {
+        guard("NaiveChunker::process(StringBuffer)")
+        std::string text = input_buffer.get_data();
+        auto result = process(text);
+        if (result.has_value()) {
+            auto chunk_buffer = std::make_shared<SafeChunkBuffer<std::string>>();
+            /// TODO: Overload set_data to handle std::vector<T>
+            ///chunk_buffer->set_data(result.value());
+            return chunk_buffer;
+        } else {
+            return unexpected(result.error());
+        }
         unguard()
         return unexpected("Error during chunking");
     }

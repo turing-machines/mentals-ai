@@ -5,7 +5,6 @@
 #include "file_manager.h"
 #include "memory_controller.h"
 
-#define SENTENCES_PER_CHUNK 20
 
 /// TODO: implement pipeline pattern
 template <typename Source, typename Target>

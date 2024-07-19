@@ -175,19 +175,31 @@ int main(int argc, char *argv[]) {
 
 
         PipelineFactory factory;
-        factory.register_stage_with_arg<FileToStringBuffer>("FileToStringBuffer", fmgr);
+        factory.register_stage_with_args<FileToStringBuffer>("FileToStringBuffer", fmgr);
         factory.register_stage<StringBufferToChunkBuffer<std::string>>("StringBufferToChunkBuffer");
 
         Pipeline<std::string, SafeChunkBuffer<std::string>> pipeline(factory);
         pipeline.add_stage("FileToStringBuffer");
         pipeline.add_stage("StringBufferToChunkBuffer");
 
-        ///auto p_input = std::make_shared<std::string>(path);
-        auto result = pipeline.lfg(path);
+        pipeline.async_result_handler([](
+            const std::string& input,
+            std::shared_ptr<SafeChunkBuffer<std::string>> result
+        ) {
+            if (result) {
+                std::cout << "Res:\n---\n" << result->get_data()[0] << "\n\n";
+            }
+        });
 
-        if (result) {
-            std::cout << "Res:\n---\n" << result->get_data()[0] << "\n\n";
-        }
+        ///auto p_input = std::make_shared<std::string>(path);
+        //auto result = pipeline.lfg(path);
+
+        pipeline.lfg_async(path);
+        pipeline.lfg_async(collection);
+
+        ///if (result) {
+        ///    std::cout << "Res:\n---\n" << result->get_data()[0] << "\n\n";
+        ///}
 
         /*/// FileManager -> MemoryController
         DataTransfer<FileManager, MemoryController> fs2memory(fmgr, memc);

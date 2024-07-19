@@ -46,10 +46,7 @@ public:
 
     void set_data(const std::vector<T>& chunks) {
         std::lock_guard<std::mutex> lock(chunk_buffer_mutex);
-        chunk_buffer.clear();
-        for (const auto& chunk : chunks) {
-            chunk_buffer.emplace_back(chunk);
-        }
+        chunk_buffer.assign(chunks.begin(), chunks.end());
     }
 
     std::deque<T> get_data() const override {

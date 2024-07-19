@@ -258,6 +258,10 @@ struct mem_chunk {
     }
 };
 
+///
+/// TODO: Refine to work with custom handlers
+/// Add diffrenet types of exception handling: info, warning, error, etc.
+///
 #define guard(method_name) \
     std::string __method_name = method_name; \
     try {

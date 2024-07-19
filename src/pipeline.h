@@ -74,16 +74,14 @@ public:
         __creators[stage_name] = []() { return std::make_shared<Stage>(); };
     }
 
-    template<typename Stage, typename Arg>
-    void register_stage_with_arg(const std::string& stage_name, Arg arg) {
-        __creators[stage_name] = [arg]() { return std::make_shared<Stage>(arg); };
+    template<typename Stage, typename... Args>
+    void register_stage_with_args(const std::string& stage_name, Args... args) {
+        __creators[stage_name] = [args...]() { return std::make_shared<Stage>(args...); };
     }
 
     std::shared_ptr<void> create_stage(const std::string& stage_name) {
         auto it = __creators.find(stage_name);
-        if (it != __creators.end()) {
-            return it->second();
-        }
+        if (it != __creators.end()) { return it->second(); }
         return nullptr;
     }
 
@@ -96,32 +94,51 @@ private:
 template <typename In, typename Out>
 class Pipeline {
 public:
+    using ResultHandler = std::function<void(const In&, std::shared_ptr<Out>)>;
+    void async_result_handler(ResultHandler handler) { result_handler = handler; }
+
     Pipeline(PipelineFactory& factory) : __factory(factory) {}
 
     void add_stage(const std::string& stage_name) {
+        guard("Pipeline::add_stage")
         auto stage = std::static_pointer_cast<PipelineStage<In, Out>>(__factory.create_stage(stage_name));
-        if (stage) {
-            __stages.push_back(stage);
-        } else {
-            fmt::print("Error: Unknown stage name {}\n", stage_name);
-        }
+        if (stage) { __stages.emplace_back(stage_name, stage);
+        } else { fmt::print("Error: Unknown stage name {}\n", stage_name); }
+        unguard()
     }
 
     std::shared_ptr<Out> lfg(const In& input) {
+        guard("Pipeline::lfg")
         std::shared_ptr<void> intermediate = std::make_shared<In>(input);
-        for (const auto& stage : __stages) {
+        for (const auto& [stage_name, stage] : __stages) {
             intermediate = stage->process(std::static_pointer_cast<In>(intermediate));
             if (!intermediate) {
-                std::cout << "Pipeline stage failed. Stopping pipeline.\n";
+                fmt::print("Pipeline stage '{}' failed. Stopping pipeline.\n", stage_name);
                 return nullptr;
             }
         }
         return std::static_pointer_cast<Out>(intermediate);
+        unguard()
+        return nullptr;
+    }
+
+    void lfg_async(const In& input) {
+        guard("Pipeline::lfg_async")
+        std::lock_guard<std::mutex> lock(queue_mutex);
+        auto future = std::async(std::launch::async, [this, input]() {
+            auto result = this->lfg(input);
+            if (result_handler) { result_handler(input, result); }
+            return result;
+        });
+        async_queue.emplace_back(std::move(future));
+        unguard()
     }
 
 private:
-    std::vector<std::shared_ptr<PipelineStage<In, Out>>> __stages;
     PipelineFactory& __factory;
+    std::vector<std::pair<std::string, std::shared_ptr<PipelineStage<In, Out>>>> __stages;
+    std::vector<std::future<std::shared_ptr<Out>>> async_queue;
+    std::mutex queue_mutex;
+    ResultHandler result_handler;
 
 };
-

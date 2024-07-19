@@ -12,6 +12,7 @@
 #include "memory_controller.h"
 #include "control_unit.h"
 #include "file_manager.h"
+#include "pipeline.h"
 #include "data_transfer.h"
 #include "gen_file.h"
 #include "web_server.h"
@@ -172,13 +173,29 @@ int main(int argc, char *argv[]) {
     
         auto fmgr = std::make_shared<FileManager>();
 
-        /// FileManager -> MemoryController
+
+        PipelineFactory factory;
+        factory.register_stage_with_arg<FileToStringBuffer>("FileToStringBuffer", fmgr);
+        factory.register_stage<StringBufferToChunkBuffer<std::string>>("StringBufferToChunkBuffer");
+
+        Pipeline<std::string, SafeChunkBuffer<std::string>> pipeline(factory);
+        pipeline.add_stage("FileToStringBuffer");
+        pipeline.add_stage("StringBufferToChunkBuffer");
+
+        ///auto p_input = std::make_shared<std::string>(path);
+        auto result = pipeline.lfg(path);
+
+        if (result) {
+            std::cout << "Res:\n---\n" << result->get_data()[0] << "\n\n";
+        }
+
+        /*/// FileManager -> MemoryController
         DataTransfer<FileManager, MemoryController> fs2memory(fmgr, memc);
         if (FileHelpers::is_file(path)) {
             fs2memory.transfer(path, collection);
         } else if (FileHelpers::is_directory(path)) {
             fs2memory.bulk_transfer(path, collection);
-        }
+        }*/
 
     }
 

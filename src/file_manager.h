@@ -8,9 +8,6 @@ class FileManager {
 public:
     class DirectoryIterator {
     public:
-        ///using iterator_category = std::input_iterator_tag;
-        ///using value_type = fs::directory_entry;
-        ///using difference_type = std::ptrdiff_t;
         using pointer = const fs::directory_entry*;
         using reference = const fs::directory_entry&;
 
@@ -110,23 +107,26 @@ public:
         return false;
     }
 
-    expected<std::string, std::string> read_file(const std::string& file_path) {
+    expected<StringBuffer, std::string> read_file(const std::string& file_path) {
         guard("FileManager::read_file")
         if (FileHelpers::exists(file_path)) {
             auto file_instance = DocFactory::get_instance(file_path);
-            auto open_res = file_instance->open();
-            if (open_res.has_value()) {
-                auto result = file_instance->read();
-                return result;
+            if (file_instance) {
+                auto open_res = file_instance->open();
+                if (open_res.has_value()) {
+                    auto result = file_instance->read();
+                    return result;
+                } else {
+                    /// Open error
+                }
             } else {
-                /// Open error
+                /// Not supported
             }
         } else {
             return unexpected(fmt::format("File '{}' not exist", file_path));
         }
         unguard()
         return unexpected("");
-
     }
 
     /// TODO: DocFactory depending on file type

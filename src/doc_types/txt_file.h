@@ -10,8 +10,8 @@ public:
 
     expected<void, std::string> open() override;
     void close() override;
-    expected<std::string, std::string> read() override;
-    expected<std::string, std::string> read(const std::string& file_path) override;
+    expected<StringBuffer, std::string> read() override;
+    expected<StringBuffer, std::string> read(const std::string& file_path) override;
 
 private:
     std::ifstream __file_stream;

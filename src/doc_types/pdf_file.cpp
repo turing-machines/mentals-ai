@@ -14,7 +14,7 @@ void PdfFile::close() {
     __document.reset();
 }
 
-expected<std::string, std::string> PdfFile::read() {
+expected<StringBuffer, std::string> PdfFile::read() {
     guard("PdfFile::read");
     if (!__document) {
         return unexpected<std::string>("Error: No document is open.");
@@ -29,12 +29,14 @@ expected<std::string, std::string> PdfFile::read() {
         content << "Page " << i + 1 << ":\n";
         content << page->text().to_latin1() << "\n";
     }
-    return content.str();
+    StringBuffer buffer;
+    buffer.append(content.str());
+    return buffer;
     unguard();
     return {};
 }
 
-expected<std::string, std::string> PdfFile::read(const std::string& file_path) {
+expected<StringBuffer, std::string> PdfFile::read(const std::string& file_path) {
     this->__file_path = file_path;
     auto file_res = open();
     if (!file_res) {

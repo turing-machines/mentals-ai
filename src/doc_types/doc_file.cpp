@@ -18,7 +18,7 @@ expected<void, std::string> DocFile::open() {
 
 void DocFile::close() {}
 
-expected<std::string, std::string> DocFile::read() {
+expected<StringBuffer, std::string> DocFile::read() {
     guard("DocFile::read");
     if (this->__file_path.empty()) {
         return unexpected<std::string>("Error: No document file is open.");
@@ -29,15 +29,17 @@ expected<std::string, std::string> DocFile::read() {
         return unexpected<std::string>("Error: Unable to read text content from document.");
     }
     std::stringstream content;
+    StringBuffer buffer;
     content << text_file.rdbuf();
+    buffer.append(content.str());
     text_file.close();
     std::remove(text_file_path.c_str());
-    return content.str();
+    return buffer;
     unguard();
     return {};
 }
 
-expected<std::string, std::string> DocFile::read(const std::string& file_path) {
+expected<StringBuffer, std::string> DocFile::read(const std::string& file_path) {
     this->__file_path = file_path;
     auto open_res = open();
     if (!open_res) {

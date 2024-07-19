@@ -19,22 +19,23 @@ void TxtFile::close() {
     }
 }
 
-expected<std::string, std::string> TxtFile::read() {
+expected<StringBuffer, std::string> TxtFile::read() {
     guard("TxtFile::read");
     if (!is_open) {
         return unexpected<std::string>("Error: No text file is open.");
     }
-    std::stringstream content;
+    StringBuffer buffer;
     std::string line;
     while (std::getline(__file_stream, line)) {
-        content << line << "\n";
+        buffer.append(line);
+        buffer.push_back('\n');
     }
-    return content.str();
+    return buffer;
     unguard();
     return {};
 }
 
-expected<std::string, std::string> TxtFile::read(const std::string& file_path) {
+expected<StringBuffer, std::string> TxtFile::read(const std::string& file_path) {
     this->__file_path = file_path;
     auto file_res = open();
     if (!file_res) {

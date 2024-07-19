@@ -1,6 +1,7 @@
 #pragma once
 
 #include "core.h"
+#include "buffer.h"
 
 class FileInterface {
 public:
@@ -9,8 +10,8 @@ public:
 
     virtual expected<void, std::string> open() = 0;
     virtual void close() = 0;
-    virtual expected<std::string, std::string> read() = 0;
-    virtual expected<std::string, std::string> read(const std::string& file_path) = 0;
+    virtual expected<StringBuffer, std::string> read() = 0;
+    virtual expected<StringBuffer, std::string> read(const std::string& file_path) = 0;
 
 protected:
     std::string __file_path;

@@ -107,6 +107,11 @@ public:
         return std::vector<T>(chunk_buffer.begin(), chunk_buffer.end());
     }
 
+    /// Unsafe iterator
+    typename std::deque<T>::iterator begin() { return chunk_buffer.begin(); }
+    typename std::deque<T>::iterator end() { return chunk_buffer.end(); }
+    typename std::deque<T>::iterator erase(typename std::deque<T>::iterator it) { return chunk_buffer.erase(it); }
+
 private:
     std::deque<T> chunk_buffer;
     mutable std::mutex chunk_buffer_mutex;

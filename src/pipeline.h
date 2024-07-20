@@ -105,18 +105,14 @@ public:
 };
 
 
-/*template <typename T>
+template <typename T>
 class ChunkBufferToMemoryController : public PipelineStage<SafeChunkBuffer<T>, void> {
 public:
     ChunkBufferToMemoryController(const std::shared_ptr<MemoryController>& memory_controller)
         : __memory_controller(memory_controller) {}
 
-    std::shared_ptr<void> process(const std::shared_ptr<SafeChunkBuffer<T>>& chunk_buffer) override {
-        /// TODO: Move or copy data
-        auto chunks = std::make_shared<std::vector<std::string>>(chunk_buffer->get_data());
-        std::optional<std::string> name = std::nullopt;
-        std::optional<std::string> meta = std::nullopt;
-        __memory_controller->process_chunks(*chunks, name, meta);
+    std::shared_ptr<void> process_stage(const std::shared_ptr<SafeChunkBuffer<T>>& chunk_buffer) override {
+        __memory_controller->process_chunks(*chunk_buffer);
         return std::make_shared<int>(0);
     }
 
@@ -124,7 +120,7 @@ private:
     std::shared_ptr<MemoryController> __memory_controller;
 
 };
-*/
+
 
 class PipelineFactory {
 public:

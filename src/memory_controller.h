@@ -95,22 +95,25 @@ public:
     }
     ///
 
-    void process_chunks( 
-        const std::vector<std::string>& chunks,
+    void process_chunks(
+        SafeChunkBuffer<std::string>& chunks,
         const std::optional<std::string>& name = std::nullopt,
         const std::optional<std::string>& meta = std::nullopt
     ) {
         total_chunks += chunks.size();
         update_progress();
         std::string content_id;
-        if (name && !name->empty()) { content_id = gen_index(*name); } else { content_id = gen_index(); }
-        for (size_t chunk_id = 0; chunk_id < chunks.size(); ++chunk_id) {
-            std::string chunk_content = chunks[chunk_id];
-            mem_chunk chunk { content_id, static_cast<int>(chunk_id), chunk_content, name, meta };
-            ///fmt::print("{}mem_chunk #{}#{}: Processing started.\n", RESET, content_id, chunk_id);
-            futures.push_back(std::async(std::launch::async, 
-                &MemoryController::chunk_embeddings, this, std::move(chunk)
-            ));
+        if (name && !name->empty()) { content_id = gen_index(*name); }
+        else { content_id = gen_index(); }
+        for (auto it = chunks.begin(); it != chunks.end(); ) {
+            mem_chunk chunk{ 
+                content_id, 
+                static_cast<int>(total_chunks - chunks.size()), 
+                *it,
+                name, meta
+            };
+            futures.push_back(std::async(std::launch::async, &MemoryController::chunk_embeddings, this, std::move(chunk)));
+            it = chunks.erase(it);
         }
     }
 

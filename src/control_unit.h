@@ -114,7 +114,7 @@ public:
         control_unit_state["current_date"] = get_current_date();
         std::string name = "user";
         ctx->add_message(name, name, message);
-        __memc->process_chunks({ message } , name);
+        ///__memc->process_chunks({ message } , name);
         __memc->write_chunks(MEMORY_MESSAGES, false);
         auto tools_result = __memc->read_chunks(MEMORY_TOOLS, message, MAX_TOOLS);
         __memc->buf_clear();
@@ -185,7 +185,7 @@ public:
         } else {
             fmt::print("{}\n\n", content);
             ctx->add_message(name, name, content);
-            __memc->process_chunks({ content } , name);
+            ///__memc->process_chunks({ content } , name);
             __memc->write_chunks(MEMORY_MESSAGES, true);
         }
         unguard()

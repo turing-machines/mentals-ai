@@ -176,17 +176,16 @@ int main(int argc, char *argv[]) {
 
         PipelineFactory factory;
         factory.register_stage_with_args<FileReaderToStringBuffer>("FileReaderToStringBuffer", fmgr);
-        ///factory.register_stage_with_args<ChunkBufferToMemoryController<std::string>>("ChunkBufferToMemoryController", memc);
+        factory.register_stage_with_args<ChunkBufferToMemoryController<std::string>>("ChunkBufferToMemoryController", memc);
         factory.register_stage<StringBufferToChunkBuffer<std::string>>("StringBufferToChunkBuffer");
         factory.register_stage<ChunkBufferToPrint<std::string>>("ChunkBufferToPrint");
-
 
 
         Pipeline pipeline(factory);
         pipeline.add_stage("FileReaderToStringBuffer");
         pipeline.add_stage("StringBufferToChunkBuffer");
-        pipeline.add_stage("ChunkBufferToPrint");
-        ///pipeline.add_stage("ChunkBufferToMemoryController");
+        //pipeline.add_stage("ChunkBufferToPrint");
+        pipeline.add_stage("ChunkBufferToMemoryController");
 
         /*pipeline.async_result_handler([](
             const std::string& input,
@@ -196,6 +195,13 @@ int main(int argc, char *argv[]) {
                 ///fmt::print("Filename: {}\nChunk count: {}\n\n", input, result->get_chunks_count());
             }
         });*/
+
+
+        /// TOFIX:
+        /// Exception in EmbeddingsProvider::embeddings: General exception: 
+        /// liboai::netimpl::CurlHolder::CurlHolder(): Failed initialization (E_CURLERROR:0x06)
+        /// Exception in MemoryController::chunk_embeddings: General exception: 
+        /// liboai::netimpl::CurlHolder::CurlHolder(): Failed initialization (E_CURLERROR:0x06)
 
         auto p_input = std::make_shared<std::string>(path);
         auto result = pipeline.execute(p_input);

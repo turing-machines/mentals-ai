@@ -4,25 +4,48 @@
 #include "buffer.h"
 #include "chunker.h"
 #include "file_manager.h"
+#include "memory_controller.h"
 
 
-template <typename In, typename Out>
-class PipelineStage {
+class PipelineStageBase {
 public:
-    PipelineStage() = default;
-    virtual ~PipelineStage() = default;
-
-    virtual std::shared_ptr<Out> process(const std::shared_ptr<In>& input) = 0;
+    virtual ~PipelineStageBase() = default;
+    virtual std::any process(const std::string& stage_name, const std::any& input) = 0;
 
 };
 
 
-class FileToStringBuffer : public PipelineStage<std::string, StringBuffer> {
+template <typename In, typename Out>
+class PipelineStage : public PipelineStageBase {
 public:
-    FileToStringBuffer(const std::shared_ptr<FileManager>& file_manager)
+    std::any process(const std::string& stage_name, const std::any& input) override {
+        if (input.type() != typeid(std::shared_ptr<In>)) {
+            fmt::print(
+                "Error in stage '{}': Expected input of type '{}', but got '{}'\n",
+                stage_name, typeid(std::shared_ptr<In>).name(), input.type().name()
+            );
+            return std::any();
+        }
+        try {
+            auto in_ptr = std::any_cast<std::shared_ptr<In>>(input);
+            return process_stage(in_ptr);
+        } catch (const std::bad_any_cast& e) {
+            fmt::print("Error in stage '{}': {}\n", stage_name, e.what());
+            return std::any();
+        }
+    }
+
+    virtual std::shared_ptr<Out> process_stage(const std::shared_ptr<In>& input) = 0;
+
+};
+
+
+class FileReaderToStringBuffer : public PipelineStage<std::string, StringBuffer> {
+public:
+    FileReaderToStringBuffer(const std::shared_ptr<FileManager>& file_manager)
         : __file_manager(file_manager) {}
 
-    std::shared_ptr<StringBuffer> process(const std::shared_ptr<std::string>& file_path) override {
+    std::shared_ptr<StringBuffer> process_stage(const std::shared_ptr<std::string>& file_path) override {
         auto file_content = __file_manager->read_file(*file_path);
         if (file_content.has_value()) {
             return std::make_shared<StringBuffer>(file_content.value());
@@ -48,7 +71,7 @@ public:
         }
     }
 
-    std::shared_ptr<SafeChunkBuffer<T>> process(const std::shared_ptr<StringBuffer>& string_buffer) override {
+    std::shared_ptr<SafeChunkBuffer<T>> process_stage(const std::shared_ptr<StringBuffer>& string_buffer) override {
         std::string data = string_buffer->get_data();
         auto result = __chunker->process(data);
         if (result.has_value()) {
@@ -67,6 +90,42 @@ private:
 };
 
 
+template <typename T>
+class ChunkBufferToPrint : public PipelineStage<SafeChunkBuffer<T>, void> {
+public:
+    ChunkBufferToPrint() {}
+
+    std::shared_ptr<void> process_stage(const std::shared_ptr<SafeChunkBuffer<T>>& chunk_buffer) override {
+        auto chunks = chunk_buffer->get_data();
+        if (!chunks.empty()) { fmt::print("{}\n", chunks[1]); }
+        else { fmt::print("Error: No chunks to print.\n"); }
+        return std::make_shared<int>(0);
+    }
+
+};
+
+
+/*template <typename T>
+class ChunkBufferToMemoryController : public PipelineStage<SafeChunkBuffer<T>, void> {
+public:
+    ChunkBufferToMemoryController(const std::shared_ptr<MemoryController>& memory_controller)
+        : __memory_controller(memory_controller) {}
+
+    std::shared_ptr<void> process(const std::shared_ptr<SafeChunkBuffer<T>>& chunk_buffer) override {
+        /// TODO: Move or copy data
+        auto chunks = std::make_shared<std::vector<std::string>>(chunk_buffer->get_data());
+        std::optional<std::string> name = std::nullopt;
+        std::optional<std::string> meta = std::nullopt;
+        __memory_controller->process_chunks(*chunks, name, meta);
+        return std::make_shared<int>(0);
+    }
+
+private:
+    std::shared_ptr<MemoryController> __memory_controller;
+
+};
+*/
+
 class PipelineFactory {
 public:
     template<typename Stage>
@@ -79,66 +138,66 @@ public:
         __creators[stage_name] = [args...]() { return std::make_shared<Stage>(args...); };
     }
 
-    std::shared_ptr<void> create_stage(const std::string& stage_name) {
+    std::shared_ptr<PipelineStageBase> create_stage(const std::string& stage_name) {
         auto it = __creators.find(stage_name);
         if (it != __creators.end()) { return it->second(); }
         return nullptr;
     }
 
 private:
-    std::unordered_map<std::string, std::function<std::shared_ptr<void>()>> __creators;
+    std::unordered_map<std::string, std::function<std::shared_ptr<PipelineStageBase>()>> __creators;
 
 };
 
 
-template <typename In, typename Out>
 class Pipeline {
 public:
-    using ResultHandler = std::function<void(const In&, std::shared_ptr<Out>)>;
+    using ResultHandler = std::function<void(const std::any&, std::any)>;
     void async_result_handler(ResultHandler handler) { result_handler = handler; }
 
     Pipeline(PipelineFactory& factory) : __factory(factory) {}
 
     void add_stage(const std::string& stage_name) {
-        guard("Pipeline::add_stage")
-        auto stage = std::static_pointer_cast<PipelineStage<In, Out>>(__factory.create_stage(stage_name));
-        if (stage) { __stages.emplace_back(stage_name, stage);
-        } else { fmt::print("Error: Unknown stage name {}\n", stage_name); }
-        unguard()
+        auto stage = __factory.create_stage(stage_name);
+        if (stage) { __stages.push_back({stage_name, stage}); } 
+        else { fmt::print("Error: Unknown stage name {}\n", stage_name); }
     }
 
-    std::shared_ptr<Out> lfg(const In& input) {
-        guard("Pipeline::lfg")
-        std::shared_ptr<void> intermediate = std::make_shared<In>(input);
+    std::any execute(const std::any& input) {
+        std::any intermediate = input;
         for (const auto& [stage_name, stage] : __stages) {
-            intermediate = stage->process(std::static_pointer_cast<In>(intermediate));
-            if (!intermediate) {
+            intermediate = stage->process(stage_name, intermediate);
+            if (intermediate.has_value()) {
+                if (intermediate.type() == typeid(std::shared_ptr<void>) 
+                    && !std::any_cast<std::shared_ptr<void>>(intermediate)
+                ) {
+                    fmt::print("Pipeline stage '{}' failed. Stopping pipeline.\n", stage_name);
+                    return std::any();
+                }
+            } else {
                 fmt::print("Pipeline stage '{}' failed. Stopping pipeline.\n", stage_name);
-                return nullptr;
+                return std::any();
             }
         }
-        return std::static_pointer_cast<Out>(intermediate);
-        unguard()
-        return nullptr;
+        return intermediate;
     }
 
-    void lfg_async(const In& input) {
-        guard("Pipeline::lfg_async")
+    void execute_async(const std::any& input) {
         std::lock_guard<std::mutex> lock(queue_mutex);
         auto future = std::async(std::launch::async, [this, input]() {
-            auto result = this->lfg(input);
+            auto result = this->execute(input);
             if (result_handler) { result_handler(input, result); }
             return result;
         });
         async_queue.emplace_back(std::move(future));
-        unguard()
     }
 
 private:
     PipelineFactory& __factory;
-    std::vector<std::pair<std::string, std::shared_ptr<PipelineStage<In, Out>>>> __stages;
-    std::vector<std::future<std::shared_ptr<Out>>> async_queue;
+    std::vector<std::pair<std::string, std::shared_ptr<PipelineStageBase>>> __stages;
+    std::vector<std::future<std::any>> async_queue;
     std::mutex queue_mutex;
     ResultHandler result_handler;
 
 };
+

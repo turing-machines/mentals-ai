@@ -180,13 +180,13 @@ namespace vdb {
 
     class vector {
     public:
-        vector() : model(std::nullopt) {}
+        vector() : model(std::nullopt) { allocate_mem(); }
         vector(const std::vector<float>& value, std::optional<embedding_model> model = std::nullopt) 
-            : __value(value), model(model) {}
+            : __value(value), model(model) { allocate_mem(); }
         vector(std::vector<float>&& value, std::optional<embedding_model> model = std::nullopt) 
-            : __value(std::move(value)), model(model) {}
+            : __value(std::move(value)), model(model) { allocate_mem(); }
         vector(const float* value, size_t n, std::optional<embedding_model> model = std::nullopt) 
-            : __value(value, value + n), model(model) {}
+            : __value(value, value + n), model(model) { allocate_mem(); }
         size_t dimensions() const { return __value.size(); }
         std::string get_model_name() const {
             if (model) {
@@ -195,7 +195,10 @@ namespace vdb {
                 return "No model set";
             }
         }
-        void set_model(embedding_model new_model) { model = new_model; }
+        void set_model(embedding_model new_model) {
+            model = new_model;
+            allocate_mem();
+        }
         operator const std::vector<float>&() const { return __value; }
         friend bool operator==(const vector& lhs, const vector& rhs) { return lhs.__value == rhs.__value; }
         friend std::ostream& operator<<(std::ostream& os, const vector& value) {
@@ -211,6 +214,16 @@ namespace vdb {
     private:
         std::vector<float> __value;
         std::optional<embedding_model> model;
+
+        void allocate_mem() {
+            if (model) {
+                size_t required_size = static_cast<size_t>(*model);
+                if (__value.capacity() < required_size) {
+                    __value.reserve(required_size);
+                }
+            }
+        }
+
     };
 }
 

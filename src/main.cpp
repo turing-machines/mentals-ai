@@ -175,42 +175,51 @@ int main(int argc, char *argv[]) {
 
 
         PipelineFactory factory;
-        factory.register_stage_with_args<FileToStringBuffer>("FileToStringBuffer", fmgr);
+        factory.register_stage_with_args<FileReaderToStringBuffer>("FileReaderToStringBuffer", fmgr);
+        ///factory.register_stage_with_args<ChunkBufferToMemoryController<std::string>>("ChunkBufferToMemoryController", memc);
         factory.register_stage<StringBufferToChunkBuffer<std::string>>("StringBufferToChunkBuffer");
+        factory.register_stage<ChunkBufferToPrint<std::string>>("ChunkBufferToPrint");
 
-        Pipeline<std::string, SafeChunkBuffer<std::string>> pipeline(factory);
-        pipeline.add_stage("FileToStringBuffer");
+
+
+        Pipeline pipeline(factory);
+        pipeline.add_stage("FileReaderToStringBuffer");
         pipeline.add_stage("StringBufferToChunkBuffer");
+        pipeline.add_stage("ChunkBufferToPrint");
+        ///pipeline.add_stage("ChunkBufferToMemoryController");
 
-        pipeline.async_result_handler([](
+        /*pipeline.async_result_handler([](
             const std::string& input,
             std::shared_ptr<SafeChunkBuffer<std::string>> result
         ) {
             if (result) {
-                std::cout << "Res:\n---\n" << result->get_data()[0] << "\n\n";
+                ///fmt::print("Filename: {}\nChunk count: {}\n\n", input, result->get_chunks_count());
             }
-        });
+        });*/
 
-        ///auto p_input = std::make_shared<std::string>(path);
-        //auto result = pipeline.lfg(path);
+        auto p_input = std::make_shared<std::string>(path);
+        auto result = pipeline.execute(p_input);
 
-        pipeline.lfg_async(path);
-        pipeline.lfg_async(collection);
+        //memc->process_chunks({ "test" }, "test");
+
+        ///pipeline.execute_async(path);
+        ///pipeline.lfg_async(collection);
 
         ///if (result) {
         ///    std::cout << "Res:\n---\n" << result->get_data()[0] << "\n\n";
         ///}
 
-        /*/// FileManager -> MemoryController
-        DataTransfer<FileManager, MemoryController> fs2memory(fmgr, memc);
-        if (FileHelpers::is_file(path)) {
-            fs2memory.transfer(path, collection);
-        } else if (FileHelpers::is_directory(path)) {
-            fs2memory.bulk_transfer(path, collection);
-        }*/
+        /// FileManager -> MemoryController
+        ///DataTransfer<FileManager, MemoryController> fs2memory(fmgr, memc);
+        ///if (FileHelpers::is_file(path)) {
+        ///    fs2memory.transfer(path, collection);
+        ///} else if (FileHelpers::is_directory(path)) {
+        ///    fs2memory.bulk_transfer(path, collection);
+        ///}
 
     }
 
+/*
     ///json ls = fmgr->list_directory(input);
     ///fmt::print("{}\n\n", ls.dump(4));
     //std::string file_content = fmgr.read_file(input);
@@ -220,8 +229,10 @@ int main(int argc, char *argv[]) {
         std::cout << entry.path() << std::endl;
     }*/
 
-/*  
-    if (!toolfile.empty()) {
+
+ /*   if (!toolfile.empty()) {
+
+        std::cout << toolfile;
 
         memc->delete_collection("tools");
         memc->create_collection("tools");

@@ -107,6 +107,9 @@ public:
         return false;
     }
 
+public:
+    /// FileReader, FileWriter section
+
     expected<StringBuffer, std::string> read_file(const std::string& file_path) {
         guard("FileManager::read_file")
         if (FileHelpers::exists(file_path)) {

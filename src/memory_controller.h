@@ -33,7 +33,7 @@ private:
         }
     }
 
-    expected<mem_chunk*, std::string> chunk_embeddings(mem_chunk& chunk) {
+    expected<mem_chunk*, std::string> chunk_embeddings(mem_chunk chunk) {
         guard("MemoryController::chunk_embeddings")
         std::string cleaned_content = chunk.content;
         if (!is_valid_utf8(chunk.content)) {
@@ -103,14 +103,13 @@ public:
         total_chunks += chunks.size();
         update_progress();
         std::string content_id;
-        if (name && !name->empty()) { content_id = gen_index(*name); }
-            else { content_id = gen_index(); }
+        if (name && !name->empty()) { content_id = gen_index(*name); } else { content_id = gen_index(); }
         for (size_t chunk_id = 0; chunk_id < chunks.size(); ++chunk_id) {
             std::string chunk_content = chunks[chunk_id];
             mem_chunk chunk { content_id, static_cast<int>(chunk_id), chunk_content, name, meta };
             ///fmt::print("{}mem_chunk #{}#{}: Processing started.\n", RESET, content_id, chunk_id);
             futures.push_back(std::async(std::launch::async, 
-                &MemoryController::chunk_embeddings, this, std::ref(chunk)
+                &MemoryController::chunk_embeddings, this, std::move(chunk)
             ));
         }
     }

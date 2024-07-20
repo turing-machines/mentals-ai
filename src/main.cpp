@@ -4,7 +4,8 @@
 /// Author: https://x.com/CostaAl4
 ///
 
-#include "cli/cli11.hpp"
+#define CLARA_CONFIG_MAIN
+#include "cli/clara.hpp"
 
 #include "platform.h"
 #include "pgvector.h"
@@ -30,19 +31,29 @@ int main(int argc, char *argv[]) {
 
     guard("Mentals")
 
-    CLI::App app{"Mentals - Central Executive Unit for LLM"};
+    std::string path, collection, input, toolfile;
+    bool list_collections = false, debug = false, help = false;
 
-    bool list_collections = false;
-    std::string input, collection, path, toolfile;
-    app.add_option("-p,--path", path, "File or directory path");
-    app.add_option("-c,--collection", collection, "Collection name");
-    app.add_option("-i,--input", input, "Input string");
-    app.add_option("-t,--tools-write", toolfile, "Write tools from TOML file to memory");
-    app.add_flag("-l,--list-collections", list_collections, "List collections");
-    app.add_flag("-d,--debug", debug, "Enable debug mode");
+    auto cli = clara::Help(help) |
+               clara::Opt(path, "path")["-p"]["--path"]("File or directory path") |
+               clara::Opt(collection, "collection")["-c"]["--collection"]("Collection name") |
+               clara::Opt(input, "input")["-i"]["--input"]("Input string") |
+               clara::Opt(toolfile, "toolfile")["-t"]["--tools-write"]("Write tools from TOML file to memory") |
+               clara::Opt(list_collections)["-l"]["--list-collections"]("List collections") |
+               clara::Opt(debug)["-d"]["--debug"]("Enable debug mode");
 
-    CLI11_PARSE(app, argc, argv);
+    auto result = cli.parse(clara::Args(argc, argv));
+    if (!result) {
+        fmt::print("Error in command line: {}\n\n", result.errorMessage());
+        fmt::print("{}\n", (std::ostringstream() << cli).str());
+        exit(EXIT_FAILURE);
+    }
 
+    if (help) {
+        fmt::print("{}\n", (std::ostringstream() << cli).str());
+        exit(EXIT_SUCCESS);
+    }
+ 
     Logger* logger = Logger::get_instance();
     logger->log("Mentals started");
 
@@ -90,7 +101,6 @@ int main(int argc, char *argv[]) {
     std::shared_ptr<PgVector> vdb = std::make_shared<PgVector>(conn_info);
     vdb->connect();
 
-    auto memc = std::make_shared<MemoryController>(emb, vdb);
 
  /*   memc.delete_collection("books");
     memc.create_collection("books");
@@ -169,10 +179,12 @@ int main(int argc, char *argv[]) {
         auto progress_callback = [&progress_bar](double progress) {
             progress_bar.update(static_cast<float>(progress));
         };
+    
+
+        auto memc = std::make_shared<MemoryController>(emb, vdb);
         memc->set_progress_callback(progress_callback);
     
         auto fmgr = std::make_shared<FileManager>();
-
 
         PipelineFactory factory;
         factory.register_stage_with_args<FileReaderToStringBuffer>("FileReaderToStringBuffer", fmgr);
@@ -184,8 +196,11 @@ int main(int argc, char *argv[]) {
         Pipeline pipeline(factory);
         pipeline.add_stage("FileReaderToStringBuffer");
         pipeline.add_stage("StringBufferToChunkBuffer");
-        //pipeline.add_stage("ChunkBufferToPrint");
         pipeline.add_stage("ChunkBufferToMemoryController");
+
+        std::string path = "assets/psychology_and_religion.pdf";
+    
+        auto result = pipeline.execute(std::make_shared<std::string>(path));
 
         /*pipeline.async_result_handler([](
             const std::string& input,
@@ -202,9 +217,6 @@ int main(int argc, char *argv[]) {
         /// liboai::netimpl::CurlHolder::CurlHolder(): Failed initialization (E_CURLERROR:0x06)
         /// Exception in MemoryController::chunk_embeddings: General exception: 
         /// liboai::netimpl::CurlHolder::CurlHolder(): Failed initialization (E_CURLERROR:0x06)
-
-        auto p_input = std::make_shared<std::string>(path);
-        auto result = pipeline.execute(p_input);
 
         //memc->process_chunks({ "test" }, "test");
 

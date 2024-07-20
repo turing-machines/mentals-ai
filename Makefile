@@ -21,8 +21,8 @@ INC_DIRS := $(shell find $(SRC_DIRS) -type d)
 INC_FLAGS := $(addprefix -I,$(INC_DIRS))
 
 # Add Boost include directory
-BOOST_INCLUDE := $(shell echo $(BOOST_INCLUDEDIR))
-INC_FLAGS += $(BOOST_INCLUDE)
+#BOOST_INCLUDE := $(shell echo $(BOOST_INCLUDEDIR))
+#INC_FLAGS += $(BOOST_INCLUDE)
 
 # Add Poppler include directories
 POPPLER_INCLUDE := $(shell pkg-config --cflags-only-I poppler-cpp)
@@ -36,15 +36,15 @@ INC_FLAGS += $(POCO_INCLUDE)
 OS := $(shell uname -s)
 ifeq ($(OS),Linux)
     CPPFLAGS += -DLINUX
-    LDFLAGS := -lrt -lpthread -lcurl -lfmt -lpqxx -lpq $(shell pkg-config --libs poppler-cpp) -lPocoFoundation -lboost_system -lboost_thread -lboost_filesystem -lncurses
+    LDFLAGS := -lrt -lpthread -lcurl -lfmt -lpqxx -lpq $(shell pkg-config --libs poppler-cpp) -lPocoFoundation #-lboost_system -lboost_thread -lboost_filesystem 
 endif
 ifeq ($(OS),Darwin)
     CPPFLAGS += -DMACOS
-    LDFLAGS := -lpthread -lcurl -lfmt -lpqxx -lpq $(shell pkg-config --libs poppler-cpp) -lPocoFoundation -lboost_system -lboost_thread -lboost_filesystem -lncurses
+    LDFLAGS := -lpthread -lcurl -lfmt -lpqxx -lpq $(shell pkg-config --libs poppler-cpp) -lPocoFoundation #-lboost_system -lboost_thread -lboost_filesystem 
 endif
 ifeq ($(OS),Windows_NT)
     CPPFLAGS += -DWIN32
-    LDFLAGS := -lws2_32 -lcurl -lfmt -lpqxx -lpq -lboost_system -lboost_thread -lboost_filesystem -lncurses
+    LDFLAGS := -lws2_32 -lcurl -lfmt -lpqxx -lpq #-lboost_system -lboost_thread -lboost_filesystem 
 endif
 
 ifeq ($(VERBOSE),1)

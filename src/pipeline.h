@@ -126,13 +126,8 @@ private:
 
 class PipelineFactory {
 public:
-    template<typename Stage>
-    void register_stage(const std::string& stage_name) {
-        __creators[stage_name] = []() { return std::make_shared<Stage>(); };
-    }
-
     template<typename Stage, typename... Args>
-    void register_stage_with_args(const std::string& stage_name, Args... args) {
+    void register_stage(const std::string& stage_name, Args... args) {
         __creators[stage_name] = [args...]() { return std::make_shared<Stage>(args...); };
     }
 

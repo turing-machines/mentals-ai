@@ -187,8 +187,8 @@ int main(int argc, char *argv[]) {
         auto fmgr = std::make_shared<FileManager>();
 
         PipelineFactory factory;
-        factory.register_stage_with_args<FileReaderToStringBuffer>("FileReaderToStringBuffer", fmgr);
-        factory.register_stage_with_args<ChunkBufferToEmbeddings<std::string>>("ChunkBufferToEmbeddings", memc);
+        factory.register_stage<FileReaderToStringBuffer>("FileReaderToStringBuffer", fmgr);
+        factory.register_stage<ChunkBufferToEmbeddings<std::string>>("ChunkBufferToEmbeddings", memc);
         factory.register_stage<StringBufferToChunkBuffer<std::string>>("StringBufferToChunkBuffer");
         factory.register_stage<ChunkBufferToPrint<std::string>>("PrinChunkBufferToPrintt");
 

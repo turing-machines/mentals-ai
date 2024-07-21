@@ -188,28 +188,22 @@ int main(int argc, char *argv[]) {
 
         PipelineFactory factory;
         factory.register_stage_with_args<FileReaderToStringBuffer>("FileReaderToStringBuffer", fmgr);
-        factory.register_stage_with_args<ChunkBufferToMemoryController<std::string>>("ChunkBufferToMemoryController", memc);
+        factory.register_stage_with_args<ChunkBufferToEmbeddings<std::string>>("ChunkBufferToEmbeddings", memc);
         factory.register_stage<StringBufferToChunkBuffer<std::string>>("StringBufferToChunkBuffer");
-        factory.register_stage<ChunkBufferToPrint<std::string>>("ChunkBufferToPrint");
+        factory.register_stage<ChunkBufferToPrint<std::string>>("PrinChunkBufferToPrintt");
 
 
         Pipeline pipeline(factory);
-        pipeline.add_stage("FileReaderToStringBuffer");
-        pipeline.add_stage("StringBufferToChunkBuffer");
-        pipeline.add_stage("ChunkBufferToMemoryController");
+        pipeline.result_handler_async([](const std::any& input, std::any& result) { fmt::print("DONE\n\n"); })
+            .stage("FileReaderToStringBuffer")
+            .stage("StringBufferToChunkBuffer")
+            .stage("ChunkBufferToEmbeddings");
 
-        std::string path = "assets/psychology_and_religion.pdf";
-    
-        auto result = pipeline.execute(std::make_shared<std::string>(path));
+        pipeline.execute(std::make_shared<std::string>("assets/psychology_and_religion.pdf"));
+        pipeline.execute(std::make_shared<std::string>("assets/thus_spoke_zarathustra.pdf"));
+        pipeline.execute(std::make_shared<std::string>("assets/15_the_spirit_in_man_art_and_literature.pdf"));
 
-        /*pipeline.async_result_handler([](
-            const std::string& input,
-            std::shared_ptr<SafeChunkBuffer<std::string>> result
-        ) {
-            if (result) {
-                ///fmt::print("Filename: {}\nChunk count: {}\n\n", input, result->get_chunks_count());
-            }
-        });*/
+        memc->write_chunks("books");
 
 
         /// TOFIX:

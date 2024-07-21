@@ -73,7 +73,7 @@ public:
         std::lock_guard<std::mutex> lock(chunk_buffer_mutex);
         return chunk_buffer.size();
     }
-
+ 
     T& back() {
         std::lock_guard<std::mutex> lock(chunk_buffer_mutex);
         return chunk_buffer.back();

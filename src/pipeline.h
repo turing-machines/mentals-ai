@@ -99,25 +99,27 @@ public:
         auto chunks = chunk_buffer->get_data();
         if (!chunks.empty()) { fmt::print("{}\n", chunks[1]); }
         else { fmt::print("Error: No chunks to print.\n"); }
-        return std::make_shared<int>(0);
+        return std::make_shared<int>(1);
     }
 
 };
 
 
 template <typename T>
-class ChunkBufferToMemoryController : public PipelineStage<SafeChunkBuffer<T>, void> {
+class ChunkBufferToEmbeddings : public PipelineStage<SafeChunkBuffer<T>, void> {
 public:
-    ChunkBufferToMemoryController(const std::shared_ptr<MemoryController>& memory_controller)
+    ChunkBufferToEmbeddings(const std::shared_ptr<MemoryController>& memory_controller)
         : __memory_controller(memory_controller) {}
 
     std::shared_ptr<void> process_stage(const std::shared_ptr<SafeChunkBuffer<T>>& chunk_buffer) override {
         __memory_controller->process_chunks(*chunk_buffer);
-        return std::make_shared<int>(0);
+        ///__memory_controller->write_chunks("books");
+        return std::make_shared<int>(1);
     }
 
 private:
     std::shared_ptr<MemoryController> __memory_controller;
+    mutable std::mutex write_chunks_mutex;
 
 };
 
@@ -148,15 +150,19 @@ private:
 
 class Pipeline {
 public:
-    using ResultHandler = std::function<void(const std::any&, std::any)>;
-    void async_result_handler(ResultHandler handler) { result_handler = handler; }
-
     Pipeline(PipelineFactory& factory) : __factory(factory) {}
 
-    void add_stage(const std::string& stage_name) {
+    Pipeline& stage(const std::string& stage_name) {
         auto stage = __factory.create_stage(stage_name);
         if (stage) { __stages.push_back({stage_name, stage}); } 
         else { fmt::print("Error: Unknown stage name {}\n", stage_name); }
+        return *this;
+    }
+
+    using ResultHandler = std::function<void(const std::any&, std::any&)>;
+    Pipeline& result_handler_async(ResultHandler handler) { 
+        result_handler = handler;
+        return *this;
     }
 
     std::any execute(const std::any& input) {

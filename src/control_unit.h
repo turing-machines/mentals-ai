@@ -12,10 +12,6 @@
 
 /// Refactoring from AgentExecutor to ControlUnit
 
-#define MAX_TOOLS 5
-#define MEMORY_TOOLS "tools"
-#define MEMORY_MESSAGES "messages"
-
 class ControlUnit : public std::enable_shared_from_this<ControlUnit>{
 private:
     Logger* logger;

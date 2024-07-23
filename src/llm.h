@@ -7,8 +7,6 @@
 
 using namespace liboai;
 
-#define DEF_TEMP 0.5
-#define DEF_TIMEOUT 120000 /// ms
 
 ///
 /// @brief LLMClient

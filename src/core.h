@@ -43,9 +43,15 @@
 #include "toml++/toml.hpp"
 #include "inja/inja.hpp"
 
-#define MAX_INTEGER std::numeric_limits<int>::max()
+#define MAX_INTEGER         std::numeric_limits<int>::max()
+#define MAKE_SHARED_STRING(str)  std::make_shared<std::string>(str)
 
+#define DEF_TEMP            0.5
+#define DEF_TIMEOUT         120000 /// ms
 #define SENTENCES_PER_CHUNK 20
+#define MAX_TOOLS           5
+#define MEMORY_TOOLS        "tools"
+#define MEMORY_MESSAGES     "messages"
 
 extern bool debug;
 extern std::atomic<bool> spinner_active;

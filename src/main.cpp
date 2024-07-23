@@ -186,24 +186,43 @@ int main(int argc, char *argv[]) {
     
         auto fmgr = std::make_shared<FileManager>();
 
-        PipelineFactory factory;
+
+        /// TODO: Global ClassRepository
+        /// TODO: Global ObjectFactory
+
+   /*     PipelineFactory factory;
         factory.register_stage<FileReaderToStringBuffer>("FileReaderToStringBuffer", fmgr);
         factory.register_stage<ChunkBufferToEmbeddings<std::string>>("ChunkBufferToEmbeddings", memc);
+        ///factory.register_stage<WriteToMemory>("WriteToMemory", memc);
         factory.register_stage<StringBufferToChunkBuffer<std::string>>("StringBufferToChunkBuffer");
-        factory.register_stage<ChunkBufferToPrint<std::string>>("PrinChunkBufferToPrintt");
-
+        factory.register_stage<ChunkBufferToPrint<std::string>>("ChunkBufferToPrint");
+        ///factory.register_stage<MapParams>("MapParams");
 
         Pipeline pipeline(factory);
-        pipeline.result_handler_async([](const std::any& input, std::any& result) { fmt::print("DONE\n\n"); })
+        pipeline.result_handler_async([](const std::any& input, const std::any& result) { fmt::print("DONE\n\n"); })
             .stage("FileReaderToStringBuffer")
             .stage("StringBufferToChunkBuffer")
             .stage("ChunkBufferToEmbeddings");
+*/
 
-        pipeline.execute(std::make_shared<std::string>("assets/psychology_and_religion.pdf"));
-        pipeline.execute(std::make_shared<std::string>("assets/thus_spoke_zarathustra.pdf"));
-        pipeline.execute(std::make_shared<std::string>("assets/15_the_spirit_in_man_art_and_literature.pdf"));
+    std::any inputs = std::vector<std::shared_ptr<std::string>>({
+        std::make_shared<std::string>("assets/psychology_and_religion.pdf"),
+        std::make_shared<std::string>("assets/thus_spoke_zarathustra.pdf")
+    });
 
-        memc->write_chunks("books");
+       ///pipeline.execute(inputs);
+
+
+
+   const std::type_info& __type_info = inputs.type();
+    
+    std::cout << "Type name: " << __type_info.name() << std::endl;
+
+        //pipeline.execute(MAKE_SHARED_STRING("assets/psychology_and_religion.pdf"));
+        //pipeline.execute(MAKE_SHARED_STRING("assets/thus_spoke_zarathustra.pdf"));
+        //pipeline.execute(MAKE_SHARED_STRING("assets/15_the_spirit_in_man_art_and_literature.pdf"));
+
+        //memc->write_chunks("books");
 
 
         /// TOFIX:

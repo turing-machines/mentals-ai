@@ -9,10 +9,6 @@
 class FileManager {
 public:
 
-    FileManager() {
-        std::cout << "FM constructor\n\n";
-    };
-
     class DirectoryIterator {
     public:
         using pointer = const fs::directory_entry*;
@@ -83,9 +79,6 @@ public:
 
     json list_directory(const std::string& dir_path) {
         guard("FileManager::list_directory")
-
-        std::cout << "Param: " << dir_path << std::endl;
-
         json items = json::array();
         if (fs::exists(dir_path) && fs::is_directory(dir_path)) {
             for (auto it = begin(dir_path); it != end(); ++it) {

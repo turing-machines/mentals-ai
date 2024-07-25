@@ -68,18 +68,26 @@ private:
 };
 
 
+template<typename T>
 class Object {
 public:
-    Object(meta::any instance) : __instance(std::move(instance)) {}
+    Object(meta::any instance)
+        : __instance(std::move(instance)), __object(__instance.try_cast<T>()) {
+        if (!__object) {
+            throw std::runtime_error(fmt::format(
+                "Failed to cast instance to the provided type '{}'", typeid(T).name()
+            ));
+        }
+    }
 
-    template<typename T>
-    T get_member(const std::string& name) {
+    template<typename MemberType>
+    MemberType get_member(const std::string& name) {
         auto data = __instance.type().data(meta_hash{}(name));
         if (data) {
-            return data.get(__instance).cast<T>();
+            return data.get(__instance).cast<MemberType>();
         } else {
             fmt::print("Data member {} not found.\n", name);
-            return T{};
+            return MemberType{};
         }
     }
 
@@ -92,7 +100,9 @@ public:
                 return {};
             }
             auto result = func.invoke(__instance, std::forward<Args>(args)...);
-            if (!result) { fmt::print("Invocation failed for method: {}\n", name); }
+            if (!result) {
+                fmt::print("Invocation failed for method: {}\n", name);
+            }
             return result;
         } else {
             fmt::print("Method {} not found.\n", name);
@@ -100,26 +110,36 @@ public:
         }
     }
 
+    T* operator->() { return __object; }
+    const T* operator->() const { return __object; }
+
+
 private:
     meta::any __instance;
+    T* __object;
 
 };
 
 
 class Factory {
 public:
-    template<typename... Args>
-    static std::shared_ptr<Object> create_object(const std::string& class_name, Args... args) {
+    template<typename T, typename... Args>
+    static std::shared_ptr<Object<T>> create_object(const std::string& class_name, Args&&... args) {
         auto instance = create_instance(class_name, std::forward<Args>(args)...);
         if (instance) {
-            return std::make_shared<Object>(instance);
+            return std::make_shared<Object<T>>(instance);
         }
         return nullptr;
     }
 
+    // template<typename T, typename... Args>
+    // static std::shared_ptr<Object<T>> create_object(Args&&... args) {
+    //     return create_object<T>(typeid(T).name(), std::forward<Args>(args)...);
+    // }
+
 private:
     template<typename... Args>
-    static meta::any create_instance(const std::string& class_name, Args... args) {
+    static meta::any create_instance(const std::string& class_name, Args&&... args) {
         auto type = TypeRegistry::instance().get_type(class_name);
         if (type) {
             return type.construct(std::forward<Args>(args)...);

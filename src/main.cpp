@@ -94,14 +94,15 @@ int main(int argc, char *argv[]) {
     llm->set_model(model);
 */
 
-    auto fmgr = Factory::create_object("FileManager");
+    auto fmgr = Factory::create_object<FileManager>("FileManager");
     if (!fmgr) {
         fmt::print("Failed to create FileManager object\n");
         exit(EXIT_FAILURE);
     }
 
     std::string dir = ".";
-    meta::any res = fmgr->invoke("list_directory", dir);
+    ///meta::any res = fmgr->invoke("list_directory", dir);
+    meta::any res = (*fmgr)->list_directory(dir);
     if (res) {
         auto ls = res.cast<json>();
         fmt::print("{}\n", ls.dump(4));

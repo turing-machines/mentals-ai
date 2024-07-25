@@ -1,11 +1,18 @@
 #pragma once
 
 #include "core.h"
+#include "type.h"
 #include "file_helpers.h"
 #include "doc_factory.h"
 
+
 class FileManager {
 public:
+
+    FileManager() {
+        std::cout << "FM constructor\n\n";
+    };
+
     class DirectoryIterator {
     public:
         using pointer = const fs::directory_entry*;
@@ -76,6 +83,9 @@ public:
 
     json list_directory(const std::string& dir_path) {
         guard("FileManager::list_directory")
+
+        std::cout << "Param: " << dir_path << std::endl;
+
         json items = json::array();
         if (fs::exists(dir_path) && fs::is_directory(dir_path)) {
             for (auto it = begin(dir_path); it != end(); ++it) {
@@ -144,3 +154,15 @@ public:
     }
 
 };
+
+
+REGISTER_TYPE(FileManager,
+    CTOR()
+    METHOD(create_directory)
+    METHOD(delete_directory)
+    METHOD(list_directory)
+    METHOD(create_file)
+    METHOD(delete_file)
+    METHOD(read_file)
+    METHOD(write_file)
+)

@@ -8,10 +8,11 @@
 #include "cli/clara.hpp"
 
 #include "platform.h"
+#include "type.h"
 #include "pgvector.h"
 #include "context.h"
 #include "memory_controller.h"
-#include "control_unit.h"
+///#include "control_unit.h"
 #include "file_manager.h"
 #include "pipeline.h"
 #include "data_transfer.h"
@@ -87,11 +88,29 @@ int main(int argc, char *argv[]) {
     //WebServer mentals_chat(DEFAULT_ADDRESS, 9002, 8080);
     //mentals_chat.start();
 
-    auto llm = std::make_shared<LLMClient>();
+
+    /*auto llm = std::make_shared<LLMClient>();
     llm->set_provider(endpoint, api_key);
     llm->set_model(model);
+*/
 
-    std::shared_ptr<EmbeddingsInterface> emb = std::make_shared<EmbeddingsProvider>();
+    auto fmgr = Factory::create_object("FileManager");
+    if (!fmgr) {
+        fmt::print("Failed to create FileManager object\n");
+        exit(EXIT_FAILURE);
+    }
+
+    std::string dir = ".";
+    meta::any res = fmgr->invoke("list_directory", dir);
+    if (res) {
+        auto ls = res.cast<json>();
+        fmt::print("{}\n", ls.dump(4));
+    } else {
+        fmt::print("Failed to list directory or invalid return type\n");
+        exit(EXIT_FAILURE);
+    }
+
+  /*  std::shared_ptr<EmbeddingsInterface> emb = std::make_shared<EmbeddingsProvider>();
     emb->set_provider(endpoint, api_key);
     emb->set_model(embedding_model::oai_3small);
 
@@ -100,7 +119,7 @@ int main(int argc, char *argv[]) {
 
     std::shared_ptr<PgVector> vdb = std::make_shared<PgVector>(conn_info);
     vdb->connect();
-
+*/
 
  /*   memc.delete_collection("books");
     memc.create_collection("books");
@@ -166,7 +185,7 @@ int main(int argc, char *argv[]) {
         }
     }
 */
-    if (list_collections) {
+  /*  if (list_collections) {
 
         auto lc = vdb->list_collections();
         if (lc.has_value()) {
@@ -185,7 +204,7 @@ int main(int argc, char *argv[]) {
         memc->set_progress_callback(progress_callback);
     
         auto fmgr = std::make_shared<FileManager>();
-
+*/
 
         /// TODO: Global ClassRepository
         /// TODO: Global ObjectFactory
@@ -205,6 +224,7 @@ int main(int argc, char *argv[]) {
             .stage("ChunkBufferToEmbeddings");
 */
 
+/*
     std::any inputs = std::vector<std::shared_ptr<std::string>>({
         std::make_shared<std::string>("assets/psychology_and_religion.pdf"),
         std::make_shared<std::string>("assets/thus_spoke_zarathustra.pdf")
@@ -217,6 +237,8 @@ int main(int argc, char *argv[]) {
    const std::type_info& __type_info = inputs.type();
     
     std::cout << "Type name: " << __type_info.name() << std::endl;
+*/
+
 
         //pipeline.execute(MAKE_SHARED_STRING("assets/psychology_and_religion.pdf"));
         //pipeline.execute(MAKE_SHARED_STRING("assets/thus_spoke_zarathustra.pdf"));
@@ -248,7 +270,7 @@ int main(int argc, char *argv[]) {
         ///    fs2memory.bulk_transfer(path, collection);
         ///}
 
-    }
+  ///  }
 
 /*
     ///json ls = fmgr->list_directory(input);

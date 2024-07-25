@@ -21,6 +21,10 @@ class StringBuffer : public Buffer<std::string> {
 public:
     StringBuffer() : buffer("") {}
 
+    bool operator==(const StringBuffer& other) const {
+        return this->buffer == other.buffer;
+    }
+
     void set_data(const std::string& str) override { buffer = str; }
     std::string get_data() const override { return buffer; }
     void append(const std::string& str) override { buffer += str; }

@@ -2,6 +2,7 @@ TARGET_EXEC := mentals
 
 BUILD_DIR := ./build
 SRC_DIRS := ./src
+META_DIR := ../meta
 
 LOGS_DIR := ./logs
 
@@ -32,6 +33,10 @@ INC_FLAGS += $(POPPLER_INCLUDE)
 POCO_INCLUDE := -I/usr/include/Poco
 INC_FLAGS += $(POCO_INCLUDE)
 
+# Add meta include directory
+META_INCLUDE := $(META_DIR)/src
+INC_FLAGS += -I$(META_INCLUDE)
+
 # Conditional configuration for OS-specific flags
 OS := $(shell uname -s)
 ifeq ($(OS),Linux)
@@ -56,11 +61,11 @@ endif
 CPPFLAGS += $(INC_FLAGS) -MMD -MP #-D__PGVECTOR__
 CXXFLAGS := -std=c++20 -Wall -Wextra -O3 -march=native # -Werror
 
-# Default to clang if available and version is >= 14, otherwise use gcc
+# Default to clang if available and version is >= 17, otherwise use gcc
 CXX := $(shell which clang++ || which g++)
 CXX_VERSION := $(shell $(CXX) --version | grep -Po '(?<=version )[\d.]+' | head -n 1 | cut -d. -f1)
 ifeq ($(CXX),$(shell which clang++))
-    ifneq ($(shell expr $(CXX_VERSION) \>= 14),1)
+    ifneq ($(shell expr $(CXX_VERSION) \>= 17),1)
         CXX := g++
     endif
 else

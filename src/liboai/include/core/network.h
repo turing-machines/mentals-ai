@@ -96,7 +96,7 @@ namespace liboai {
 				endpoint_root_ = endpoint;
 			}
 
-		protected:
+		public:
 			enum class Method : uint8_t {
 				HTTP_GET,     // GET
 				HTTP_POST,    // POST

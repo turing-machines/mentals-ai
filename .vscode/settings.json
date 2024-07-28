@@ -81,7 +81,8 @@
         "*.ipp": "cpp",
         "*.header": "c",
         "unordered_set": "cpp",
-        "shared_mutex": "cpp"
+        "shared_mutex": "cpp",
+        "__type_h": "c"
     },
     "cmake.sourceDirectory": "/home/costa-al/control_unit/liboai",
     "makefile.launchConfigurations": [

@@ -8,7 +8,6 @@
 #include "cli/clara.hpp"
 
 #include "platform.h"
-#include "type.h"
 #include "pgvector.h"
 #include "context.h"
 #include "memory_controller.h"
@@ -20,6 +19,8 @@
 #include "web_server.h"
 ///#include "terminal_chat.h"
 #include "tui/progress_bar.h"
+
+#include "llm.h"
 
 
 bool debug{false};
@@ -94,15 +95,53 @@ int main(int argc, char *argv[]) {
     llm->set_model(model);
 */
 
+
+    const meta_hpp::class_type test_type = meta_hpp::resolve_type<PgVector>();
+
+    std::cout << "* PgVector\n";
+    for (const meta_hpp::method& method : test_type.get_methods()) {
+        std::cout << "  + " << method.get_name() << "/" << method.get_type().get_arity() << "\n";
+    }
+
+    const meta_hpp::class_type pgvector_type = meta_hpp::resolve_type<PgVector>();
+
+    const meta_hpp::method pgvector_connect = pgvector_type.get_method("connect");
+
+    meta_hpp::uvalue pgvector_v = pgvector_type.create();
+
+    std::string conn_info = fmt::format("dbname={} user={} password={} hostaddr={} port={}", 
+        dbname, user, password, hostaddr, port);
+
+    auto connect_result = pgvector_connect.invoke(pgvector_v, conn_info);
+    if (connect_result.is<expected<void, std::string>>()) {
+        auto result = connect_result.as<expected<void, std::string>>();
+        if (!result) {
+            fmt::print("Connection error: {}\n", result.error());
+        }
+    }
+
+/*
+    const meta_hpp::class_type llmclient_type = meta_hpp::resolve_type<LLMClient>();
+
+    const meta_hpp::method llmclient_set_provider = llmclient_type.get_method("set_provider");
+
+    meta_hpp::uvalue llmclient_v = llmclient_type.create();
+    auto set_provider_result = llmclient_set_provider.invoke(llmclient_v, endpoint, api_key);
+*/
+
+
+    /*register_pgvector();
+
+    ///auto fmgr = Factory::create_object<FileManager>("FileManager");
     auto fmgr = Factory::create_object<FileManager>("FileManager");
     if (!fmgr) {
         fmt::print("Failed to create FileManager object\n");
         exit(EXIT_FAILURE);
-    }
+    }*/
 
-    std::string dir = ".";
-    ///meta::any res = fmgr->invoke("list_directory", dir);
-    meta::any res = (*fmgr)->list_directory(dir);
+    /*std::string dir = ".";
+    ///meta_hpp::any res = fmgr->invoke("list_directory", dir);
+    meta_hpp::any res = (*fmgr)->list_directory(dir);
     if (res) {
         auto ls = res.cast<json>();
         fmt::print("{}\n", ls.dump(4));
@@ -110,6 +149,85 @@ int main(int argc, char *argv[]) {
         fmt::print("Failed to list directory or invalid return type\n");
         exit(EXIT_FAILURE);
     }
+
+    std::string conn_info = fmt::format("dbname={} user={} password={} hostaddr={} port={}", 
+        dbname, user, password, hostaddr, port);
+
+
+    auto vdb = Factory::create_object<PgVector>("PgVector");
+    (*vdb)->connect(conn_info);*/
+
+
+   /* meta_hpp::reflect<Test>()
+        .type(meta_hash{}("Test"))
+        .ctor<>()
+        .ctor<int, double>()
+        ///.func<&Test::create_transaction>(meta_hash{}("create_transaction"))
+        .func<&Test::set_int>(meta_hash{}("set_int"))
+        .func<&Test::get_int>(meta_hash{}("get_int"))
+        .func<&Test::set_double>(meta_hash{}("set_double"))
+        .func<&Test::get_double>(meta_hash{}("get_double"))
+        .func<&Test::display>(meta_hash{}("display"));
+    */
+
+    /*meta_hpp::reflect<PgVector>()
+        .type(meta_hash{}("PgVector"))
+        .ctor<>()
+        .func<&PgVector::test>(meta_hash{}("test"))
+        .func<&PgVector::connect>(meta_hash{}("connect"));*/
+
+
+    /*PgVector vec = PgVector{};
+    meta_hpp::any any_vec = meta_hpp::any(std::move(vec));
+
+    meta_hpp::type vec_type = any_vec.type();
+    meta_hpp::func connect_func = vec_type.func(meta_hash{}("test"));
+    if (connect_func) {
+        connect_func.invoke(any_vec);
+    }*/
+
+
+    /*///Initialize meta reflection
+    auto factory = meta_hpp::reflect<PgVector>(meta_hash{}("PgVector"));
+
+    // Register constructors and functions
+    factory.ctor<>(); // Ensure the default constructor is registered
+
+    factory.func<&PgVector::test>(meta_hash{}("test"));
+    factory.func<&PgVector::connect>(meta_hash{}("connect"));
+    factory.func<&PgVector::list_collections>(meta_hash{}("list_collections"));
+
+    // Resolve the type
+    auto type = meta_hpp::resolve(meta_hash{}("PgVector"));
+
+    // Construct an instance of PgVector
+    auto pg_vector = type.construct();
+    if (!pg_vector) {
+        std::cerr << "Error: Failed to construct PgVector instance." << std::endl;
+        return 1; // Exit with error code
+    }
+
+    // Construct connection info string
+    std::string conn_info = fmt::format("dbname={} user={} password={} hostaddr={} port={}", 
+                                        dbname, user, password, hostaddr, port);
+
+    // Attempt to find the 'test' function
+    auto func = pg_vector.type().func(meta_hash{}("test"));
+    if (func) {
+        // Invoke the function
+        auto conn_res = func.invoke(pg_vector); // , conn_info);
+    } else {
+        // Print error if function is not found
+        std::cerr << "Error: Function 'test' not found in PgVector." << std::endl;
+        return 1; // Exit with error code
+    }*/
+
+    ///PgVector* pg_vector_ptr = pg_vector.try_cast<PgVector>();
+    
+    ///auto txn = pg_vector_ptr->create_transaction();
+    ///pg_vector_ptr->commit_transaction(txn);
+
+
 
   /*  std::shared_ptr<EmbeddingsInterface> emb = std::make_shared<EmbeddingsProvider>();
     emb->set_provider(endpoint, api_key);

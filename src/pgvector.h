@@ -20,6 +20,29 @@ const std::string NegativeInnerProduct = "<#>";
 const std::string CosineDistance = "<=>";
 
 class PgVector {
+public:
+    PgVector() = default;
+
+    PgVector(PgVector&& other) noexcept
+        : conn_str(std::move(other.conn_str)),
+          conn(std::move(other.conn)),
+          logger(other.logger) {
+        other.logger = nullptr;
+    }
+
+    PgVector& operator=(PgVector&& other) noexcept {
+        if (this != &other) {
+            conn_str = std::move(other.conn_str);
+            conn = std::move(other.conn);
+            logger = other.logger;
+            other.logger = nullptr;
+        }
+        return *this;
+    }
+
+    PgVector(const PgVector&) = delete;
+    PgVector& operator=(const PgVector&) = delete;
+
 private:
     std::string conn_str;
     std::unique_ptr<pqxx::connection> conn;
@@ -34,10 +57,16 @@ private:
      };
 */
 public:
-    PgVector(const std::string& conn_info);
-    ~PgVector();
 
-    expected<void, std::string> connect();
+    /*PgVector();
+    PgVector(const PgVector&) = delete;
+    PgVector& operator=(const PgVector&) = delete;
+
+    PgVector(PgVector&&) noexcept = default;
+    PgVector& operator=(PgVector&&) noexcept = default;
+*/
+
+    expected<void, std::string> connect(const std::string& conn_info);
     std::unique_ptr<pqxx::work> create_transaction();
     void commit_transaction(std::unique_ptr<pqxx::work>& txn);
     expected<json, std::string> list_collections();
@@ -78,3 +107,18 @@ public:
         const std::string& search_query,
         int limit);
 };
+
+
+REGISTER_CLASS(PgVector,
+    CTOR()
+    CTOR(PgVector&&)
+    METHOD(connect)
+    METHOD(create_transaction)
+    METHOD(commit_transaction)
+    METHOD(list_collections)
+    METHOD(create_collection)
+    METHOD(delete_collection)
+    METHOD(get_collection_info)
+    METHOD(search_content)
+    METHOD(bm25_search_content)
+)

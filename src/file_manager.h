@@ -1,7 +1,7 @@
 #pragma once
 
 #include "core.h"
-#include "type.h"
+///#include "type.h"
 #include "file_helpers.h"
 #include "doc_factory.h"
 
@@ -148,7 +148,7 @@ public:
 
 };
 
-
+/*
 REGISTER_TYPE(FileManager,
     CTOR()
     METHOD(create_directory)
@@ -159,3 +159,4 @@ REGISTER_TYPE(FileManager,
     METHOD(read_file)
     METHOD(write_file)
 )
+*/

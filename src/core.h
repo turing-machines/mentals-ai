@@ -42,6 +42,8 @@
 #include "nlohmann/json.hpp"
 #include "toml++/toml.hpp"
 #include "inja/inja.hpp"
+#include "meta/meta.hpp"
+
 
 #define MAX_INTEGER         std::numeric_limits<int>::max()
 #define MAKE_SHARED_STRING(str)  std::make_shared<std::string>(str)
@@ -264,6 +266,16 @@ struct mem_chunk {
         : content_id(content_id), chunk_id(chunk_id), content(content), embedding(embedding), 
         name(name), meta(meta), created_at(created_at) {}
 
+    bool operator==(const mem_chunk& other) const {
+        return content_id == other.content_id &&
+               chunk_id == other.chunk_id &&
+               content == other.content &&
+               embedding == other.embedding &&
+               name == other.name &&
+               meta == other.meta &&
+               created_at == other.created_at;
+    }
+
     json serialize_json() const {
         json j;
         j["content_id"] = content_id;
@@ -275,7 +287,27 @@ struct mem_chunk {
         j["created_at"] = created_at.value_or(nullptr);
         return j;
     }
+
 };
+
+/// Meta
+
+#define REGISTER_CLASS(type, ...) \
+template <typename T = type> \
+struct __register_##type { \
+    __register_##type() { \
+        meta_hpp::class_<type>() \
+        __VA_ARGS__; \
+    } \
+}; \
+static __register_##type __register_instance_##type;
+
+#define CTOR(...) \
+    .constructor_<__VA_ARGS__>()
+
+#define METHOD(method) \
+    .method_(#method, &T::method)
+
 
 ///
 /// TODO: Refine to work with custom handlers

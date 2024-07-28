@@ -1,7 +1,6 @@
 #pragma once
 
 #include "core.h"
-#include "type.h"
 #include "logger.h"
 #include "liboai.h"
 #include "context.h"
@@ -12,32 +11,32 @@ using namespace liboai;
 ///
 /// @brief LLMClient
 ///
-
-class LLMClient final {
+class LLMClient final : private Network {
     std::string llm_model;
     Authorization& auth = Authorization::Authorizer();
+
     Logger* logger = Logger::get_instance();
-    Network network;  // Use composition to include Network
 
 public:
+
     LLMClient() = default;
     ~LLMClient() = default;
-
     LLMClient(const LLMClient&) = delete;
+    LLMClient(LLMClient&&) = delete;
+
     LLMClient& operator=(const LLMClient&) = delete;
-    LLMClient(LLMClient&&) = default;
-    LLMClient& operator=(LLMClient&&) = default;
+    LLMClient& operator=(LLMClient&&) = delete;
 
     void set_model(std::string model) {
-        llm_model = std::move(model);
+        llm_model = model;
     }
 
-    void set_provider(const std::string& endpoint, const std::string& key) {
+    void set_provider(std::string endpoint, std::string key) {
         bool result = auth.SetKey(key);
         if (!result) {
             throw std::runtime_error("Failed to set API key");
         }
-        network.SetRoot(endpoint);
+        this->endpoint_root_ = endpoint;
     }
 
     Response chat_completion(
@@ -52,7 +51,7 @@ public:
         std::optional<float> frequency_penalty = std::nullopt, 
         std::optional<std::unordered_map<std::string, int8_t>> logit_bias = std::nullopt, 
         std::optional<std::string> user = std::nullopt
-    ) noexcept(false) {
+    ) const& noexcept(false) {
         guard("LLMClient::chat_completion")
         JsonConstructor jcon;
         jcon.push_back("model", llm_model);
@@ -71,14 +70,17 @@ public:
         }
         auth.SetMaxTimeout(DEF_TIMEOUT);
         Response response;
-        response = network.Request(
-            Network::Method::HTTP_POST, network.GetRoot(), "/chat/completions", "application/json",
-            auth.GetAuthorizationHeaders(),
-            netimpl::components::Body { jcon.dump() },
-            stream ? netimpl::components::WriteCallback{std::move(stream.value())} : netimpl::components::WriteCallback{},
-            auth.GetProxies(),
-            auth.GetProxyAuth(),
-            auth.GetMaxTimeout()
+        response = this->Request(
+            Method::HTTP_POST, this->endpoint_root_, "/chat/completions", "application/json",
+            this->auth.GetAuthorizationHeaders(),
+            netimpl::components::Body {
+                jcon.dump()
+            },
+            stream ? netimpl::components::WriteCallback{std::move(stream.value())} 
+                : netimpl::components::WriteCallback{},
+            this->auth.GetProxies(),
+            this->auth.GetProxyAuth(),
+            this->auth.GetMaxTimeout()
         );
         logger->log("Response");
         logger->log(json::parse(response.content).dump(4));
@@ -133,9 +135,3 @@ public:
 };
 
 
-REGISTER_TYPE(LLMClient,
-    CTOR()
-    METHOD(set_model)
-    METHOD(set_provider)
-    METHOD(chat_completion)
-)

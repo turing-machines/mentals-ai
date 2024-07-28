@@ -1,14 +1,23 @@
 #include "pgvector.h"
 
 
-PgVector::PgVector(const std::string& conn_info) : conn_str(conn_info), conn(nullptr) {
+/*PgVector::PgVector() {
     logger = Logger::get_instance();
-}
+}*/
 
-PgVector::~PgVector() {}
+/*PgVector::PgVector(const std::string& conn_info) : conn_str(conn_info), conn(nullptr) {
+    logger = Logger::get_instance();
+    std::cout << "PgVector conn info: " << conn_info << "\n\n";
+    logger->log(fmt::format("PgVector constructor: conn_str = '{}'", conn_str));
+}*/
 
-expected<void, std::string> PgVector::connect() {
+///PgVector::~PgVector() {}
+
+
+expected<void, std::string> PgVector::connect(const std::string& conn_info) {
     guard("PgVector::connect");
+    logger = Logger::get_instance();
+    conn_str = conn_info;
     conn = std::make_unique<pqxx::connection>(conn_str);
     if (!conn->is_open()) {
         logger->log(fmt::format("Failed to connect to database: {}", conn->dbname()));

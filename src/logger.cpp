@@ -1,4 +1,4 @@
-#include "logger.h"
+#include "../include/logger.h"
 
 /// Initialize static members
 std::unique_ptr<Logger> Logger::instance = nullptr;

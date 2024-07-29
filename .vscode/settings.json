@@ -74,12 +74,57 @@
         "set": "cpp",
         "cinttypes": "cpp"
     },
-    "cmake.sourceDirectory": "/home/costa-al/control_unit/liboai",
+    "cmake.sourceDirectory": "/home/cppshizoid/Code/Work/mentals-ai",
     "makefile.launchConfigurations": [
         {
             "cwd": "/home/costa-al/control_unit/build",
             "binaryPath": "/home/costa-al/control_unit/build/mentals",
             "binaryArgs": []
         }
-    ]
+    ],
+    "cSpell.words": [
+        "noncopyable"
+    ],
+    "editor.tokenColorCustomizations": {
+        "[*Light*]": {
+            "textMateRules": [
+                {
+                    "scope": "ref.matchtext",
+                    "settings": {
+                        "foreground": "#000"
+                    }
+                }
+            ]
+        },
+        "[*Dark*]": {
+            "textMateRules": [
+                {
+                    "scope": "ref.matchtext",
+                    "settings": {
+                        "foreground": "#fff"
+                    }
+                }
+            ]
+        },
+        "textMateRules": [
+            {
+                "scope": "googletest.failed",
+                "settings": {
+                    "foreground": "#f00"
+                }
+            },
+            {
+                "scope": "googletest.passed",
+                "settings": {
+                    "foreground": "#0f0"
+                }
+            },
+            {
+                "scope": "googletest.run",
+                "settings": {
+                    "foreground": "#0f0"
+                }
+            }
+        ]
+    }
 }

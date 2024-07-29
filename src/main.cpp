@@ -8,6 +8,7 @@
 #include "cli/clara.hpp"
 
 #include "platform.h"
+#include "class.h"
 #include "pgvector.h"
 #include "context.h"
 #include "memory_controller.h"
@@ -95,8 +96,35 @@ int main(int argc, char *argv[]) {
     llm->set_model(model);
 */
 
+    ClassFactory& factory = ClassFactory::get_instance();
 
-    const meta_hpp::class_type test_type = meta_hpp::resolve_type<PgVector>();
+    auto pgvector = factory.create_shared<PgVector>();
+    pgvector->list_methods();
+
+    std::string conn_info = fmt::format("dbname={} user={} password={} hostaddr={} port={}", 
+        dbname, user, password, hostaddr, port);
+    auto connect_result = (*pgvector)->connect(conn_info);
+
+    if (connect_result.has_value()) {
+        fmt::print("Connection successful!\n");
+    } else {
+        fmt::print("Connection failed.\n");
+    }
+
+    /*try {
+        auto connect_result = pgvector.invoke("connect", conn_info);
+        if (connect_result.is<expected<void, std::string>>()) {
+            auto result = connect_result.as<expected<void, std::string>>();
+            if (!result) {
+                fmt::print("Connection error: {}\n", result.error());
+            }
+        }
+    } catch (const std::exception& ex) {
+        std::cerr << "Exception: " << ex.what() << std::endl;
+    }*/
+
+
+   /* const meta_hpp::class_type test_type = meta_hpp::resolve_type<PgVector>();
 
     std::cout << "* PgVector\n";
     for (const meta_hpp::method& method : test_type.get_methods()) {
@@ -118,7 +146,7 @@ int main(int argc, char *argv[]) {
         if (!result) {
             fmt::print("Connection error: {}\n", result.error());
         }
-    }
+    }*/
 
 /*
     const meta_hpp::class_type llmclient_type = meta_hpp::resolve_type<LLMClient>();
@@ -135,7 +163,7 @@ int main(int argc, char *argv[]) {
     ///auto fmgr = Factory::create_object<FileManager>("FileManager");
     auto fmgr = Factory::create_object<FileManager>("FileManager");
     if (!fmgr) {
-        fmt::print("Failed to create FileManager object\n");
+        fmt::print("Failed to create FileManager Object\n");
         exit(EXIT_FAILURE);
     }*/
 
@@ -326,7 +354,7 @@ int main(int argc, char *argv[]) {
 */
 
         /// TODO: Global ClassRepository
-        /// TODO: Global ObjectFactory
+        /// TODO: Global ClassFactory
 
    /*     PipelineFactory factory;
         factory.register_stage<FileReaderToStringBuffer>("FileReaderToStringBuffer", fmgr);

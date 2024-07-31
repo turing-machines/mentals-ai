@@ -29,7 +29,7 @@ target_link_libraries(oai PRIVATE CURL::libcurl)
 
 install(TARGETS oai DESTINATION lib)
 #not needed anymore
-#install(FILES liboai.h DESTINATION include)
+install(FILES include/liboai.h DESTINATION include)
 install(FILES
 include/components/audio.h
 include/components/azure.h

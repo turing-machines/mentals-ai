@@ -1,4 +1,4 @@
-#include "tool_registry.h"
+#include "../include/tool_registry.h"
 
 /// Register tool with a given name
 void ToolRegistry::register_tool(const std::string& name, function_t func) {

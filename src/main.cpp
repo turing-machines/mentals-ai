@@ -4,13 +4,13 @@
 /// Author: https://x.com/CostaAl4
 ///
 
-#include "platform.h"
-#include "pgvector.h"
-#include "context.h"
-#include "memory_controller.h"
-#include "agent_executor.h"
+#include "../include/platform.h"
+#include "../include/pgvector.h"
+#include "../include/context.h"
+#include "../include/memory_controller.h"
+#include "../include/agent_executor.h"
 
-#include "pdffile.h"
+#include "../include/pdffile.h"
 
 bool debug{false};
 std::atomic<bool> spinner_active{false};

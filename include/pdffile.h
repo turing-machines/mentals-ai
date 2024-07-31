@@ -1,8 +1,9 @@
 #pragma once
 
 #include "file.h"
-#include <poppler-document.h>
-#include <poppler-page.h>
+#include "poppler/cpp/poppler-document.h"
+#include "poppler/cpp/poppler-page.h"
+#include <memory>
 
 class PdfFile : public FileInterface {
 public:

@@ -9,3 +9,10 @@ snake_game/
 pacman_game/
 ai_videos.csv
 
+cmake-build-debug/
+logs/
+bin/
+
+.vscode
+.cache
+checks.json

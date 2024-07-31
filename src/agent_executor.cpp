@@ -1,6 +1,6 @@
-#include "agent_executor.h"
-#include "tool_registry.h"
-#include "native_tools.h"
+#include "../include/agent_executor.h"
+#include "../include/tool_registry.h"
+#include "../include/native_tools.h"
 
 AgentExecutor::AgentExecutor() {
 

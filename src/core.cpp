@@ -1,4 +1,4 @@
-#include "core.h"
+#include "../include/core.h"
 
 
 void print_help() {

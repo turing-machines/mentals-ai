@@ -36,10 +36,10 @@
 #include <fmt/core.h>
 #include <fmt/format.h>
 
-#include "tl/expected.hpp"
-#include "treehh/tree.hh"
-#include "nlohmann/json.hpp"
-#include "toml++/toml.hpp"
+#include "../lib/tl/expected.hpp"
+#include "../lib/treehh/tree.hh"
+#include "../lib/nlohmann/json.hpp"
+#include "../lib/toml++/toml.hpp"
 
 
 #define MAX_INTEGER std::numeric_limits<int>::max()
@@ -142,7 +142,7 @@ struct fmt::formatter<std::vector<std::string>> {
     }
     template <typename FormatContext>
     auto format(const std::vector<std::string>& vec, FormatContext& ctx) -> decltype(ctx.out()) {
-        return format_to(ctx.out(), "{}", vector_to_comma_separated_string(vec));
+        return fmt::format_to(ctx.out(), "{}", vector_to_comma_separated_string(vec));
     }
 };
 

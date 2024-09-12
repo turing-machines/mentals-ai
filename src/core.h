@@ -142,7 +142,7 @@ struct fmt::formatter<std::vector<std::string>> {
     }
     template <typename FormatContext>
     auto format(const std::vector<std::string>& vec, FormatContext& ctx) -> decltype(ctx.out()) {
-        return format_to(ctx.out(), "{}", vector_to_comma_separated_string(vec));
+        return fmt::format_to(ctx.out(), "{}", vector_to_comma_separated_string(vec));
     }
 };
 

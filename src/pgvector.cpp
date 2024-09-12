@@ -162,8 +162,12 @@ expected<void, std::string> PgVector::write_content(
     );
     std::string name_value = name ? *name : "";
     std::string desc_value = desc ? *desc : "";
-    txn.exec_params(sql, content_id, name_value, desc_value, content, 
-        (std::ostringstream() << embedding).str());
+
+    std::ostringstream oss;
+    oss << embedding;
+    std::string embedding_str = oss.str();
+
+    txn.exec_params(sql, content_id, name_value, desc_value, content, embedding_str);
     unguard();
     return {};
 }
@@ -198,7 +202,12 @@ expected<json, std::string> PgVector::search_content(
         { "distance_function"   , CosineDistance        },
         { "limit"               , to_string(limit)      }
     }));
-    pqxx::result res = txn.exec_params(sql, (std::ostringstream() << search_vector).str());
+
+    std::ostringstream oss;
+    oss << search_vector;
+    std::string search_vector_str = oss.str();
+
+    pqxx::result res = txn.exec_params(sql, search_vector_str);
     txn.commit();
     json j_result = json::array();
     for (auto row : res) {

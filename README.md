@@ -94,6 +94,12 @@ cd mentals-ai
 
 **Configuration**
 
+Copy the sample configuration file:
+
+```shell
+cp config.toml.sample config.toml
+```
+
 Place your API key in the `config.toml` file:
 
 ```bash

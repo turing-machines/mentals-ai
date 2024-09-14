@@ -1,4 +1,4 @@
-#include "pgvector.h"
+#include "../include/pgvector.h"
 
 
 PgVector::PgVector(const std::string& conn_info) : conn_str(conn_info), conn(nullptr) {

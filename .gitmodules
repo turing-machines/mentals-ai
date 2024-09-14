@@ -1,0 +1,21 @@
+[submodule "lib/libpqxx"]
+	path = lib/libpqxx
+	url = https://github.com/jtv/libpqxx
+[submodule "lib/treehh"]
+	path = lib/treehh
+	url = https://github.com/kpeeters/tree.hh.git
+[submodule "lib/expected"]
+	path = lib/expected
+	url = https://github.com/TartanLlama/expected.git
+[submodule "lib/fmt"]
+	path = lib/fmt
+	url = https://github.com/fmtlib/fmt
+[submodule "lib/lib/nlohmann"]
+	path = lib/lib/nlohmann
+	url = https://github.com/nlohmann/json.git
+[submodule "lib/tomlcpp"]
+	path = lib/tomlcpp
+	url = https://github.com/marzer/tomlplusplus.git
+[submodule "lib/poppler_mirror"]
+	path = lib/poppler_mirror
+	url = https://github.com/tsdgeos/poppler_mirror.git

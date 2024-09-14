@@ -1,4 +1,4 @@
-#include "code_interpreter.h"
+#include "../include/code_interpreter.h"
 
 CodeInterpreter::CodeInterpreter() {
     python_executable = find_python_executable();

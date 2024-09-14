@@ -2,7 +2,7 @@
 
 #include "core.h"
 #include "logger.h"
-#include "liboai.h"
+#include "../lib/liboai/include/liboai.h"
 
 ///
 /// @brief LLM client

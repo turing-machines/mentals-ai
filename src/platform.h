@@ -97,7 +97,7 @@ bool command_exists(const std::string& cmd) {
 
 std::string get_package_manager_info() {
     std::string info;
-    std::array<const char*, 4> package_managers = {"pip", "conda", "poetry", "pipenv"};
+    std::array<const char*, 5> package_managers = {"pip", "pip3", "conda", "poetry", "pipenv"};
     for (const char* manager : package_managers) {
         if (command_exists(manager)) {
             std::string command = std::string(manager) + " --version";

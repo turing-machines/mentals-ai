@@ -32,7 +32,23 @@ ifeq ($(OS),Linux)
 endif
 ifeq ($(OS),Darwin)
     CPPFLAGS += -DMACOS
-    LDFLAGS := -lpthread -lcurl -lfmt -lpqxx -lpq $(shell pkg-config --libs poppler-cpp)
+    FMT_INCLUDE := $(shell pkg-config --cflags fmt)
+    INC_FLAGS += $(FMT_INCLUDE)
+    PQXX_INCLUDE := $(shell pkg-config --cflags libpqxx)
+    INC_FLAGS += $(PQXX_INCLUDE)
+    
+    # explicit pqxx paths
+    PG_CONFIG := /opt/homebrew/opt/postgresql@14/bin/pg_config
+    PG_INCLUDE := $(shell $(PG_CONFIG) --includedir)
+    PG_LIB := $(shell $(PG_CONFIG) --libdir)
+    INC_FLAGS += -I$(PG_INCLUDE)
+    
+    LDFLAGS := -L$(PG_LIB) \
+               -L/opt/homebrew/lib \
+               -lpq -lpqxx -lfmt \
+               -lpthread -lcurl \
+               -L/opt/homebrew/Cellar/poppler/25.01.0/lib -lpoppler-cpp \
+               -Wl,-rpath,$(PG_LIB)
 endif
 ifeq ($(OS),Windows_NT)
     CPPFLAGS += -DWIN32
@@ -50,7 +66,11 @@ CXXFLAGS := -std=c++20 -Wall -Wextra -O3 -march=native # -Werror
 
 # Default to clang if available and version is >= 14, otherwise use gcc
 CXX := $(shell which clang++ || which g++)
-CXX_VERSION := $(shell $(CXX) --version | grep -Po '(?<=version )[\d.]+' | head -n 1 | cut -d. -f1)
+ifeq ($(shell $(CXX) --version | grep -q "clang" && echo "yes"),yes)
+    CXX_VERSION := $(shell $(CXX) --version | sed -n 's/.*version \([0-9]*\).*/\1/p' | head -n 1)
+else
+    CXX_VERSION := $(shell $(CXX) --version | sed -n 's/^.* \([0-9]*\)\..*/\1/p' | head -n 1)
+endif
 ifeq ($(CXX),$(shell which clang++))
     ifneq ($(shell expr $(CXX_VERSION) \>= 14),1)
         CXX := g++

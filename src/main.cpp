@@ -5,9 +5,9 @@
 ///
 
 #include "platform.h"
-#include "pgvector.h"
+//#include "pgvector.h"
 #include "context.h"
-#include "memory_controller.h"
+//#include "memory_controller.h"
 #include "agent_executor.h"
 
 #include "pdffile.h"
@@ -55,136 +55,6 @@ int main(int argc, char *argv[]) {
             endpoint, mask_api_key(api_key), model, platform_info
         );
     }
-/*
-    LLM llm;
-    llm.set_provider(endpoint, api_key);
-    llm.set_model(model);
-
-    std::string conn_info = fmt::format("dbname={} user={} password={} hostaddr={} port={}", 
-        dbname, user, password, hostaddr, port);
-
-    PgVector vdb(conn_info);
-    vdb.connect();
-
-    MemoryController memc(llm, vdb);
-    memc.set_model(embedding_model::oai_3small);
-
-
-    memc.delete_collection("books");
-    memc.create_collection("books");
-
-    std::vector<std::string> file_names = {
-        "assets/thus_spoke_zarathustra.pdf",
-        "assets/15_the_spirit_in_man_art_and_literature.pdf",
-        "assets/psychology_and_religion.pdf"
-    };
-
-    std::unique_ptr<FileInterface> file = std::make_unique<PdfFile>();
-    for (const auto& file_name : file_names) {
-        fmt::print("\033[0mLoading file: {}\n", file_name);
-        auto file_res = file->read_file(file_name);
-        if (!file_res) {
-            std::cerr << file_res.error() << std::endl;
-            continue;
-        }
-        fmt::print("\033[0m{} chunking...\n", file_name);
-        std::vector<std::string> chunks = split_text_by_sentences(file_res.value(), 20);
-        memc.process_chunks(chunks, file_name);
-    }
-
-    memc.write_chunks("books");
-
-
-    std::string query = input; /// "What does he thinks about life?";
-
-    /// Read most relevant 20 chunks
-    auto chunks_res = memc.read_chunks("books", query, 20);
-
-    if (chunks_res) {
-        //std::cout << "Search results:\n" << (*search_res).dump(4) << "\n\n";
-        liboai::Conversation conv;
-        conv.SetSystemData(
-            "You are a helpful assistant.\n"
-            "Answer the user's question in no more than 300 words.\n"
-            "Use the content below to answer the user's question.\n"
-            "At the end of your answer, cite references for chunks in memory.\n\n"
-            "----- CONTENT SECTION -----\n" +
-            (*chunks_res).dump(4)
-        );
-        conv.AddUserData(query, "user");
-        liboai::Response response = llm.chat_completion(conv, 0.5);
-        json content = json::parse(std::string(response.content));
-        if (content.contains("choices")) {
-            for (auto& choice : content["choices"].items()) {
-                if (choice.value().contains("message")) {
-                    json message = choice.value()["message"];
-                    std::string content = std::string(message["content"]);
-                    if (!content.empty()) {
-                        fmt::print("\n-----\n{}\n\n", content);
-                    }
-                }
-            }
-        }
-    }
-*/
-/*
-    vdb.delete_collection("tools");
-    vdb.delete_collection("gens");
-    vdb.create_collection("tools", embedding_model::oai_3small);
-    ///vdb.create_collection("gens", embedding_model::oai_ada002);
-    //vdb.create_collection("tools", embedding_model::oai_3large);
-
-    auto res = vdb.list_collections();
-
-    if (res) {
-        std::cout << "Collections: " << *res << "\n\n";
-    }
-
-    auto native_instructions_toml = toml::parse_file("native_tools.toml");
-    auto tools = native_instructions_toml["instruction"].as_array();
-
-    std::stringstream ss;
-    ss << toml::json_formatter{ *tools };
-    json native_instructions = json::parse(ss.str());
-
-    for (auto& item : native_instructions) {
-        std::string tool_text;
-        //tool_text = item.dump(4);
-        //tool_text = std::string(item["name"]);
-        tool_text = std::string(item["name"]) + "\n" + std::string(item["description"]);
-        if (item.contains("parameters")) {
-            for (auto& param : item["parameters"]) {
-                tool_text += "\n" 
-                    + std::string(param["name"]) + " : " 
-                    + std::string(param["description"]);
-            }
-        }
-        //tool_text = std::string(item["description"]);
-        std::cout << tool_text << "\n-------\n";
-        vdb::vector vec = llm.embedding(tool_text); //, embedding_model::oai_3large);
-        
-        std::string idx = gen_index();
-
-        vdb.write_content("tools", idx, item["name"], vec, item["name"]);
-    }
-
-    GenFile gen;
-    auto [variables, instructions] = gen.load_from_file(filename);
-    std::string search_text = instructions["root"].prompt;
-    fmt::print("Search text:\n{}\n\n", search_text);
-    fmt::print("Tools: {}\n\n", instructions["root"].use);
-    vdb::vector search_vec = llm.embedding(search_text); //, embedding_model::oai_3large);
-    auto search_res = vdb.search_content("tools", search_vec, 5, vdb::query_type::cosine_similarity);
-    if (search_res) {
-        std::cout << "Search results:\n" << (*search_res).dump(4) << "\n\n";
-    }
-
-    auto info = vdb.get_collection_info("tools");
-    if (info) {
-        std::cout << "tools info: " << (*info).dump(4) << "\n\n";
-    }
-*/
-
 
     /// Init central executive
     ///auto agent_executor = std::make_shared<AgentExecutor>(conn);

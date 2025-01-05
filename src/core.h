@@ -33,6 +33,7 @@
 #include <cassert>
 #include <codecvt>
 #include <locale>
+// fmt includes
 #include <fmt/core.h>
 #include <fmt/format.h>
 
@@ -131,30 +132,40 @@ bool is_valid_utf8(const std::string &str);
 std::string remove_invalid_utf8(const std::string &str);
 
 
+// ---------------------------------------------------------------------------
+// Custom formatter for std::vector<std::string> — fully qualify fmt::format_to
+// ---------------------------------------------------------------------------
 template <>
 struct fmt::formatter<std::vector<std::string>> {
-    constexpr auto parse(format_parse_context& ctx) -> decltype(ctx.begin()) {
-        auto it = ctx.begin(), end = ctx.end();
-        if (it != end && *it != '}') {
-            throw fmt::format_error("invalid format");
-        }
-        return it;
-    }
+    constexpr auto parse(format_parse_context& ctx) { return ctx.begin(); }
+    
     template <typename FormatContext>
-    auto format(const std::vector<std::string>& vec, FormatContext& ctx) -> decltype(ctx.out()) {
-        return format_to(ctx.out(), "{}", vector_to_comma_separated_string(vec));
+    auto format(const std::vector<std::string>& vec, FormatContext& ctx) const {
+        std::string result = "[";
+        for (size_t i = 0; i < vec.size(); ++i) {
+            result += vec[i];
+            if (i < vec.size() - 1) result += ", ";
+        }
+        result += "]";
+        return fmt::format_to(ctx.out(), "{}", result);
     }
 };
 
+// ---------------------------------------------------------------------------
+// Custom formatter for embedding_model
+// ---------------------------------------------------------------------------
 template <>
-struct fmt::formatter<embedding_model> : formatter<std::string> {
-    auto format(embedding_model c, format_context& ctx) {
-        std::string name = "Unknown";
+struct fmt::formatter<embedding_model> {
+    constexpr auto parse(format_parse_context& ctx) { return ctx.begin(); }
+    
+    template <typename FormatContext>
+    auto format(const embedding_model& c, FormatContext& ctx) const {
+        std::string name;
         switch (c) {
             case embedding_model::oai_3small: name = "text-embedding-3-small"; break;
             case embedding_model::oai_3large: name = "text-embedding-3-large"; break;
         }
-        return formatter<std::string>::format(name, ctx);
+        return fmt::format_to(ctx.out(), "{}", name);
     }
 };
 
@@ -180,7 +191,9 @@ namespace vdb {
             : __value(std::move(value)), model(model) {}
         vector(const float* value, size_t n, std::optional<embedding_model> model = std::nullopt) 
             : __value(value, value + n), model(model) {}
+
         size_t dimensions() const { return __value.size(); }
+
         std::string get_model_name() const {
             if (model) {
                 return fmt::format("{}", *model);
@@ -188,9 +201,15 @@ namespace vdb {
                 return "No model set";
             }
         }
+
         void set_model(embedding_model new_model) { model = new_model; }
+
         operator const std::vector<float>&() const { return __value; }
-        friend bool operator==(const vector& lhs, const vector& rhs) { return lhs.__value == rhs.__value; }
+
+        friend bool operator==(const vector& lhs, const vector& rhs) {
+            return lhs.__value == rhs.__value;
+        }
+
         friend std::ostream& operator<<(std::ostream& os, const vector& value) {
             os << "[";
             for (size_t i = 0; i < value.__value.size(); i++) {
@@ -216,6 +235,9 @@ struct mem_chunk {
     std::optional<std::string> meta;
 };
 
+// ---------------------------------------------------------------------------
+// Exception guard macros
+// ---------------------------------------------------------------------------
 #define guard(method_name) \
     std::string __method = method_name; \
     try {
@@ -239,3 +261,4 @@ struct mem_chunk {
         log_exception(__method, "Unknown exception"); \
         throw; \
     }
+

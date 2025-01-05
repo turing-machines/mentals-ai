@@ -50,7 +50,11 @@ CXXFLAGS := -std=c++20 -Wall -Wextra -O3 -march=native # -Werror
 
 # Default to clang if available and version is >= 14, otherwise use gcc
 CXX := $(shell which clang++ || which g++)
-CXX_VERSION := $(shell $(CXX) --version | grep -Po '(?<=version )[\d.]+' | head -n 1 | cut -d. -f1)
+ifeq ($(shell $(CXX) --version | grep -q "clang" && echo "yes"),yes)
+    CXX_VERSION := $(shell $(CXX) --version | sed -n 's/.*version \([0-9]*\).*/\1/p' | head -n 1)
+else
+    CXX_VERSION := $(shell $(CXX) --version | sed -n 's/^.* \([0-9]*\)\..*/\1/p' | head -n 1)
+endif
 ifeq ($(CXX),$(shell which clang++))
     ifneq ($(shell expr $(CXX_VERSION) \>= 14),1)
         CXX := g++

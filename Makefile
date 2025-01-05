@@ -34,9 +34,21 @@ ifeq ($(OS),Darwin)
     CPPFLAGS += -DMACOS
     FMT_INCLUDE := $(shell pkg-config --cflags fmt)
     INC_FLAGS += $(FMT_INCLUDE)
-    LDFLAGS := -L/opt/homebrew/lib -lpthread -lcurl -lfmt -lpqxx -lpq $(shell pkg-config --libs poppler-cpp)
     PQXX_INCLUDE := $(shell pkg-config --cflags libpqxx)
     INC_FLAGS += $(PQXX_INCLUDE)
+    
+    # explicit pqxx paths
+    PG_CONFIG := /opt/homebrew/opt/postgresql@14/bin/pg_config
+    PG_INCLUDE := $(shell $(PG_CONFIG) --includedir)
+    PG_LIB := $(shell $(PG_CONFIG) --libdir)
+    INC_FLAGS += -I$(PG_INCLUDE)
+    
+    LDFLAGS := -L$(PG_LIB) \
+               -L/opt/homebrew/lib \
+               -lpq -lpqxx -lfmt \
+               -lpthread -lcurl \
+               -L/opt/homebrew/Cellar/poppler/25.01.0/lib -lpoppler-cpp \
+               -Wl,-rpath,$(PG_LIB)
 endif
 ifeq ($(OS),Windows_NT)
     CPPFLAGS += -DWIN32

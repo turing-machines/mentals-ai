@@ -155,8 +155,10 @@ struct fmt::formatter<std::vector<std::string>> {
 // Custom formatter for embedding_model
 // ---------------------------------------------------------------------------
 template <>
-struct fmt::formatter<embedding_model> : formatter<std::string> {
-    auto format(embedding_model c, format_context& ctx) {
+struct fmt::formatter<embedding_model> {
+    constexpr auto parse(format_parse_context& ctx) { return ctx.begin(); }
+    
+    auto format(embedding_model c, format_context& ctx) const {
         std::string name = "Unknown";
         switch (c) {
             case embedding_model::oai_3small: name = "text-embedding-3-small"; break;

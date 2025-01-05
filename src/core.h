@@ -137,17 +137,17 @@ std::string remove_invalid_utf8(const std::string &str);
 // ---------------------------------------------------------------------------
 template <>
 struct fmt::formatter<std::vector<std::string>> {
-    constexpr auto parse(format_parse_context& ctx) -> decltype(ctx.begin()) {
-        auto it = ctx.begin(), end = ctx.end();
-        if (it != end && *it != '}') {
-            throw fmt::format_error("invalid format");
-        }
-        return it;
-    }
+    constexpr auto parse(format_parse_context& ctx) { return ctx.begin(); }
+    
     template <typename FormatContext>
-    auto format(const std::vector<std::string>& vec, FormatContext& ctx) -> decltype(ctx.out()) {
-        // Use fully qualified fmt::format_to to avoid ambiguity
-        return fmt::format_to(ctx.out(), "{}", vector_to_comma_separated_string(vec));
+    auto format(const std::vector<std::string>& vec, FormatContext& ctx) const {
+        std::string result = "[";
+        for (size_t i = 0; i < vec.size(); ++i) {
+            result += vec[i];
+            if (i < vec.size() - 1) result += ", ";
+        }
+        result += "]";
+        return fmt::format_to(ctx.out(), "{}", result);
     }
 };
 

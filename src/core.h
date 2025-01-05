@@ -158,13 +158,14 @@ template <>
 struct fmt::formatter<embedding_model> {
     constexpr auto parse(format_parse_context& ctx) { return ctx.begin(); }
     
-    auto format(embedding_model c, format_context& ctx) const {
-        std::string name = "Unknown";
+    template <typename FormatContext>
+    auto format(const embedding_model& c, FormatContext& ctx) const {
+        std::string name;
         switch (c) {
             case embedding_model::oai_3small: name = "text-embedding-3-small"; break;
             case embedding_model::oai_3large: name = "text-embedding-3-large"; break;
         }
-        return formatter<std::string>::format(name, ctx);
+        return fmt::format_to(ctx.out(), "{}", name);
     }
 };
 

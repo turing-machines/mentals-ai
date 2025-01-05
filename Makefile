@@ -32,7 +32,9 @@ ifeq ($(OS),Linux)
 endif
 ifeq ($(OS),Darwin)
     CPPFLAGS += -DMACOS
-    LDFLAGS := -lpthread -lcurl -lfmt -lpqxx -lpq $(shell pkg-config --libs poppler-cpp)
+    FMT_INCLUDE := $(shell pkg-config --cflags fmt)
+    INC_FLAGS += $(FMT_INCLUDE)
+    LDFLAGS := -L/opt/homebrew/lib -lpthread -lcurl -lfmt -lpqxx -lpq $(shell pkg-config --libs poppler-cpp)
 endif
 ifeq ($(OS),Windows_NT)
     CPPFLAGS += -DWIN32

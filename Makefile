@@ -35,6 +35,8 @@ ifeq ($(OS),Darwin)
     FMT_INCLUDE := $(shell pkg-config --cflags fmt)
     INC_FLAGS += $(FMT_INCLUDE)
     LDFLAGS := -L/opt/homebrew/lib -lpthread -lcurl -lfmt -lpqxx -lpq $(shell pkg-config --libs poppler-cpp)
+    PQXX_INCLUDE := $(shell pkg-config --cflags libpqxx)
+    INC_FLAGS += $(PQXX_INCLUDE)
 endif
 ifeq ($(OS),Windows_NT)
     CPPFLAGS += -DWIN32

@@ -69,7 +69,7 @@ about other possible solutions.
 35 Let's imagine the current best solution is totally wrong, what other ways
 are there to think about the problem specification?
 36 What is the best way to modify this current best solution, given what you
-know about these kinds of problem specifications?
+know about these kinds of problem specification?
 37 Ignoring the current best solution, create an entirely new solution to the
 problem.
 38 Let's think step by step.

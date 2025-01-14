@@ -176,7 +176,7 @@ Simulate request headers correctly e.g. user-agent as Mozilla and Linux.
 
 #### 🛠️ Tool
 
-The tool is a kind of instruction. Mentals has a set of native tools to handle message output, user input, file handling, Python interpreter, Bash commands, and Short-term memory.
+Tool is a kind of instruction. Mentals has a set of native tools to handle message output, user input, file handling, Python interpreter, Bash commands, and Short-term memory.
 
 Ask user example:
 ```

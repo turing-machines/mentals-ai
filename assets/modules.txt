@@ -13,21 +13,21 @@
    perspectives, questioning assumptions, and evaluating the evidence or
    information available. It focuses on logical reasoning, evidence-based
    decision-making, and identifying potential biases or flaws in thinking.
-11 Try creative thinking, generate innovative and out-of-the-box ideas to solve
-the problem. Explore unconventional solutions, thinking beyond traditional
-boundaries, and encouraging imagination and originality.
+11 Try creative thinking, and generate innovative and out-of-the-box ideas to solve
+the problem. Explore unconventional solutions, think beyond traditional
+boundaries, and encourage imagination and originality.
 12 Seek input and collaboration from others to solve the problem. Emphasize
 teamwork, open communication, and leveraging the diverse perspectives and
 expertise of a group to come up with effective solutions.
 13 Use systems thinking: Consider the problem as part of a larger system and
-understanding the interconnectedness of various elements. Focuses on identifying
+understand the interconnectedness of various elements. Focuses on identifying
 the underlying causes, feedback loops, and interdependencies that influence the
 problem, and developing holistic solutions that address the system as a whole.
 14 Use Risk Analysis: Evaluate potential risks, uncertainties, and tradeoffs
 associated with different solutions or approaches to a problem. Emphasize
 assessing the potential consequences and likelihood of success or failure, and
 making informed decisions based on a balanced analysis of risks and benefits.
-15 Use Reflective Thinking: Step back from the problem, take the time for
+15 Use Reflective Thinking: Step back from the problem, and take the time for
 introspection and self-reflection. Examine personal biases,
 assumptions, and mental models that may influence problem-solving, and being
 open to learning from past experiences to improve future approaches.
@@ -62,7 +62,7 @@ innovation?
 than just individual instances?
 32 Is the problem time-sensitive or urgent, requiring immediate attention and
 action?
-33 What kinds of solution typically are produced for this kind of problem
+33 What kinds of solutions typically are produced for this kind of problem
 specification?
 34 Given the problem specification and the current best solution, have a guess
 about other possible solutions.
@@ -73,7 +73,7 @@ know about these kinds of problem specification?
 37 Ignoring the current best solution, create an entirely new solution to the
 problem.
 38 Let's think step by step.
-39 Let's make a step by step plan and implement it with good notion and
+39 Let's make a step by step plan and implement it with good notions and
 explanation.
 40 Use bash and python to solve the problem with code interpreter.
 [/reasoning modules]

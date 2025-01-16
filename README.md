@@ -1,8 +1,8 @@
-Mentals AI is a tool designed for creating and operating agents that feature **`loops`**, **`memory`**, and various **`tools`**, all through straightforward **`markdown`** file with a .gen extension. Think of an agent file as an executable file. You focus entirely on the logic of the agent, eliminating the necessity to write scaffolding code in Python or any other language. Essentially, it redefines the foundational frameworks for future AI applications 🍓
+Mentals AI is a tool designed for creating and operating agents that feature **`loops`**, **`memory`**, and various **`tools`**, all through straightforward **`markdown`** files with a .gen extension. Think of an agent file as an executable file. You focus entirely on the logic of the agent, eliminating the necessity to write scaffolding code in Python or any other language. Essentially, it redefines the foundational frameworks for future AI applications 🍓
 
 > [!NOTE] 
 > * [work in progress] A local vector database to store your chats with the agents as well as your private information. See [memory](https://github.com/turing-machines/mentals-ai/tree/memory) branch.
-> * [work in progress] Web UI with agents, tools and vector storage
+> * [work in progress] Web UI with agents, tools, and vector storage
 
 - [Getting Started](#-getting-started)
 - [Differences from Other Frameworks](#-differences-from-other-frameworks)
@@ -27,9 +27,9 @@ Or more complex use cases:
 |![react](assets/react.png) | ![space_invaders.gen](assets/space_invaders.gif) | ![mario.gen](assets/mario.gif) |
 
 Or help with the content:
-- Collect YouTube videos on a given topic and save to a .csv file with the videos, views, channel name, and link;
+- Collect YouTube videos on a given topic and save them to a .csv file with the videos, views, channel name, and link;
 - Get the transcription from the video and create a table of contents;
-- Take top news from Hacker News, choose a topic and write an article on the topic with the participation of the critic and save to a file.
+- Take top news from Hacker News, choose a topic and write an article on the topic with the participation of the critic, and save to a file.
 
 All of the above examples are located in the [agents](agents) folder.
 
@@ -244,7 +244,7 @@ What the meme was about?
 
 ### ⚙️ Control flow: From strings to algorithms
 
-The control flow, which includes conditions, instruction calls, and loops (such as `ReAct`, `Auto-CoT`, etc.), is fully expressed in natural language. This method enables the creation of `semantic conditions` that direct data stream branching. For instance, you can request an agent to autonomously play a word chain game in a loop or establish an ambiguous exit condition: `exit the loop if you are satisfied with the result`. Here, the language model and its context determine whether to continue or stop. All this is achieved without needing to define flow logic in Python or any other programming languages.
+The control flow, which includes conditions, instruction calls, and loops (such as `ReAct`, `Auto-CoT`, etc.), is fully expressed in natural language. This method enables the creation of `semantic conditions` that direct data stream branching. For instance, you can request an agent to autonomously play a word chain game in a loop or establish an ambiguous exit condition: `exit the loop if you are satisfied with the result`. Here, the language model and its context determine whether to continue or stop. All this is achieved without needing to define flow logic in Python or any other programming language.
 
 #### ⚖️ Reason Action (ReAct) example
 
@@ -261,7 +261,7 @@ available to you. Output action as: "Action: action name to call".
 
 Your available actions:
 - `execute_bash_command` for util purposes e.g. make directory, install packages, etc.;
-- `software_development` for software development and bug fixing purposes;
+- `software_development` for software development and bug-fixing purposes;
 - `quality_assurance` for QA testing purposes.
 ...
 ```
@@ -287,10 +287,10 @@ In this example, we will use the plain text format:
 Build/update tree structure in formatted text.
 
 Update the tree structure within the specified action;
-Memorize final tree structure.
+Memorize the final tree structure.
 ```
 
-Next we need to initialize the tree with initial data, let's start with the root instruction:
+Next, we need to initialize the tree with initial data, let's start with the root instruction:
 
 ```
 # root
@@ -348,7 +348,7 @@ A complete example is contained in the [agents/tree_structure.gen](agents/tree_s
 
 ## ✨ The Idea
 
-The concept originated from studies on psychoanalysis [Executive functions](https://en.wikipedia.org/wiki/Executive_functions), [Exploring Central Executive, Alan Baddeley, 1996](https://www.krigolsonteaching.com/uploads/4/3/8/4/43848243/baddeley_1996.pdf). He described a system that orchestrates cognitive processes and working memory, facilitating retrievals from long-term memory. The LLM functions as `System 1`, processing queries and executing instructions without inherent motivation or goal-setting. So, what then is `System 2`? Drawing from historical insights, now reconsidered through a scientific lens:
+The concept originated from studies on psychoanalysis [Executive functions](https://en.wikipedia.org/wiki/Executive_functions), [Exploring Central Executive, Alan Baddeley, 1996](https://www.krigolsonteaching.com/uploads/4/3/8/4/43848243/baddeley_1996.pdf). He described a system that orchestrates cognitive processes and working memory, facilitating retrievals from long-term memory. The LLM functions as `System 1`, processing queries and executing instructions without inherent motivation or goal-setting. So, what then is `System 2`? Drawing from historical insights now reconsidered through a scientific lens:
 
 > The central executive, or executive functions, is crucial for controlled processing in working memory. It manages tasks including directing attention, maintaining task objectives, decision-making, and memory retrieval.
 
